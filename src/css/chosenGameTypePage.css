@@ -1,0 +1,187 @@
+.host-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.background-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.form-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 500px;
+    width: 90%;
+    padding: 20px;
+}
+
+
+.back-link {
+    color: #fff;
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.form-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 2rem;
+}
+
+.form {
+    margin-top: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-label {
+    font-size: 18px;
+    color: #fff;
+    margin-bottom: 0.5rem;
+}
+
+.form-input {
+    font-family: monospace;
+    text-align: center;
+    font-size: 1.5em;
+    width: 100%;
+    padding: 12px;
+    background-color: black;
+    border-radius: 4px;
+    color: white;
+    border: 2px solid #fff;
+}
+
+.form-submit {
+    width: 100%;
+    padding: 12px;
+    background-color: transparent;
+    border: 2px solid #fff;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.form-submit:hover {
+    border-color: #aaa;
+    background-color: #555;
+}
+
+.form-submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.back-button {
+    position: absolute;
+    font-family: monospace;
+    border: 2px solid white;
+    top: 80px;
+    left: 80px;
+    padding: 10px 20px;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.back-button:hover{
+    color: #00FA9A;
+    border-color: #00FA9A;
+    text-shadow: 0 0 10px #00FA9A;
+    background: black;
+}
+
+.animated-text {
+    margin-bottom: 60px;
+    font-family: monospace;
+    overflow: hidden;
+    border-right: 3px solid white;
+    white-space: nowrap;
+    width: 0;
+    animation: typing 4s steps(40) forwards, blink-caret 0.75s step-end infinite;
+    color: white;
+    font-size: 20px;
+}
+
+.animated-text2 {
+    margin-top: 50px;
+    margin-bottom: 30px;
+    font-family: monospace;
+    overflow: hidden;
+    border-right: 3px solid white;
+    white-space: nowrap;
+    width: 0;
+    animation: typing2 3s steps(12) forwards, blink-caret 0.75s step-end infinite;
+    color: white;
+    font-size: 20px;
+}
+
+@keyframes typing {
+    from { width: 0 }
+    to { width: 39ch }
+}
+
+@keyframes typing2 {
+    from { width: 0 }
+    to { width: 12ch }
+}
+
+@keyframes blink-caret {
+    from, to { border-color: transparent }
+    50% { border-color: white }
+}
+
+.host-create-button {
+    position: absolute;
+    border: 2px solid white;
+    font-family: monospace;
+    padding: 10px 20px;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-left: 185px;
+    margin-top: 20px;
+}
+
+.host-create-button:hover{
+    color: #00FA9A;
+    border-color: #00FA9A;
+    text-shadow: 0 0 10px #00FA9A;
+    background: black;
+}
+
+.player-icons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.player-icon {
+    width: 80px;
+    height: 80px;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+.player-icon:last-child {
+    margin-right: 0;
+}
+
+

@@ -1,0 +1,79 @@
+.landing-container-mode {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    position: relative;
+    overflow: hidden;
+}
+
+.game-mode-button {
+    background: transparent;
+    border: 2px solid white;
+    border-radius: 20px;
+    padding: 10px 60px;
+    color: white;
+    font-size: 1.5rem;
+    font-family: monospace;
+    transition: all 0.5s ease-in-out;
+    margin: 0;
+    width: 200px;
+    text-align: left;
+    position: relative;
+    margin-bottom: 100px;
+}
+
+.game-mode-button:hover{
+    color: #00FA9A;
+    border-color: #00FA9A;
+    text-shadow: 0 0 10px #00FA9A;
+    background: black;
+}
+
+.game-mode-button span {
+    z-index: 1;
+}
+
+
+.game-mode-icon {
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    top: 50%;
+    left: -65px;
+    transform: translateY(-50%);
+    z-index: 2;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.host-button .game-mode-icon {
+    background-image: url('/public/images/host.png');
+}
+
+
+.private-button .game-mode-icon {
+    background-image: url('/public/images/private.png');
+}
+
+.back-button {
+    position: absolute;
+    border: 2px solid white;
+    font-family: monospace;
+    top: 80px;
+    left: 80px;
+    padding: 10px 20px;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.back-button:hover{
+    color: #00FA9A;
+    border-color: #00FA9A;
+    text-shadow: 0 0 10px #00FA9A;
+    background: black;
+}
