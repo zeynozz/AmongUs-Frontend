@@ -84,6 +84,9 @@ export default function LobbyPage({ game, onChangeSetGame }: Props) {
       stompClient.send(`/app/${gameCode}/play`, {}, JSON.stringify(game));
     }
   }
+  function handleChangeOutfit(){
+    navigate("change-outfit");
+  }
 
   if (!game) {
     return <div>Loading...</div>;
@@ -98,6 +101,11 @@ export default function LobbyPage({ game, onChangeSetGame }: Props) {
         </video>
         <div className="lobby-container">
           <div className="spaceship-lobby">
+            <div className="outfit-button-container">
+              <div className="outfit-button" onClick={handleChangeOutfit}>
+                <img src="/public/images/kleiderbügel.png" alt="Change Outfit"/>
+              </div>
+            </div>
             {game.players.map((player, index) => (
                 <div key={player.id} className={`player player-${index + 1}`}>
                   <img
