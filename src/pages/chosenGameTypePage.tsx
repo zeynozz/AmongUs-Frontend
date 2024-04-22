@@ -18,6 +18,7 @@ export default function ChosenGameTypePage({
   const [username, setUsername] = useState("");
   const [numPlayers, setNumPlayers] = useState(1);
   const [numImpostors, setNumImpostors] = useState(0);
+  const [map, setMap] = useState("Spaceship");
 
   useEffect(() => {
     if (username && numPlayers) {
@@ -25,7 +26,7 @@ export default function ChosenGameTypePage({
         setNumImpostors(Math.floor(numPlayers / 2));
       }
     }
-  }, [username, numPlayers, numImpostors]);
+  }, [username, numPlayers, numImpostors, map]);
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -34,6 +35,7 @@ export default function ChosenGameTypePage({
       gameCode: 0,
       numberOfPlayers: numPlayers,
       numberOfImpostors: numImpostors,
+      map: map,
       player: {
         username: username,
         position: {
@@ -100,6 +102,21 @@ export default function ChosenGameTypePage({
                     />
                 ))}
               </div>
+            </div>
+            <div className="mb-4">
+              <label className="block text-lg mb-2 text-white" htmlFor="map">
+                Map:
+              </label>
+              <select
+                  className="bg-gray-800 appearance-none border-2 border-gray-700 rounded-lg w-full py-2 px-4 text-white leading-tight focus:outline-none focus:bg-gray-700"
+                  id="map"
+                  value={map}
+                  onChange={(e) => setMap(e.target.value)}
+                  required
+              >
+                <option value="Spaceship">Spaceship</option>
+                {/* Add other map options here */}
+              </select>
             </div>
             <button type="submit" className="host-create-button" onClick={playSound}>
               HOST

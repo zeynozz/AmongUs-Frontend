@@ -5,6 +5,7 @@ import ChosenGameTypePage from "./pages/chosenGameTypePage";
 import LobbyPage from "./pages/lobbyPage";
 import PrivatePage from "./pages/privatePage";
 import {useState} from "react";
+import {PlayGame} from "./pages/gamePlay";
 
 export type Game = {
   gameCode: string;
@@ -12,6 +13,8 @@ export type Game = {
   numberOfImpostors: number;
   players: Player[];
   gameID: number;
+  sabotages: Sabotage[];
+  map: boolean[][];
 };
 
 export type Player = {
@@ -19,6 +22,12 @@ export type Player = {
   username: string;
   position: { x: number; y: number };
   role: string;
+};
+
+export type Sabotage = {
+    id: number;
+    title: string;
+    description: string;
 };
 
 export default function App() {
@@ -41,6 +50,10 @@ export default function App() {
         path="/lobby/:gameCode"
         element={<LobbyPage game={game} onChangeSetGame={gameSetup} />}
       />
+        <Route
+            path="/:gamecode/play"
+            element={<PlayGame game={game} onChangeSetGame={gameSetup} />}
+        />
     </Routes>
   );
 }
