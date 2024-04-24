@@ -5,6 +5,8 @@ import SockJS from "sockjs-client";
 import Stomp from "stompjs";
 import "../css/lobbyPage.css"
 
+const colors = ['white', 'green'];
+
 type Props = {
   game: Game;
   onChangeSetGame: (game: Game) => void;
@@ -12,8 +14,9 @@ type Props = {
 
 export default function LobbyPage({ game, onChangeSetGame }: Props) {
   const [stompClient, setStompClient] = useState(null);
+  const [playerColors, setPlayerColors] = useState({});
   const navigate = useNavigate();
-  const {gameCode} = useParams();
+  const { gameCode } = useParams();
 
 
 
@@ -36,6 +39,16 @@ export default function LobbyPage({ game, onChangeSetGame }: Props) {
   const memoizedOnChangeSetGame = useCallback(onChangeSetGame, [
     onChangeSetGame,
   ]);
+
+  useEffect(() => {
+    if (game && Object.keys(playerColors).length === 0) {
+      const newPlayerColors = {};
+      game.players.forEach(player => {
+        newPlayerColors[player.id] = colors[Math.floor(Math.random() * colors.length)];
+      });
+      setPlayerColors(newPlayerColors);
+    }
+  }, [game, playerColors]);
 
   useEffect(() => {
     if (!stompClient) return;
@@ -109,7 +122,7 @@ export default function LobbyPage({ game, onChangeSetGame }: Props) {
             {game.players.map((player, index) => (
                 <div key={player.id} className={`player player-${index + 1}`}>
                   <img
-                      src="/public/images/whiteFigure.png"
+                      src={`/public/images/${playerColors[player.id]}Figure.png`}
                       alt={`${player.username} avatar`}
                       className="player-avatar"
                       style={{ transform: `translateX(${player.position.x}px) translateY(${player.position.y}px)` }}
