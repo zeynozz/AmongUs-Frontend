@@ -5,7 +5,7 @@ import SockJS from "sockjs-client";
 import Stomp from "stompjs";
 import "../css/lobbyPage.css"
 
-const colors = ['white', 'green'];
+const colors = ['white', 'green', 'blue', 'pink', 'purple'];
 
 type Props = {
   game: Game;
