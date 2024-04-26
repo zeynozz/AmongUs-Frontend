@@ -119,7 +119,7 @@ export default function ChosenGameTypePage({
             </div>
 
             <button type="submit" className="host-create-button" onClick={playSound}>
-              HOSTß
+              HOST
             </button>
           </form>
         </div>

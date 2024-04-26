@@ -12,7 +12,7 @@ type Props = {
 
 const MiniMap: React.FC<Props> = ({ Map, playerList, closeMiniMap }) => {
     if (!Map) {
-        return <div>Can`t show Minimap right now</div>;
+        return <div>Error Map</div>;
     }
 
     return (
