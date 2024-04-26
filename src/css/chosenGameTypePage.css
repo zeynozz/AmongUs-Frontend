@@ -142,6 +142,24 @@
     to { width: 12ch }
 }
 
+.animated-text4 {
+    margin-top: 50px;
+    margin-bottom: 30px;
+    font-family: monospace;
+    overflow: hidden;
+    border-right: 3px solid white;
+    white-space: nowrap;
+    width: 0;
+    animation: typing4 3s steps(11) forwards, blink-caret 0.75s step-end infinite;
+    color: white;
+    font-size: 20px;
+}
+
+@keyframes typing4 {
+    from { width: 0 }
+    to { width: 11ch }
+}
+
 @keyframes blink-caret {
     from, to { border-color: transparent }
     50% { border-color: white }

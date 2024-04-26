@@ -1,8 +1,8 @@
 import React from 'react';
 
 type Props = {
-    onClick: () => void; // Benenne es um zu onClick, um es universeller zu machen
-    label: string; // Füge eine Beschriftung als Prop hinzu
+    onClick: () => void;
+    label: string;
 };
 
 const MapButton: React.FC<Props> = ({ onClick, label }) => {

@@ -103,23 +103,23 @@ export default function ChosenGameTypePage({
                 ))}
               </div>
             </div>
-            <div className="mb-4">
-              <label className="block text-lg mb-2 text-white" htmlFor="map">
-                Map:
-              </label>
-              <select
-                  className="bg-gray-800 appearance-none border-2 border-gray-700 rounded-lg w-full py-2 px-4 text-white leading-tight focus:outline-none focus:bg-gray-700"
+
+            <div className="form-group">
+              <h1 className="animated-text4">Choose Map:</h1>
+              <select className="form-input"
                   id="map"
                   value={map}
                   onChange={(e) => setMap(e.target.value)}
                   required
               >
-                <option value="Spaceship">Spaceship</option>
-                {/* Add other map options here */}
+                <option value="Spaceship">🚀 Spaceship</option>
+                <option value="FHV">🏫 FHV</option>
+                <option value="Ocean">🌊 Ocean</option>
               </select>
             </div>
+
             <button type="submit" className="host-create-button" onClick={playSound}>
-              HOST
+              HOSTß
             </button>
           </form>
         </div>
