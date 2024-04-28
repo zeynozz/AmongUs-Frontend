@@ -19,3 +19,11 @@
 
 .MapDisplay-cell.player {
 }
+
+.player-name {
+    text-align: center;
+    margin-top: 5px; /* adjust as needed */
+    color: white; /* choose a color that stands out on your map */
+    font-size: 0.75rem; /* adjust as needed */
+    white-space: nowrap; /* Keeps the name on a single line */
+}

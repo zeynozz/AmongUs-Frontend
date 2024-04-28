@@ -31,20 +31,18 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
 
     function handleKeyDown(event: KeyboardEvent) {
         const keyCode = event.code;
-        const playerIdCookie = document.cookie.split(";").find(cookie => cookie.trim().startsWith("playerId="));
-        if (playerIdCookie) {
-            const playerId = playerIdCookie.split("=")[1];
-            // Send move message to server
+        if (playerId) {
             const moveMessage = {
                 id: playerId,
                 keyCode: keyCode,
                 gameCode: game.gameCode,
             };
-            if (stompClient && game.players.length > 0 && playerId) {
+            if (stompClient && game.players.length > 0) {
                 stompClient.send("/app/move", {}, JSON.stringify(moveMessage));
             }
         }
     }
+
 
     useEffect(() => {
         window.addEventListener("keydown", handleKeyDown);
@@ -63,14 +61,10 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
                     onChangeSetGame(receivedMessage);
                 }
             );
-            // Subscribe to receive updated game state
             stompClient.subscribe(`/topic/${game.gameCode}/play`, (message: { body: string }) => {
-                console.log("Game Message from Subscription to endpoint gamecode/play: " + message.body);
                 const updatedGame = JSON.parse(message.body);
                 onChangeSetGame(updatedGame);
             });
-            //send game to backend to be updated
-            console.log("sending game to backend...");
             stompClient.send(`/app/${game.gameCode}/play`, {}, JSON.stringify(game));
         }
     }, [stompClient]);
@@ -84,12 +78,14 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
     const playerId = playerIdCookie ? parseInt(playerIdCookie.split("=")[1]) : null;
     const playerIndex = game.players.findIndex((player) => player.id === playerId);
 
+    console.log(game.players);
+
+
     return (
         <div className="landing-container">
             <video autoPlay loop muted className="background-video" src="/public/videos/stars.mp4">
                 Your browser does not support the video tag.
             </video>
-            <h4>List of players:</h4>
             <ul>
                 {game.players.map((player) => (
                     <li key={player.id}>
@@ -101,5 +97,4 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
             <GameMap map={game.map} playerList={game.players} />
         </div>
     );
-
 }
