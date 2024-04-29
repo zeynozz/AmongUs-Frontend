@@ -143,7 +143,7 @@
 }
 
 .outfit-dialog {
-    height: 500px;
+    height: 400px;
     width: 700px;
     position: relative;
     background-color: #2a2f32;
@@ -169,4 +169,24 @@
 
 .close-button:hover {
     background-color: #c2780b;
+}
+.player-dialog {
+    height: 190px;
+    width: 190px;
+    position: absolute;
+    top: 45%;
+    right: 50px;
+    transform: translateY(-50%);
+}
+
+.color-dropdown{
+    top: 50px;
+    height: 30px;
+    width: 100px;
+    text-align: center;
+    background-color:#2a2f32;
+    color: white;
+    border: 1.5px solid #00FA9A;
+    text-shadow: 0 0 10px #00FA9A;
+    border-radius: 5px;
 }

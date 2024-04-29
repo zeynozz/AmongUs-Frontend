@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Game } from "../App";
 import SockJS from "sockjs-client";
 import Stomp from "stompjs";
-import "../css/lobbyPage.css"
+import "../css/lobbyPage.css";
 
 const colors = ['white', 'green', 'blue', 'pink', 'purple'];
 
@@ -16,10 +16,11 @@ export default function LobbyPage({ game, onChangeSetGame }: Props) {
   const [stompClient, setStompClient] = useState(null);
   const [playerColors, setPlayerColors] = useState({});
   const [isOutfitDialogOpen, setIsOutfitDialogOpen] = useState(false);
+  const [selectedColor, setSelectedColor] = useState(colors[0]);
+  const [selectedPlayerId, setSelectedPlayerId] = useState(null);
+  const [selectedPlayerColor, setSelectedPlayerColor] = useState(null);
   const navigate = useNavigate();
   const { gameCode } = useParams();
-
-
 
   useEffect(() => {
     if (!stompClient) {
@@ -98,12 +99,32 @@ export default function LobbyPage({ game, onChangeSetGame }: Props) {
       stompClient.send(`/app/${gameCode}/play`, {}, JSON.stringify(game));
     }
   }
-  function handleChangeOutfit() {
+
+  function handleChangeOutfit(playerId) {
+    setSelectedPlayerId(playerId);
     setIsOutfitDialogOpen(true);
+    setSelectedColor(playerColors[playerId]);
+    setSelectedPlayerColor(playerColors[playerId]);
   }
 
   function handleCloseOutfitDialog() {
     setIsOutfitDialogOpen(false);
+  }
+
+  function handleColorChange(event) {
+    const newColor = event.target.value;
+    setSelectedColor(newColor);
+
+
+    const updatedPlayerColors = {...playerColors};
+    updatedPlayerColors[selectedPlayerId] = newColor;
+    setPlayerColors(updatedPlayerColors);
+
+    setSelectedPlayerColor(newColor);
+  }
+
+  function handleColorChangeAndClose(event) {
+    handleColorChange(event);
   }
 
   if (!game) {
@@ -125,24 +146,35 @@ export default function LobbyPage({ game, onChangeSetGame }: Props) {
                 <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
               </svg>
             </div>
-            <p>Hallo</p>
+            <p>Choose your Color</p>
+            <select value={selectedColor} onChange={handleColorChangeAndClose} className="color-dropdown">
+              {colors.map((color, index) => (
+                  <option key={index} value={color}>{color}</option>
+              ))}
+            </select>
+            {selectedPlayerId !== null && (
+                <img
+                    src={`/public/images/${selectedPlayerColor}Figure.png`}
+                    alt={`${selectedColor} avatar`}
+                    className="player-dialog"
+                />
+            )}
           </div>
         </div>
         <div className="lobby-container">
           <div className="spaceship-lobby">
-            <div className="spaceship-lobby">
-              {game.players.map((player, index) => (
-                  <div key={player.id} className={`player player-${index + 1}`}>
-                    <img
-                        src={`/public/images/${playerColors[player.id]}Figure.png`}
-                        alt={`${player.username} avatar`}
-                        className="player-avatar"
-                        style={{ transform: `translateX(${player.position.x}px) translateY(${player.position.y}px)` }}
-                    />
-                    <span className="player-name">{player.username}</span>
-                  </div>
-              ))}
-            </div>
+            {game.players.map((player, index) => (
+                <div key={player.id} className={`player player-${index + 1}`}>
+                  <img
+                      src={`/public/images/${playerColors[player.id]}Figure.png`}
+                      alt={`${player.username} avatar`}
+                      className="player-avatar"
+                      style={{ transform: `translateX(${player.position.x}px) translateY(${player.position.y}px)` }}
+                      onClick={() => handleChangeOutfit(player.id)}
+                  />
+                  <span className="player-name">{player.username}</span>
+                </div>
+            ))}
           </div>
           <div className="game-info">
             <div className="game-code">
