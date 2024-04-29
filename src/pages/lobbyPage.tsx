@@ -193,11 +193,6 @@ export default function LobbyPage({ game, onChangeSetGame }: Props) {
             </button>
           </div>
         </div>
-        <div className="outfit-button-container">
-          <div className="outfit-button" onClick={handleChangeOutfit}>
-            <img src="/public/images/kleiderbügel.png" alt="Change Outfit"/>
-          </div>
-        </div>
       </div>
   );
 }
