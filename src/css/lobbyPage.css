@@ -174,7 +174,27 @@
     border: 1.5px solid #00FA9A;
     text-shadow: 0 0 10px #00FA9A;
     border-radius: 10px;
-    height: 66px;
+    height: 55px;
     width: 300px;
-    margin-left:20px;
+    margin-left:10px;
+    text-align: center;
+}
+
+.save-button {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 1.5px solid cyan;
+    font-size: 18px;
+    border-radius: 10px;
+    color: white;
+    height: 40px;
+    width: 120px;
+    text-align:center;
+    align-items: center;
+}
+
+.save-button:hover {
+    background-color: cadetblue;
 }

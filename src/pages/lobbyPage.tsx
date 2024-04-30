@@ -112,21 +112,16 @@ export default function LobbyPage({ game, onChangeSetGame }: Props) {
   }
 
   function handleColorChange(event) {
-    const newColor = event.target.value;
-    setSelectedColor(newColor);
+    setSelectedColor(event.target.value);
+    setSelectedPlayerColor(event.target.value);
+  }
 
-
-    const updatedPlayerColors = {...playerColors};
-    updatedPlayerColors[selectedPlayerId] = newColor;
+  function handleSaveButtonClick() {
+    const updatedPlayerColors = { ...playerColors };
+    updatedPlayerColors[selectedPlayerId] = selectedColor;
     setPlayerColors(updatedPlayerColors);
-
-    setSelectedPlayerColor(newColor);
+    setIsOutfitDialogOpen(false);
   }
-
-  function handleColorChangeAndClose(event) {
-    handleColorChange(event);
-  }
-
 
   if (!game) {
     return <div>Loading...</div>;
@@ -150,7 +145,7 @@ export default function LobbyPage({ game, onChangeSetGame }: Props) {
                 <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
               </svg>
             </div>
-            <select value={selectedColor} onChange={handleColorChangeAndClose} className="color-dropdown">
+            <select value={selectedColor} onChange={handleColorChange} className="color-dropdown">
               {colors.map((color, index) => (
                   <option key={index} value={color}>{color}</option>
               ))}
@@ -162,6 +157,9 @@ export default function LobbyPage({ game, onChangeSetGame }: Props) {
                     className="player-dialog"
                 />
             )}
+            <div className="button-container">
+              <button onClick={handleSaveButtonClick} className="save-button">Save</button>
+            </div>
           </div>
         </div>
         <div className="lobby-container">
