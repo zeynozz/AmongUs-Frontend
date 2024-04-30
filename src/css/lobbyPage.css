@@ -156,7 +156,8 @@
 }
 
 .color-dropdown{
-    top: 50px;
+    margin-top: 90px;
+    margin-left:20px;
     height: 30px;
     width: 100px;
     text-align: center;
@@ -165,4 +166,15 @@
     border: 1.5px solid #00FA9A;
     text-shadow: 0 0 10px #00FA9A;
     border-radius: 5px;
+}
+
+.header-class {
+    font-size: 30px;
+    color: white;
+    border: 1.5px solid #00FA9A;
+    text-shadow: 0 0 10px #00FA9A;
+    border-radius: 10px;
+    height: 66px;
+    width: 300px;
+    margin-left:20px;
 }
