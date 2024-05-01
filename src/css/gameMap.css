@@ -30,8 +30,8 @@
     position: relative;
     background-color: gold; /* Change as needed */
     animation: glow 1.5s infinite alternate;
+    cursor: pointer; /* Add cursor pointer to indicate clickable */
 }
-
 
 .task::after {
     content: '';
@@ -43,7 +43,13 @@
     border: 2px solid rgba(255, 223, 0, 0.8); /* Glowing border */
     border-radius: 50%;
     animation: glow 2s infinite alternate;
+    pointer-events: none; /* Make the border not clickable */
 }
+
+.MapDisplay-cell.task {
+    pointer-events: auto; /* Make the task cell clickable */
+}
+
 
 @keyframes glow {
     0% {
@@ -80,4 +86,33 @@
     font-size: 0.75rem;
     white-space: nowrap;
     border-radius: 3px;
+}
+
+/* Popup-Styling */
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.popup-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
 }
