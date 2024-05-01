@@ -55,13 +55,12 @@ export default function LobbyPage({ game, onChangeSetGame }: Props) {
 
   useEffect(() => {
     const apiUrl = `http://localhost:3000/game/${gameCode}`;
-    console.log("Fetching game data from: ", apiUrl);
 
     fetch(apiUrl)
         .then((response) => {
           if (!response.ok) {
             throw new Error(
-                `Failed to fetch game data: ${response.status} ${response.statusText}`
+                `Error Game Fetch: ${response.status} ${response.statusText}`
             );
           }
           return response.json();
@@ -109,7 +108,6 @@ export default function LobbyPage({ game, onChangeSetGame }: Props) {
                   <span className="player-name">{player.username}</span>
                 </div>
             ))}
-
           </div>
           <div className="game-info">
             <div className="game-code">
