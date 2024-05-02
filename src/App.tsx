@@ -5,6 +5,8 @@ import ChosenGameTypePage from "./pages/chosenGameTypePage";
 import LobbyPage from "./pages/lobbyPage";
 import PrivatePage from "./pages/privatePage";
 import {useState} from "react";
+import {useMapBounds} from "./mapBounds";
+
 
 export type Game = {
   gameCode: string;

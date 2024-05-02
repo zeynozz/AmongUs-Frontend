@@ -4,7 +4,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden;
 }
 
 .lobby-container {
@@ -19,10 +18,7 @@
     align-items: center;
 }
 
-.players-info {
-    display: flex;
-    align-items: center;
-}
+
 
 .player-icon {
     height: 20px;
@@ -32,15 +28,14 @@
 
 .player-count {
     color: white;
-    font-size: 1.2em;
+    font-size: 1em;
     font-family: monospace;
 }
 
 .spaceship-lobby {
     width: 100%;
     height: 70%;
-    background: #2a2f32;
-    clip-path: polygon(20% 0, 80% 0, 100% 100%, 0% 100%);
+    background-image: url("/public/images/spaceship.png");
     display: flex;
     align-items: center;
     justify-content: space-around;
@@ -70,20 +65,23 @@
 }
 
 .game-info {
+    position: absolute;
+    bottom: 20px; /* Anpassen der Position nach Bedarf */
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
-    justify-content: space-around;
+    flex-direction: column;
     align-items: center;
     width: 100%;
     padding: 20px;
     background-color: rgba(0, 0, 0, 0.7);
     color: white;
     border-radius: 10px;
-    margin-top: -150px;
-    position: relative;
     z-index: 2;
 }
 
-.game-code, .players-info {
+.game-code,
+.players-info {
     font-size: 1.2em;
     font-family: monospace;
 }
