@@ -1,3 +1,5 @@
+// Assuming an HTML structure with elements having IDs 'card' and 'reader'
+
 const card: HTMLElement | null = document.getElementById('card');
 const reader: HTMLElement | null = document.getElementById('reader');
 let active: boolean = false;
@@ -7,6 +9,7 @@ let timeEnd: number | undefined;
 const soundAccepted: HTMLAudioElement = new Audio('https://thomaspark.co/projects/among-us-card-swipe/audio/CardAccepted.mp3');
 const soundDenied: HTMLAudioElement = new Audio('https://thomaspark.co/projects/among-us-card-swipe/audio/CardDenied.mp3');
 
+// Adding event listeners for mouse and touch events
 document.addEventListener('mousedown', dragStart);
 document.addEventListener('mouseup', dragEnd);
 document.addEventListener('mousemove', drag);
@@ -14,15 +17,11 @@ document.addEventListener('touchstart', dragStart);
 document.addEventListener('touchend', dragEnd);
 document.addEventListener('touchmove', drag);
 
-function dragStart(e: MouseEvent | TouchEvent) {
-    if (!card || e.target !== card) return;
+// Function to start dragging
+function dragStart(e: MouseEvent | TouchEvent): void {
+    if (!card || !(e.target instanceof HTMLElement && e.target === card)) return;
 
-    if (e.type === 'touchstart') {
-        initialX = (e as TouchEvent).touches[0].clientX;
-    } else {
-        initialX = (e as MouseEvent).clientX;
-    }
-
+    initialX = e instanceof TouchEvent ? e.touches[0].clientX : e.clientX;
     timeStart = performance.now();
     if (card.classList.contains('slide')) {
         card.classList.remove('slide');
@@ -30,22 +29,14 @@ function dragStart(e: MouseEvent | TouchEvent) {
     active = true;
 }
 
-function dragEnd(e: MouseEvent | TouchEvent) {
+// Function to end dragging
+function dragEnd(e: MouseEvent | TouchEvent): void {
     if (!active || !initialX || !timeStart) return;
 
     e.preventDefault();
-    let x: number;
-    let status: string | undefined;
+    let x: number = e instanceof TouchEvent && e.changedTouches ? e.changedTouches[0].clientX - initialX : (e as MouseEvent).clientX - initialX;
 
-    if (e.type === 'touchend') {
-        x = (e as TouchEvent).touches[0].clientX - initialX;
-    } else {
-        x = (e as MouseEvent).clientX - initialX;
-    }
-
-    if (x < (reader?.offsetWidth || 0)) {
-        status = 'invalid';
-    }
+    let status: string | undefined = x < (reader?.offsetWidth || 0) ? 'invalid' : undefined;
 
     timeEnd = performance.now();
     if (!card.classList.contains('slide')) {
@@ -57,22 +48,17 @@ function dragEnd(e: MouseEvent | TouchEvent) {
     setStatus(status);
 }
 
-function drag(e: MouseEvent | TouchEvent) {
+// Function to handle dragging
+function drag(e: MouseEvent | TouchEvent): void {
     if (!active || !initialX) return;
 
     e.preventDefault();
-    let x: number;
-
-    if (e.type === 'touchmove') {
-        x = (e as TouchEvent).touches[0].clientX - initialX;
-    } else {
-        x = (e as MouseEvent).clientX - initialX;
-    }
-
+    let x: number = e instanceof TouchEvent ? e.touches[0].clientX - initialX : e.clientX - initialX;
     setTranslate(x);
 }
 
-function setTranslate(x: number) {
+// Function to set the translate value of the card
+function setTranslate(x: number): void {
     if (!card || !reader) return;
 
     if (x < 0) {
@@ -81,29 +67,25 @@ function setTranslate(x: number) {
         x = reader.offsetWidth;
     }
 
-    x -= (card.offsetWidth / 2);
+    x -= card.offsetWidth / 2;
 
-    card.style.transform = 'translateX(' + x + 'px)';
+    card.style.transform = `translateX(${x}px)`;
 }
 
-function setStatus(status: string | undefined) {
+// Function to set the status of the reader
+function setStatus(status: string | undefined): void {
     if (!reader || !status || !timeStart || !timeEnd) return;
 
     let duration = timeEnd - timeStart;
 
-    if (duration > 700) {
-        status = 'slow';
-    } else if (duration < 400) {
-        status = 'fast';
-    } else {
-        status = 'valid';
-    }
+    status = duration > 700 ? 'slow' : duration < 400 ? 'fast' : 'valid';
 
     reader.dataset.status = status;
     playAudio(status);
 }
 
-function playAudio(status: string | undefined) {
+// Function to play audio based on the status
+function playAudio(status: string | undefined): void {
     if (!status) return;
 
     soundDenied.pause();
