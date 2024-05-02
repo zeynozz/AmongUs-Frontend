@@ -12,6 +12,7 @@ type Props = {
   onChangeSetGame: (game: Game) => void;
 };
 
+
 export default function LobbyPage({ game, onChangeSetGame }: Props) {
   const [stompClient, setStompClient] = useState(null);
   const [playerColors, setPlayerColors] = useState({});
