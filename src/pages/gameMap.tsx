@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import "../css/gameMap.css";
 import "../css/Popup.css";
-import CardSwipe from './CardSwipe'; // Importiere die CardSwipe Komponente
+import CardSwipe from './CardSwipe';
 
 interface Player {
     username: string;

@@ -15,9 +15,17 @@ const CardSwipe = ({ onClose }) => {
     const evaluateSwipe = () => {
         if (!timeStart || !timeEnd) return;
         const duration = timeEnd - timeStart;
-        const status = duration > 700 ? 'slow' : duration < 400 ? 'fast' : 'valid';
+        let status;
 
-        setStatus(status);
+        if (duration > 1000) {
+            status = "slow";
+        } else if (duration < 700){
+            status = "valid";
+            setTimeout(() => {
+            }, 10000);
+        }
+
+        readerRef.current.dataset.status = status;
         playAudio(status);
 
         if (status === 'valid') {
@@ -30,18 +38,17 @@ const CardSwipe = ({ onClose }) => {
 
         let duration = timeEnd - timeStart;
 
-        status = duration > 700 ? 'slow' : duration < 400 ? 'fast' : 'valid';
-
+        if (duration > 1000) {
+            status = "slow";
+        } else if (duration < 700){
+            status = "valid";
+            setSwipeSuccessful(true);
+        }
         readerRef.current.dataset.status = status;
     };
 
     const playAudio = (status) => {
         if (!status) return;
-
-        soundDenied.current.pause();
-        soundAccepted.current.pause();
-        soundDenied.current.currentTime = 0;
-        soundAccepted.current.currentTime = 0;
 
         if (status === 'valid') {
             soundAccepted.current.play();
@@ -52,7 +59,7 @@ const CardSwipe = ({ onClose }) => {
 
     const handleDragStart = (e) => {
         const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
-        setInitialX(clientX);
+        setInitialX(e.clientX);
         setTimeStart(performance.now());
         cardRef.current.classList.remove('slide');
         setActive(true);
@@ -66,7 +73,7 @@ const CardSwipe = ({ onClose }) => {
         let status;
 
         if (e.type === 'touchend') {
-            x = e.changedTouches[0].clientX - initialX;
+            x = e.touches[0].clientX - initialX;
         } else {
             x = e.clientX - initialX;
         }
@@ -85,9 +92,28 @@ const CardSwipe = ({ onClose }) => {
 
     const handleDrag = (e) => {
         if (!active) return;
-        const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
-        const newTranslateX = clientX - initialX - cardRef.current.offsetWidth / 2;
-        cardRef.current.style.transform = `translateX(${newTranslateX}px)`;
+
+        e.preventDefault();
+        let x;
+
+        if (e.type === "touchmove") {
+            x = e.touches[0].clientX - initialX;
+        } else {
+            x = e.clientX - initialX;
+        }
+        setTranslate(x);
+    };
+
+    const setTranslate = (x) => {
+        if (x < 0) {
+            x = 0;
+        } else if (x > readerRef.current.offsetWidth) {
+            x = readerRef.current.offsetWidth;
+        }
+
+        x -= cardRef.current.offsetWidth / 2;
+
+        cardRef.current.style.transform = "translateX(" + x + "px)";
     };
 
     useEffect(() => {
@@ -110,7 +136,7 @@ const CardSwipe = ({ onClose }) => {
 
     useEffect(() => {
         if (swipeSuccessful) {
-            onClose();
+            soundAccepted.current.play();
         }
     }, [swipeSuccessful, onClose]);
 
