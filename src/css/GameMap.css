@@ -28,9 +28,9 @@
 
 .task {
     position: relative;
-    background-color: gold; /* Change as needed */
+    background-color: gold;
     animation: glow 1.5s infinite alternate;
-    cursor: pointer; /* Add cursor pointer to indicate clickable */
+    cursor: pointer;
 }
 
 .task::after {
@@ -40,14 +40,14 @@
     left: 0;
     right: 0;
     bottom: 0;
-    border: 2px solid rgba(255, 223, 0, 0.8); /* Glowing border */
+    border: 2px solid rgba(255, 223, 0, 0.8);
     border-radius: 50%;
     animation: glow 2s infinite alternate;
-    pointer-events: none; /* Make the border not clickable */
+    pointer-events: none;
 }
 
 .MapDisplay-cell.task {
-    pointer-events: auto; /* Make the task cell clickable */
+    pointer-events: auto;
 }
 
 
@@ -65,22 +65,22 @@
 
 .player {
     position: relative;
-    display: flex; /* Flex to align image and text */
-    justify-content: center; /* Center content */
-    align-items: center; /* Center content vertically */
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .player-image {
-    width: 100%; /* Full width of the cell */
-    height: auto; /* Maintain aspect ratio */
+    width: 100%;
+    height: auto;
 }
 
 .player-name {
     position: absolute;
-    bottom: -20px; /* Adjust based on your needs */
+    bottom: -20px;
     left: 50%;
-    transform: translateX(-50%); /* Center the name below the image */
-    background: rgba(0, 0, 0, 0.75); /* Semi-transparent background */
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.75);
     color: white;
     padding: 2px 5px;
     font-size: 0.75rem;
@@ -88,7 +88,6 @@
     border-radius: 3px;
 }
 
-/* Popup-Styling */
 .popup {
     position: fixed;
     top: 0;
@@ -108,7 +107,7 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
-.overlay {
+.overlay2 {
     position: fixed;
     top: 0;
     left: 0;

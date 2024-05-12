@@ -76,7 +76,7 @@ const GameMap: React.FC<Props> = ({ map, playerList }) => {
             {showPopup && (
                 <div className="popup" id="popup">
                     <CardSwipe onClose={handlePopupClose} />
-                    <div className="overlay" onClick={() => setShowPopup(false)}></div>
+                    <div className="overlay2" onClick={() => setShowPopup(false)}></div>
                 </div>
             )}
         </div>
