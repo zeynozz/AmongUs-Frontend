@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
 import {Game} from "../App";
-import "../css/chosenGameTypePage.css";
+import "../css/HostPage.css";
 
 type Props = {
   setGame: (game: Game) => void;
 };
+var currentPlayerId = 0;
 
 const playSound = () => {
   const audio = new Audio('/public/sounds/press.mp3');
@@ -13,11 +14,12 @@ const playSound = () => {
 };
 
 export default function HostPage({
-                                             setGame,}: Props) {
+                                   setGame,}: Props) {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [numPlayers, setNumPlayers] = useState(1);
   const [numImpostors, setNumImpostors] = useState(0);
+  const [map, setMap] = useState("Spaceship");
 
   useEffect(() => {
     if (username && numPlayers) {
@@ -25,15 +27,19 @@ export default function HostPage({
         setNumImpostors(Math.floor(numPlayers / 2));
       }
     }
-  }, [username, numPlayers, numImpostors]);
+  }, [username, numPlayers, numImpostors, map]);
 
   function handleSubmit(event) {
     event.preventDefault();
 
+    // Simulated unique game code generation
+    const gameCode = Date.now();  // This is a simple approach for demonstration
+
     const gameData = {
-      gameCode: 0,
+      gameCode: gameCode,
       numberOfPlayers: numPlayers,
       numberOfImpostors: numImpostors,
+      map: map,
       player: {
         username: username,
         position: {
@@ -52,25 +58,28 @@ export default function HostPage({
       },
       body: JSON.stringify(gameData),
     })
-        .then((response) => {
+        .then(response => {
           if (!response.ok) {
             throw new Error("Error - creating game");
           }
           return response.json();
         })
-        .then((game) => {
+        .then(game => {
           setGame(game);
           console.log("Game created :) => ", game);
           navigate(`/lobby/${game.gameCode}`);
           const playerId = game?.players[0]?.id;
-          if (playerId) {
-            document.cookie = `playerId=${playerId}; path=/`;
+          if (playerId && currentPlayerId == 0) {
+            sessionStorage.setItem('currentPlayerId', JSON.stringify(playerId));
+            console.log("Current PlayerId:", currentPlayerId)
           }
         })
-        .catch((error) => {
+        .catch(error => {
           console.error("Error creating game:", error);
+          alert("Failed to create game: " + error.message); // User feedback
         });
   }
+
 
   return (
       <div className="host-container">
@@ -101,6 +110,21 @@ export default function HostPage({
                 ))}
               </div>
             </div>
+
+            <div className="form-group">
+              <h1 className="animated-text4">Choose Map:</h1>
+              <select className="form-input"
+                      id="map"
+                      value={map}
+                      onChange={(e) => setMap(e.target.value)}
+                      required
+              >
+                <option value="Spaceship">🚀 Spaceship</option>
+                <option value="FHV">🏫 FHV</option>
+                <option value="Ocean">🌊 Ocean</option>
+              </select>
+            </div>
+
             <button type="submit" className="host-create-button" onClick={playSound}>
               HOST
             </button>

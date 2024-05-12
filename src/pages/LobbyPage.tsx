@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Game } from "../App";
 import SockJS from "sockjs-client";
 import Stomp from "stompjs";
-import "../css/lobbyPage.css";
+import "../css/LobbyPage.css";
 
 const colors = ['white', 'green', 'blue', 'pink', 'purple'];
 
