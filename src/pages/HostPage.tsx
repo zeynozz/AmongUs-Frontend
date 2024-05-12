@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
 import {Game} from "../App";
-import "../css/chosenGameTypePage.css";
+import "../css/HostPage.css";
 
 type Props = {
   setGame: (game: Game) => void;
@@ -13,7 +13,7 @@ const playSound = () => {
   audio.play();
 };
 
-export default function ChosenGameTypePage({
+export default function HostPage({
                                              setGame,}: Props) {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");

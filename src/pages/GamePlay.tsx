@@ -1,4 +1,4 @@
-import GameMap from "./gameMap";
+import GameMap from "./GameMap";
 import {useEffect, useState} from "react";
 import Stomp from "stompjs";
 import {Game} from "../App";

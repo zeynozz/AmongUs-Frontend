@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEffect, useRef } from "react";
-import '../css/homePage.css';
+import '../css/HomePage.css';
 
 const backgroundMusic = new Audio('/public/sounds/theme.mp3');
 

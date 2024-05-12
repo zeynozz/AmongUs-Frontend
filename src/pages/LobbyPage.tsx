@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Game } from "../App";
 import SockJS from "sockjs-client";
 import Stomp from "stompjs";
-import "../css/lobbyPage.css"
+import "../css/LobbyPage.css"
 
 type Props = {
   game: Game;
@@ -122,7 +122,7 @@ export default function LobbyPage({ game, onChangeSetGame }: Props) {
                 disabled={!isGameReadyToStart}
                 className="start-game-button"
             >
-              <img src="/public/images/img.png" alt="Start Game" />
+              <img src="/public/images/start.png" alt="Start Game" />
             </button>
           </div>
         </div>

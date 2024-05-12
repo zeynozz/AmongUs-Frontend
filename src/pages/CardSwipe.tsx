@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import "../css/Popup.css";
+import "../css/CardSwipe.css";
 
 const CardSwipe = ({ onClose }) => {
     const [active, setActive] = useState(false);

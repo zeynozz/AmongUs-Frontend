@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import SockJS from "sockjs-client";
 import Stomp from "stompjs";
-import "../css/privatePage.css";
+import "../css/PrivatePage.css";
 
 export default function PrivatePage() {
   const navigate = useNavigate();

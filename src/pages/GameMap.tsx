@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import "../css/gameMap.css";
-import "../css/Popup.css";
+import "../css/GameMap.css";
+import "../css/CardSwipe.css";
 import CardSwipe from './CardSwipe';
 
 interface Player {

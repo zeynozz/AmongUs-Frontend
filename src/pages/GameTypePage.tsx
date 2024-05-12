@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import React from "react";
-import "../css/gameTypePage.css"
+import "../css/GameTypePage.css"
 
 export default function GameTypePage() {
 

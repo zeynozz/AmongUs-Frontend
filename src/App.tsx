@@ -1,11 +1,11 @@
 import { Route, Routes } from "react-router-dom";
-import HomePage from "./pages/homePage";
-import GameTypePage from "./pages/gameTypePage";
-import ChosenGameTypePage from "./pages/chosenGameTypePage";
-import LobbyPage from "./pages/lobbyPage";
-import PrivatePage from "./pages/privatePage";
+import HomePage from "./pages/HomePage";
+import GameTypePage from "./pages/GameTypePage";
+import HostPage from "./pages/HostPage";
+import LobbyPage from "./pages/LobbyPage";
+import PrivatePage from "./pages/PrivatePage";
 import {useState} from "react";
-import {PlayGame} from "./pages/gamePlay";
+import {PlayGame} from "./pages/GamePlay";
 
 export type Game = {
   gameCode: string;
@@ -13,7 +13,6 @@ export type Game = {
   numberOfImpostors: number;
   players: Player[];
   gameID: number;
-  sabotages: Sabotage[];
   map: number[][];
 };
 
@@ -22,12 +21,6 @@ export type Player = {
   username: string;
   position: { x: number; y: number };
   role: string;
-};
-
-export type Sabotage = {
-    id: number;
-    title: string;
-    description: string;
 };
 
 export default function App() {
@@ -44,9 +37,10 @@ export default function App() {
       <Route path="/gameType" element={<GameTypePage />} />
       <Route
         path="/host"
-        element={<ChosenGameTypePage setGame={gameSetup} />}
+        element={<HostPage setGame={gameSetup} />}
       />
-      <Route path="/join" element={<PrivatePage setGame={gameSetup} />} />
+      <Route path="/join" element={<PrivatePage/>}
+      />
       <Route
         path="/lobby/:gameCode"
         element={<LobbyPage game={game} onChangeSetGame={gameSetup} />}
