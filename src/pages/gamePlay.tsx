@@ -1,8 +1,8 @@
-import {Game} from "../App";
-import React, {useEffect, useState} from "react";
-import Stomp from "stompjs";
-import SockJS from "sockjs-client";
 import GameMap from "./gameMap";
+import {useEffect, useState} from "react";
+import Stomp from "stompjs";
+import {Game} from "../App";
+import SockJS from "sockjs-client";
 
 
 type Props = {
@@ -21,66 +21,48 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
                 setStompClient(client);
             });
 
-            return () => {
-                if (stompClient) {
-                    stompClient.disconnect();
-                }
-            };
+            return () => stompClient?.disconnect();
         }
-    }, []);
-
-    function handleKeyDown(event: KeyboardEvent) {
-        const playerId = JSON.parse(sessionStorage.getItem('currentPlayerId')); // Zugriff aus sessionStorage
-        const keyCode = event.code;
-        if (playerId) {
-            const moveMessage = {
-                id: playerId,
-                keyCode: keyCode,
-                gameCode: game.gameCode,
-            };
-            if (stompClient && game.players.length > 0) {
-                stompClient.send("/app/move", {}, JSON.stringify(moveMessage));
-            }
-        }
-    }
-
+    }, [stompClient]);
 
     useEffect(() => {
-        window.addEventListener("keydown", handleKeyDown);
-        return () => {
-            window.removeEventListener("keydown", handleKeyDown);
+        const handleKeyDown = (event: KeyboardEvent) => {
+            const playerId = JSON.parse(sessionStorage.getItem('currentPlayerId') || "null");
+            const keyCode = event.code;
+            if (playerId && stompClient && game.players.length > 0) {
+                const moveMessage = {
+                    id: playerId,
+                    keyCode: keyCode,
+                    gameCode: game.gameCode,
+                };
+                stompClient.send("/app/move", {}, JSON.stringify(moveMessage));
+            }
         };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
     }, [stompClient, game.players]);
 
     useEffect(() => {
         if (stompClient) {
-            stompClient.subscribe(
-                "/topic/positionChange",
-                (message: { body: string }) => {
-                    const receivedMessage = JSON.parse(message.body);
-                    console.log("Received message: ", receivedMessage);
-                    onChangeSetGame(receivedMessage);
-                }
-            );
-            stompClient.subscribe(`/topic/${game.gameCode}/play`, (message: { body: string }) => {
+            const positionChangeSubscription = stompClient.subscribe("/topic/positionChange", (message) => {
+                const receivedMessage = JSON.parse(message.body);
+                onChangeSetGame(receivedMessage);
+            });
+
+            const gamePlaySubscription = stompClient.subscribe(`/topic/${game.gameCode}/play`, (message) => {
                 const updatedGame = JSON.parse(message.body);
                 onChangeSetGame(updatedGame);
             });
+
             stompClient.send(`/app/${game.gameCode}/play`, {}, JSON.stringify(game));
+
+            return () => {
+                positionChangeSubscription.unsubscribe();
+                gamePlaySubscription.unsubscribe();
+            };
         }
-    }, [stompClient]);
-
-    console.log("Cookie: ", document.cookie);
-    const playerIdCookie = document.cookie
-        .split(";")
-        .map(cookie => cookie.trim())
-        .find(cookie => cookie.startsWith("playerId="));
-    console.log(playerIdCookie);
-    const playerId = playerIdCookie ? parseInt(playerIdCookie.split("=")[1]) : null;
-    const playerIndex = game.players.findIndex((player) => player.id === playerId);
-
-    console.log(game.players);
-
+    }, [stompClient, game.gameCode]);
 
     return (
         <div className="landing-container">
@@ -90,8 +72,7 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
             <ul>
                 {game.players.map((player) => (
                     <li key={player.id}>
-                        Username: {player.username}
-                        {player.id === playerId ? " (you)" : ""}
+                        Username: {player.username} {player.id === JSON.parse(sessionStorage.getItem('currentPlayerId') || "null") ? " (you)" : ""}
                     </li>
                 ))}
             </ul>
