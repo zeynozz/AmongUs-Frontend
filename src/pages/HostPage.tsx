@@ -12,7 +12,7 @@ const playSound = () => {
   audio.play();
 };
 
-export default function ChosenGameTypePage({
+export default function HostPage({
                                              setGame,}: Props) {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
