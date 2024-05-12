@@ -14,7 +14,7 @@ export default function GameTypePage() {
         <video autoPlay loop muted className="background-video" src="/public/videos/stars.mp4">
           Your browser does not support the video tag.
         </video>
-        <Link to="/configGame" className="game-mode-button host-button" onClick={playSound}>
+        <Link to="/host" className="game-mode-button host-button" onClick={playSound}>
           <span>HOST</span>
           <div className="game-mode-icon"></div>
         </Link>

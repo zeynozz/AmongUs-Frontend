@@ -14,7 +14,7 @@ export type Game = {
   players: Player[];
   gameID: number;
   sabotages: Sabotage[];
-  map: boolean[][];
+  map: number[][];
 };
 
 export type Player = {
@@ -37,15 +37,16 @@ export default function App() {
     setGame(gameCreated);
   }
 
+
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/gameType" element={<GameTypePage />} />
       <Route
-        path="/configGame"
+        path="/host"
         element={<ChosenGameTypePage setGame={gameSetup} />}
       />
-      <Route path="/join" element={<PrivatePage />} />
+      <Route path="/join" element={<PrivatePage setGame={gameSetup} />} />
       <Route
         path="/lobby/:gameCode"
         element={<LobbyPage game={game} onChangeSetGame={gameSetup} />}

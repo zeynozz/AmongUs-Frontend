@@ -30,6 +30,7 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
     }, []);
 
     function handleKeyDown(event: KeyboardEvent) {
+        const playerId = JSON.parse(sessionStorage.getItem('currentPlayerId')); // Zugriff aus sessionStorage
         const keyCode = event.code;
         if (playerId) {
             const moveMessage = {

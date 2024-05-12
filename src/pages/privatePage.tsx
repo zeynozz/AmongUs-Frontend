@@ -7,8 +7,11 @@ import "../css/privatePage.css"
 export default function PrivatePage() {
   const navigate = useNavigate();
   const [playerName, setPlayerName] = useState("");
+
   const [gameCode, setGameCode] = useState("");
   const [stompClient, setStompClient] = useState(null);
+  var currentPlayerId = 0;
+
 
   useEffect(() => {
     const socket = new SockJS("http://localhost:3000/ws");
@@ -61,9 +64,9 @@ export default function PrivatePage() {
     const data = JSON.parse(message.body);
     const playerId = data.headers.playerId[0];
     console.log("Player ID:", playerId);
-    if (playerId) {
-      document.cookie = `playerId=${playerId}; path=/`;
-    }
+    if (playerId && currentPlayerId == 0) {
+      sessionStorage.setItem('currentPlayerId', JSON.stringify(playerId));
+      console.log("Current PlayerId:", currentPlayerId)    }
   };
 
   useEffect(() => {
