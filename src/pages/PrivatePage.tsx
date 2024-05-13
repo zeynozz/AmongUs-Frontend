@@ -69,7 +69,7 @@ export default function PrivatePage() {
 
   useEffect(() => {
     if (stompClient) {
-      stompClient.subscribe("/topic/playerJoined", handleJoinGameResponse);
+      stompClient.subscribe("/user/topic/playerJoined", handleJoinGameResponse);
     }
   }, [stompClient]);
 

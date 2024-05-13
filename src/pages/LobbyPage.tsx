@@ -57,7 +57,7 @@ export default function LobbyPage({ game, onChangeSetGame }: Props) {
     if (!stompClient) return;
 
     stompClient.subscribe(
-        "/topic/playerJoined",
+        "/user/topic/playerJoined",
         (message: { body: string }) => {
           const receivedMessage = JSON.parse(message.body);
           memoizedOnChangeSetGame(receivedMessage.body);
