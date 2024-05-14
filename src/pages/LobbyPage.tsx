@@ -102,10 +102,20 @@ export default function LobbyPage({ game, onChangeSetGame }: Props) {
   }
 
   function handleChangeOutfit(playerId) {
-    setSelectedPlayerId(playerId);
-    setIsOutfitDialogOpen(true);
-    setSelectedColor(playerColors[playerId]);
-    setSelectedPlayerColor(playerColors[playerId]);
+    const currentPlayerId = JSON.parse(sessionStorage.getItem('currentPlayerId') || "null");
+
+   //für konsolenausgabe
+    console.log("playerId:", playerId);
+    console.log("currentPlayerId:", currentPlayerId);
+
+    if (playerId === currentPlayerId) {
+      setSelectedPlayerId(playerId);
+      setIsOutfitDialogOpen(true);
+      setSelectedColor(playerColors[playerId]);
+      setSelectedPlayerColor(playerColors[playerId]);
+    } else {
+      console.log("You can only change your own outfit!");
+    }
   }
 
   function handleCloseOutfitDialog() {
@@ -152,11 +162,14 @@ export default function LobbyPage({ game, onChangeSetGame }: Props) {
               ))}
             </select>
             {selectedPlayerId !== null && (
-                <img
+                <div className="player-dialog">
+                  <img
                     src={`/public/images/${selectedPlayerColor}Figure.png`}
                     alt={`${selectedColor} avatar`}
                     className="player-dialog"
                 />
+                  <span className="player-dialog-name">{game.players.find(player => player.id === selectedPlayerId)?.username}</span>
+                </div>
             )}
             <div className="button-container">
               <button onClick={handleSaveButtonClick} className="save-button">Save</button>
