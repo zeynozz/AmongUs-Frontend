@@ -1,3 +1,5 @@
+/* GameMap.css */
+
 .MapDisplay-row {
     display: flex;
 }
@@ -12,7 +14,6 @@
 .walkable {
     background-image: url("/public/images/floor.png");
 }
-
 
 @keyframes pulse {
     0% {
@@ -50,6 +51,10 @@
     pointer-events: auto;
 }
 
+.completed-task {
+    background-color: grey; /* Change to a different color for completed tasks */
+    cursor: not-allowed; /* Change cursor to indicate the task is not clickable */
+}
 
 @keyframes glow {
     0% {
@@ -114,4 +119,39 @@
     width: 100%;
     height: 100%;
     cursor: pointer;
+}
+
+.progress-container {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1000;
+    width: 15%;
+}
+
+.progress {
+    width: 100%;
+}
+
+.progress-bar {
+    width: 0;
+    height: 30px;
+    background-color: green;
+    text-align: center;
+    line-height: 30px;
+    color: white;
+    transition: width 0.5s;
+}
+
+.task-list {
+    margin-top: 30px;
+}
+
+.task-item {
+    font-size: 19px;
+    color: white; /* Make the task text white */
+}
+
+.task-item.completed {
+    color: green; /* Mark completed tasks as green */
 }

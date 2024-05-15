@@ -19,10 +19,8 @@ const CardSwipe = ({ onClose }) => {
 
         if (duration > 1000) {
             status = "slow";
-        } else if (duration < 700){
+        } else if (duration < 700) {
             status = "valid";
-            setTimeout(() => {
-            }, 10000);
         }
 
         readerRef.current.dataset.status = status;
@@ -30,21 +28,10 @@ const CardSwipe = ({ onClose }) => {
 
         if (status === 'valid') {
             setSwipeSuccessful(true);
+            onClose(true); // Call onClose with true when the swipe is successful
+        } else {
+            onClose(false); // Call onClose with false when the swipe is unsuccessful
         }
-    };
-
-    const setStatus = (status) => {
-        if (!readerRef.current || !status || !timeStart || !timeEnd) return;
-
-        let duration = timeEnd - timeStart;
-
-        if (duration > 1000) {
-            status = "slow";
-        } else if (duration < 700){
-            status = "valid";
-            setSwipeSuccessful(true);
-        }
-        readerRef.current.dataset.status = status;
     };
 
     const playAudio = (status) => {
@@ -59,7 +46,7 @@ const CardSwipe = ({ onClose }) => {
 
     const handleDragStart = (e) => {
         const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
-        setInitialX(e.clientX);
+        setInitialX(clientX);
         setTimeStart(performance.now());
         cardRef.current.classList.remove('slide');
         setActive(true);
@@ -70,22 +57,18 @@ const CardSwipe = ({ onClose }) => {
 
         e.preventDefault();
         let x;
-        let status;
 
         if (e.type === 'touchend') {
-            x = e.touches[0].clientX - initialX;
+            x = e.changedTouches[0].clientX - initialX;
         } else {
             x = e.clientX - initialX;
-        }
-        if (x < readerRef.current.offsetWidth) {
-            status = 'invalid';
         }
 
         setTimeEnd(performance.now());
         cardRef.current.classList.add('slide');
         setActive(false);
         evaluateSwipe();
-        if (status !== 'valid') {
+        if (x < readerRef.current.offsetWidth) {
             cardRef.current.style.transform = 'translateX(0px)';
         }
     };
@@ -138,7 +121,7 @@ const CardSwipe = ({ onClose }) => {
         if (swipeSuccessful) {
             soundAccepted.current.play();
         }
-    }, [swipeSuccessful, onClose]);
+    }, [swipeSuccessful]);
 
     return (
         <div id="wrapper">
@@ -157,6 +140,7 @@ const CardSwipe = ({ onClose }) => {
                 </div>
                 <div className="bottom"></div>
             </div>
+            <div className="overlay2" onClick={() => onClose(false)}></div> {/* Call onClose with false when clicking outside */}
         </div>
     );
 };
