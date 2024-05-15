@@ -151,7 +151,7 @@
     width: 190px;
     position: absolute;
     top: 45%;
-    right: 50px;
+    right: 30px;
     transform: translateY(-50%);
 }
 
@@ -197,4 +197,14 @@
 
 .save-button:hover {
     background-color: cadetblue;
+}
+
+.player-dialog-name{
+    position: absolute;
+    color:white;
+    margin-top:173px;
+    margin-left: 57px;
+    text-align: center;
+    transform: translateX(-50%);
+    text-shadow: 0 0 15px rgba(204, 53, 80, 0.76);
 }
