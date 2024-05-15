@@ -108,7 +108,7 @@ export default function LobbyPage({ game, onChangeSetGame }: Props) {
     console.log("playerId:", playerId);
     console.log("currentPlayerId:", currentPlayerId);
 
-    if (playerId === currentPlayerId) {
+    if (playerId == currentPlayerId) {
       setSelectedPlayerId(playerId);
       setIsOutfitDialogOpen(true);
       setSelectedColor(playerColors[playerId]);
