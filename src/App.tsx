@@ -21,7 +21,9 @@ export type Player = {
     username: string;
     position: { x: number; y: number };
     role: string;
+    color: string;
 };
+
 
 export default function App() {
     const [game, setGame] = useState<Game | null>(null);
