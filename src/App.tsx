@@ -21,6 +21,7 @@ export type Player = {
     username: string;
     position: { x: number; y: number };
     role: string;
+    isAlive: boolean;
 };
 
 export default function App() {

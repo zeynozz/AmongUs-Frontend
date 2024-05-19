@@ -108,6 +108,9 @@ const GameMap: React.FC<Props> = ({ map, playerList }) => {
                     <div className="overlay2" onClick={() => handlePopupClose(false)}></div>
                 </div>
             )}
+            <div className="kill-button-container">
+                <img src="/public/images/kill.png" alt="Kill" className="kill-button" />
+            </div>
         </div>
     );
 };
