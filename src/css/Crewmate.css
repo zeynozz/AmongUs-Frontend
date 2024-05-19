@@ -1,0 +1,21 @@
+.crewmate-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1rem;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    background-color: #121212;
+}
+
+.crewmate-task-list,
+.crewmate-map-button {
+    flex: none;
+}
+
+.crewmate-role {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+}

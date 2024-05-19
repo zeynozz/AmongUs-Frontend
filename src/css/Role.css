@@ -1,0 +1,46 @@
+@font-face {
+    font-family: 'DSEG14Classic';
+    src: url('/public/fonts/DSEG14Classic-Regular.woff2') format('woff2'),
+    url('/public/fonts/DSEG14Classic-Regular.woff') format('woff'),
+    url('/public/fonts/DSEG14Classic-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.roleInformation {
+    font-family: 'DSEG14Classic', sans-serif;
+    color: #FFFFFF;
+    border: 2px solid white;
+    border-radius: 15px;
+    padding: 0.5rem;
+    max-width: 100%;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+}
+
+.role {
+    margin-left: 1rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.crewmate {
+    color: #00FF00;
+}
+
+.impostor {
+    color: #FF0000;
+
+}

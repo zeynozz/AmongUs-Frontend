@@ -20,10 +20,9 @@ export type Player = {
     id: number;
     username: string;
     position: { x: number; y: number };
-    role: string;
     color: string;
+    role: "IMPOSTOR" | "CREWMATE";
 };
-
 
 export default function App() {
     const [game, setGame] = useState<Game | null>(null);

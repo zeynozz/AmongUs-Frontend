@@ -1,6 +1,6 @@
-import React, {useEffect, useState} from "react";
-import {Link, useNavigate} from "react-router-dom";
-import {Game} from "../App";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Game } from "../App";
 import "../css/HostPage.css";
 
 type Props = {
@@ -13,19 +13,22 @@ const playSound = () => {
   audio.play();
 };
 
-export default function HostPage({
-                                   setGame,}: Props) {
+export default function HostPage({ setGame }: Props) {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [numPlayers, setNumPlayers] = useState(1);
   const [numImpostors, setNumImpostors] = useState(0);
   const [map, setMap] = useState("Spaceship");
+  const [buttonDisabled, setButtonDisabled] = useState(true);
 
   useEffect(() => {
-    if (username && numPlayers) {
+    if (username && numPlayers && numImpostors >= 0 && map) {
       if (numImpostors > numPlayers / 2) {
         setNumImpostors(Math.floor(numPlayers / 2));
       }
+      setButtonDisabled(false);
+    } else {
+      setButtonDisabled(true);
     }
   }, [username, numPlayers, numImpostors, map]);
 
@@ -80,7 +83,6 @@ export default function HostPage({
         });
   }
 
-
   return (
       <div className="host-container">
         <video autoPlay loop muted className="background-video" src="/public/videos/stars.mp4">
@@ -94,12 +96,12 @@ export default function HostPage({
             <div className="form-group">
               <h1 className="animated-text">Type your player name to host the game:</h1>
               <input className="form-input" type="text" id="username" value={username}
-                     onChange={(e) => setUsername(e.target.value)} required/>
+                     onChange={(e) => setUsername(e.target.value)} required />
             </div>
             <div className="form-group">
               <h1 className="animated-text2">Max Players:</h1>
               <div className="player-icons">
-                {Array.from({length: 6}, (_, i) => (
+                {Array.from({ length: 6 }, (_, i) => (
                     <img
                         key={i}
                         src={i < numPlayers ? "/public/images/greenFigure.png" : "/public/images/whiteFigure.png"}
@@ -110,7 +112,19 @@ export default function HostPage({
                 ))}
               </div>
             </div>
-
+            <div className="form-group">
+              <h1 className="animated-text3">Number of Impostors:</h1>
+              <input
+                  className="form-input"
+                  type="number"
+                  id="numImpostors"
+                  value={numImpostors}
+                  onChange={(e) => setNumImpostors(parseInt(e.target.value))}
+                  min="0"
+                  max={Math.floor(numPlayers / 2)}
+                  required
+              />
+            </div>
             <div className="form-group">
               <h1 className="animated-text4">Choose Map:</h1>
               <select className="form-input"
@@ -124,8 +138,7 @@ export default function HostPage({
                 <option value="Ocean">🌊 Ocean</option>
               </select>
             </div>
-
-            <button type="submit" className="host-create-button" onClick={playSound}>
+            <button type="submit" className="host-create-button" onClick={playSound} disabled={buttonDisabled}>
               HOST
             </button>
           </form>

@@ -1,9 +1,11 @@
-import GameMap from "./GameMap";
-import {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import Stomp from "stompjs";
-import {Game} from "../App";
 import SockJS from "sockjs-client";
-
+import Crewmate from "./Crewmate";
+import Impostor from "./Impostor";
+import GameMap from "./GameMap";
+import RoleAnimation from "./RoleAnimation";
+import { Game } from "../App";
 
 type Props = {
     game: Game;
@@ -12,6 +14,10 @@ type Props = {
 
 export function PlayGame({ game, onChangeSetGame }: Props) {
     const [stompClient, setStompClient] = useState(null);
+    const [showAnimation, setShowAnimation] = useState(true);
+    const playerId = JSON.parse(sessionStorage.getItem('currentPlayerId') || "null");
+    const playerIndex = game.players.findIndex((player) => player.id === playerId);
+    const playerRole = game.players.at(playerIndex)?.role;
 
     useEffect(() => {
         if (!stompClient) {
@@ -64,18 +70,30 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
         }
     }, [stompClient, game.gameCode]);
 
+    useEffect(() => {
+        if (playerRole) {
+            setTimeout(() => setShowAnimation(false), 3000); // Show animation for 3 seconds
+        }
+    }, [playerRole]);
+
+    console.log('Current Player ID:', playerId);
+    console.log('Player Index:', playerIndex);
+    console.log('Player Role:', playerRole);
+
     return (
         <div className="landing-container">
+            {showAnimation && playerRole && <RoleAnimation role={playerRole} />}
             <video autoPlay loop muted className="background-video" src="/public/videos/stars.mp4">
                 Your browser does not support the video tag.
             </video>
             <ul>
                 {game.players.map((player) => (
                     <li key={player.id}>
-                        Username: {player.username} {player.id === JSON.parse(sessionStorage.getItem('currentPlayerId') || "null") ? " (you)" : ""}
+                        Username: {player.username} {player.id === playerId ? " (you)" : ""}
                     </li>
                 ))}
             </ul>
+            {playerRole === "IMPOSTOR" ? <Impostor /> : <Crewmate />}
             <GameMap map={game.map} playerList={game.players} />
         </div>
     );
