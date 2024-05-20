@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Game } from "../App"; // Stellen Sie sicher, dass dieser Pfad korrekt ist
+import { Game } from "../App";
 import SockJS from "sockjs-client";
 import Stomp from "stompjs";
 import "../css/LobbyPage.css";
