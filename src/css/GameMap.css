@@ -1,12 +1,31 @@
-/* GameMap.css */
+@font-face {
+    font-family: 'DSEG14Classic';
+    src: url('/public/fonts/DSEG14Classic-Regular.woff2') format('woff2'),
+    url('/public/fonts/DSEG14Classic-Regular.woff') format('woff'),
+    url('/public/fonts/DSEG14Classic-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.MapDisplay-map-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.map-container {
+    position: absolute;
+    transition: transform 0.5s ease;
+}
 
 .MapDisplay-row {
     display: flex;
 }
 
 .MapDisplay-cell {
-    width: 20px;
-    height: 20px;
+    width: 50px;
+    height: 50px;
     background-size: cover;
     background-position: center;
 }
@@ -52,8 +71,8 @@
 }
 
 .completed-task {
-    background-color: grey; /* Change to a different color for completed tasks */
-    cursor: not-allowed; /* Change cursor to indicate the task is not clickable */
+    background-color: grey;
+    cursor: not-allowed;
 }
 
 @keyframes glow {
@@ -123,7 +142,7 @@
 
 .progress-container {
     position: absolute;
-    top: 10px;
+    top: 150px;
     left: 10px;
     z-index: 1000;
     width: 15%;
@@ -131,27 +150,58 @@
 
 .progress {
     width: 100%;
+    background-color: #ccc;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
 .progress-bar {
+    font-family: 'DSEG14Classic', sans-serif;
     width: 0;
     height: 30px;
-    background-color: green;
+    background-color: #4CAF50;
     text-align: center;
     line-height: 30px;
     color: white;
     transition: width 0.5s;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, transparent 75%, transparent);
+    background-size: 50px 50px;
+    animation: move 2s linear infinite;
+}
+
+@keyframes move {
+    0% {
+        left: -50px;
+    }
+    100% {
+        left: 100%;
+    }
 }
 
 .task-list {
+    font-family: 'DSEG14Classic', sans-serif;
     margin-top: 30px;
 }
 
 .task-item {
+    font-family: 'DSEG14Classic', sans-serif;
     font-size: 19px;
-    color: white; /* Make the task text white */
+    color: white;
 }
 
 .task-item.completed {
-    color: green; /* Mark completed tasks as green */
+    font-family: 'DSEG14Classic', sans-serif;
+    color: green;
 }
