@@ -4,6 +4,7 @@ import "../css/CardSwipe.css";
 import CardSwipe from './CardSwipe';
 
 interface Player {
+    id: number;
     username: string;
     position: { x: number; y: number };
 }
@@ -19,8 +20,15 @@ const GameMap: React.FC<Props> = ({ map, playerList }) => {
     const [completedTasks, setCompletedTasks] = useState<{ x: number, y: number }[]>([]);
     const [currentTask, setCurrentTask] = useState<{ x: number, y: number } | null>(null);
 
-    // Initialize playerPosition with the initial player position if available
-    const initialPlayerPosition = playerList.length > 0 ? playerList[0].position : { x: 45, y: 7 };
+    const playerId = JSON.parse(sessionStorage.getItem('currentPlayerId') || "null") as number;
+
+    console.log('Current Player ID:', playerId);
+    console.log('Player List:', playerList);
+
+    const currentPlayer = playerList.find(player => player.id === playerId);
+    console.log('Current Player:', currentPlayer);
+
+    const initialPlayerPosition = currentPlayer ? currentPlayer.position : { x: 45, y: 7 };
     const [playerPosition, setPlayerPosition] = useState<{ x: number, y: number }>(initialPlayerPosition);
 
     const tasks = [
@@ -53,15 +61,13 @@ const GameMap: React.FC<Props> = ({ map, playerList }) => {
 
     const progressPercentage = (tasksCompleted / 5) * 100;
 
-    // Ensure the player position is updated correctly when the playerList changes
     useEffect(() => {
-        if (playerList.length > 0) {
-            const player = playerList[0];
-            if (player) {
-                setPlayerPosition(player.position);
-            }
+        if (currentPlayer) {
+            setPlayerPosition(currentPlayer.position);
+        } else {
+            console.error("Current player not found in playerList", { playerId, playerList });
         }
-    }, [playerList]);
+    }, [playerList, currentPlayer]);
 
     const cameraStyle = {
         transform: `translate(-${playerPosition.x * 50 - window.innerWidth / 2}px, -${playerPosition.y * 50 - window.innerHeight / 2}px)`
@@ -132,3 +138,4 @@ const GameMap: React.FC<Props> = ({ map, playerList }) => {
 };
 
 export default GameMap;
+
