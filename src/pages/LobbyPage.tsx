@@ -52,7 +52,7 @@ export default function LobbyPage({ game, onChangeSetGame }: Props) {
     stompClient.subscribe("/topic/" + gameCode + "/colorChange", (message: { body: string }) => {
       const updatedPlayer = JSON.parse(message.body);
       const updatedPlayers = game.players.map(player =>
-          player.id == updatedPlayer.id ? { ...player, color: updatedPlayer.color } : player
+          player.id === updatedPlayer.id ? { ...player, color: updatedPlayer.color } : player
       );
       memoizedOnChangeSetGame({ ...game, players: updatedPlayers });
     });
@@ -87,7 +87,7 @@ export default function LobbyPage({ game, onChangeSetGame }: Props) {
   function handleChangeOutfit(playerId: number) {
     const currentPlayerId = JSON.parse(sessionStorage.getItem("currentPlayerId") || "null");
 
-    if (playerId == currentPlayerId) {
+    if (playerId === currentPlayerId) {
       const player = game.players.find(p => p.id === playerId);
       if (player) {
         setSelectedPlayerId(playerId);
@@ -126,6 +126,31 @@ export default function LobbyPage({ game, onChangeSetGame }: Props) {
         stompClient.send("/app/updatePlayerColor", {}, JSON.stringify(playerToUpdate));
       }
     }
+  }
+
+  function copyToClipboard(text: string, element: HTMLElement) {
+    navigator.clipboard.writeText(text).then(() => {
+      console.log(`Copied to clipboard: ${text}`);
+      showTooltip(element);
+    }, (err) => {
+      console.error('Could not copy text: ', err);
+    });
+  }
+
+  function showTooltip(element: HTMLElement) {
+    const tooltip = document.createElement('div');
+    tooltip.className = 'tooltip';
+    tooltip.textContent = 'Copied!';
+    element.appendChild(tooltip);
+    setTimeout(() => {
+      tooltip.classList.add('show-tooltip');
+      setTimeout(() => {
+        tooltip.classList.remove('show-tooltip');
+        setTimeout(() => {
+          element.removeChild(tooltip);
+        }, 300);
+      }, 2000);
+    }, 10);
   }
 
   if (!game) {
@@ -183,14 +208,14 @@ export default function LobbyPage({ game, onChangeSetGame }: Props) {
                       alt={`${player.username} avatar`}
                       className="player-avatar"
                       style={{ transform: `translateX(${player.position.x}px) translateY(${player.position.y}px)` }}
-                      onClick={() => handleChangeOutfit(player.id)}
+                      onClick={(e) => { handleChangeOutfit(player.id); copyToClipboard(player.color, e.currentTarget); }}
                   />
                   <span className="player-name">{player.username}</span>
                 </div>
             ))}
           </div>
           <div className="game-info">
-            <div className="game-code">CODE: {gameCode}</div>
+            <div className="game-code" onClick={(e) => copyToClipboard(gameCode, e.currentTarget)}>CODE: {gameCode}</div>
             <div className="players-info">
               <img src="/public/images/whiteFigure.png" alt="Player Icon" className="player-icon" />
               <span className="player-count">
