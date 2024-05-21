@@ -7,6 +7,7 @@ interface Player {
     id: number;
     username: string;
     position: { x: number; y: number };
+    color: string;
 }
 
 interface Props {
@@ -113,7 +114,7 @@ const GameMap: React.FC<Props> = ({ map, playerList }) => {
                                 cellClass += ' player';
                                 cellContent = (
                                     <>
-                                        <img src="/images/whiteFigure.png" alt="Player" className="player-image" />
+                                        <img src={`/images/${player.color}Figure.png`} alt="Player" className="player-image" />
                                         <div className="player-name">{player.username}</div>
                                     </>
                                 );
