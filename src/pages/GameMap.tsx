@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import "../css/GameMap.css";
 import "../css/CardSwipe.css";
 import CardSwipe from './CardSwipe';
 
 interface Player {
+    id: number;
     username: string;
     position: { x: number; y: number };
     color: string;
@@ -16,9 +17,20 @@ interface Props {
 
 const GameMap: React.FC<Props> = ({ map, playerList }) => {
     const [showPopup, setShowPopup] = useState(false);
-    const [tasksCompleted, setTasksCompleted] = useState(0); // State to track tasks completed
-    const [completedTasks, setCompletedTasks] = useState<{ x: number, y: number }[]>([]); // State to track completed tasks
-    const [currentTask, setCurrentTask] = useState<{ x: number, y: number } | null>(null); // State to track current task
+    const [tasksCompleted, setTasksCompleted] = useState(0);
+    const [completedTasks, setCompletedTasks] = useState<{ x: number, y: number }[]>([]);
+    const [currentTask, setCurrentTask] = useState<{ x: number, y: number } | null>(null);
+
+    const playerId = JSON.parse(sessionStorage.getItem('currentPlayerId') || "null") as number;
+
+    console.log('Current Player ID:', playerId);
+    console.log('Player List:', playerList);
+
+    const currentPlayer = playerList.find(player => player.id === playerId);
+    console.log('Current Player:', currentPlayer);
+
+    const initialPlayerPosition = currentPlayer ? currentPlayer.position : { x: 45, y: 7 };
+    const [playerPosition, setPlayerPosition] = useState<{ x: number, y: number }>(initialPlayerPosition);
 
     const tasks = [
         { id: 1, name: "Card Swipe 1", position: { x: 51, y: 11 } },
@@ -37,24 +49,45 @@ const GameMap: React.FC<Props> = ({ map, playerList }) => {
 
     const handlePopupClose = (success: boolean) => {
         if (success && currentTask) {
-            setTasksCompleted(prev => prev + 1); // Increment tasks completed on successful task
-            setCompletedTasks(prev => [...prev, currentTask]); // Add the task to the completedTasks list
+            setTasksCompleted(prev => prev + 1);
+            setCompletedTasks(prev => [...prev, currentTask]);
         }
         setShowPopup(false);
-        setCurrentTask(null); // Reset current task
+        setCurrentTask(null);
     };
 
     if (!map) {
         return <div>Loading map...</div>;
     }
 
-    // Calculate the progress percentage
     const progressPercentage = (tasksCompleted / 5) * 100;
+
+    useEffect(() => {
+        if (currentPlayer) {
+            setPlayerPosition(currentPlayer.position);
+        } else {
+            console.error("Current player not found in playerList", { playerId, playerList });
+        }
+    }, [playerList, currentPlayer]);
+
+    useEffect(() => {
+        const handleResize = () => {
+            // Force a re-render to update the camera style on resize
+            setPlayerPosition(prev => ({ ...prev }));
+        };
+
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
+    const cameraStyle = {
+        transform: `translate(-${playerPosition.x * 50 - window.innerWidth / 2}px, -${playerPosition.y * 50 - window.innerHeight / 2}px)`
+    };
 
     return (
         <div className="MapDisplay-map-container">
-            <div className="progress-container" style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 1000 }}>
-                <div className="progress" role="progressbar" aria-label="Example with label" aria-valuenow={progressPercentage} aria-valuemin={0} aria-valuemax={100}>
+            <div className="progress-container">
+                <div className="progress" role="progressbar" aria-valuenow={progressPercentage} aria-valuemin={0} aria-valuemax={100}>
                     <div className="progress-bar" style={{ width: `${progressPercentage}%` }}>{progressPercentage}% Complete</div>
                 </div>
                 <div className="task-list">
@@ -68,41 +101,43 @@ const GameMap: React.FC<Props> = ({ map, playerList }) => {
             <video autoPlay loop muted className="background-video" src="/public/videos/stars.mp4">
                 Your browser does not support the video tag.
             </video>
-            {map.map((row, rowIndex) => (
-                <div key={rowIndex} className="MapDisplay-row">
-                    {row.map((cell, cellIndex) => {
-                        const player = playerList.find(p => p.position.x === cellIndex && p.position.y === rowIndex);
-                        const isPlayer = Boolean(player);
-                        let cellClass = '';
-                        switch (cell) {
-                            case 1:
-                                cellClass = 'walkable';
-                                break;
-                            case 2:
-                                cellClass = completedTasks.some(task => task.x === cellIndex && task.y === rowIndex) ? 'completed-task' : 'task'; // Mark as completed if in the completedTasks list
-                                break;
-                            default:
-                                cellClass = 'obstacle';
-                                break;
-                        }
-                        let cellContent = null;
-                        if (isPlayer) {
-                            cellClass += ' player';
-                            cellContent = (
-                                <>
-                                    <img src={`/images/${player.color}Figure.png`} alt="Player" className="player-image" />
-                                    <div className="player-name">{player.username}</div>
-                                </>
+            <div className="map-container" style={cameraStyle}>
+                {map.map((row, rowIndex) => (
+                    <div key={rowIndex} className="MapDisplay-row">
+                        {row.map((cell, cellIndex) => {
+                            const player = playerList.find(p => p.position.x === cellIndex && p.position.y === rowIndex);
+                            const isPlayer = Boolean(player);
+                            let cellClass = '';
+                            switch (cell) {
+                                case 1:
+                                    cellClass = 'walkable';
+                                    break;
+                                case 2:
+                                    cellClass = completedTasks.some(task => task.x === cellIndex && task.y === rowIndex) ? 'completed-task' : 'task';
+                                    break;
+                                default:
+                                    cellClass = 'obstacle';
+                                    break;
+                            }
+                            let cellContent = null;
+                            if (isPlayer) {
+                                cellClass += ' player';
+                                cellContent = (
+                                    <>
+                                        <img src={`/images/${player.color}Figure.png`} alt="Player" className="player-image" />
+                                        <div className="player-name">{player.username}</div>
+                                    </>
+                                );
+                            }
+                            return (
+                                <div key={cellIndex} className={`MapDisplay-cell ${cellClass}`} onClick={() => handleTaskClick(cell, cellIndex, rowIndex)}>
+                                    {cellContent}
+                                </div>
                             );
-                        }
-                        return (
-                            <div key={cellIndex} className={`MapDisplay-cell ${cellClass}`} onClick={() => handleTaskClick(cell, cellIndex, rowIndex)}>
-                                {cellContent}
-                            </div>
-                        );
-                    })}
-                </div>
-            ))}
+                        })}
+                    </div>
+                ))}
+            </div>
             {showPopup && (
                 <div className="popup" id="popup">
                     <CardSwipe onClose={handlePopupClose} />

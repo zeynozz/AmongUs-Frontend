@@ -1,4 +1,4 @@
-.space{
+.space {
     position: relative;
     min-height: 100vh;
     display: flex;
@@ -51,12 +51,12 @@
     width: 80px;
     height: auto;
     transition: transform 0.3s ease;
+    cursor: pointer;
 }
 
 .player {
     position: relative;
 }
-
 
 .player-icon {
     height: 70px;
@@ -86,6 +86,8 @@
 .game-code, .players-info {
     font-size: 1.2em;
     font-family: monospace;
+    cursor: pointer;
+    position: relative;
 }
 
 .start-game-button {
@@ -106,6 +108,7 @@
     cursor: not-allowed;
     opacity: 0.5;
 }
+
 .overlay {
     position: fixed;
     top: 0;
@@ -140,12 +143,12 @@
     justify-content: center;
     align-items: center;
     cursor: pointer;
-
 }
 
 .close-button:hover {
     background-color: #c2780b;
 }
+
 .player-dialog {
     height: 190px;
     width: 190px;
@@ -155,13 +158,13 @@
     transform: translateY(-50%);
 }
 
-.color-dropdown{
+.color-dropdown {
     margin-top: 90px;
-    margin-left:20px;
+    margin-left: 20px;
     height: 30px;
     width: 100px;
     text-align: center;
-    background-color:#2a2f32;
+    background-color: #2a2f32;
     color: white;
     border: 1.5px solid #00FA9A;
     text-shadow: 0 0 10px #00FA9A;
@@ -176,7 +179,7 @@
     border-radius: 10px;
     height: 55px;
     width: 300px;
-    margin-left:10px;
+    margin-left: 10px;
     text-align: center;
 }
 
@@ -191,7 +194,7 @@
     color: white;
     height: 40px;
     width: 120px;
-    text-align:center;
+    text-align: center;
     align-items: center;
 }
 
@@ -199,12 +202,32 @@
     background-color: cadetblue;
 }
 
-.player-dialog-name{
+.player-dialog-name {
     position: absolute;
-    color:white;
-    margin-top:173px;
+    color: white;
+    margin-top: 173px;
     margin-left: 57px;
     text-align: center;
     transform: translateX(-50%);
     text-shadow: 0 0 15px rgba(204, 53, 80, 0.76);
+}
+
+/* Tooltip styles */
+.tooltip {
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.8em;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.show-tooltip {
+    opacity: 1;
 }

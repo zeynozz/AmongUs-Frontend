@@ -59,10 +59,10 @@ export default function PrivatePage() {
 
   const handleJoinGameResponse = (message) => {
     const data = JSON.parse(message.body);
-    const playerId = data.headers.playerId[0];
-    if (playerId && !currentPlayerId) { // Nur setzen, wenn currentPlayerId null oder undefined ist
+    const playerId = parseInt(data.headers.playerId[0], 10);
+    if (playerId && !currentPlayerId) {
       sessionStorage.setItem('currentPlayerId', JSON.stringify(playerId));
-      setCurrentPlayerId(playerId); // Aktualisiere den Zustand
+      setCurrentPlayerId(playerId);
       console.log("Current PlayerId:", playerId);
     }
   };

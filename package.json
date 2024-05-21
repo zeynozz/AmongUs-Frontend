@@ -10,12 +10,16 @@
     "start": "vite preview"
   },
   "dependencies": {
+    "@react-three/drei": "^9.105.6",
+    "@react-three/fiber": "^8.16.6",
+    "@types/three": "^0.164.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3",
     "react-stomp": "^5.1.0",
     "sockjs": "^0.3.24",
     "sockjs-client": "^1.6.1",
+    "three": "^0.164.1",
     "universal-cookie": "^7.1.4"
   },
   "devDependencies": {
