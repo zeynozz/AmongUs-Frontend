@@ -4,8 +4,9 @@ import GameTypePage from "./pages/GameTypePage";
 import HostPage from "./pages/HostPage";
 import LobbyPage from "./pages/LobbyPage";
 import PrivatePage from "./pages/PrivatePage";
-import {useState} from "react";
-import {PlayGame} from "./pages/GamePlay";
+import { useState } from "react";
+import { PlayGame } from "./pages/GamePlay";
+import { StompClientProvider } from "./pages/StompClientProvider";
 
 export type Game = {
     gameCode: string;
@@ -31,25 +32,16 @@ export default function App() {
         setGame(gameCreated);
     }
 
-
     return (
-        <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/gameType" element={<GameTypePage />} />
-            <Route
-                path="/host"
-                element={<HostPage setGame={gameSetup} />}
-            />
-            <Route path="/join" element={<PrivatePage/>}
-            />
-            <Route
-                path="/lobby/:gameCode"
-                element={<LobbyPage game={game} onChangeSetGame={gameSetup} />}
-            />
-            <Route
-                path="/:gamecode/play"
-                element={<PlayGame game={game} onChangeSetGame={gameSetup} />}
-            />
-        </Routes>
+        <StompClientProvider>
+            <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/gameType" element={<GameTypePage />} />
+                <Route path="/host" element={<HostPage setGame={gameSetup} />} />
+                <Route path="/join" element={<PrivatePage />} />
+                <Route path="/lobby/:gameCode" element={<LobbyPage game={game} onChangeSetGame={gameSetup} />} />
+                <Route path="/:gamecode/play" element={<PlayGame game={game} onChangeSetGame={gameSetup} />} />
+            </Routes>
+        </StompClientProvider>
     );
 }
