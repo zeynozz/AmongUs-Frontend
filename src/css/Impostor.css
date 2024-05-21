@@ -2,14 +2,15 @@
     position: absolute;
     top: 50px;
     left: 170px;
-    width: 100%;
+    width: auto; /* Change to auto for better flexibility */
     z-index: 1000;
 }
 
 .impostor-role {
-    flex-grow: 1;
     display: flex;
-    left: 50px;
+    align-items: center;
+    flex-grow: 1;
+    position: relative; /* Ensure proper positioning for children */
 }
 
 .impostor-map-button {
@@ -24,11 +25,10 @@
     border: none;
     padding: 0;
     cursor: pointer;
-    margin-top:20px;
+    margin-left: 10px; /* Adjust spacing between text and button */
 }
 
 .kill-button img {
     width: 40px; /* Adjust size as needed */
     height: 40px; /* Adjust size as needed */
 }
-
