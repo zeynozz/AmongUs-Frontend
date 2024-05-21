@@ -1,0 +1,36 @@
+@font-face {
+    font-family: 'DSEG14Classic';
+    src: url('/public/fonts/DSEG14Classic-Regular.woff2') format('woff2'),
+    url('/public/fonts/DSEG14Classic-Regular.woff') format('woff'),
+    url('/public/fonts/DSEG14Classic-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@keyframes fadeInRed {
+    0% { opacity: 0; transform: scale(0.5); }
+    50% { opacity: 1; transform: scale(1.1); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.kill-animation-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(255, 0, 0, 0.7); /* Semi-transparent red background */
+    z-index: 1000;
+    animation: fadeInRed 0.5s forwards;
+}
+
+.kill-animation-image {
+    max-width: 50%;
+    max-height: 50%;
+    border: 5px solid red;
+    box-shadow: 0 0 20px red;
+    animation: fadeInRed 1s ease-in-out;
+}

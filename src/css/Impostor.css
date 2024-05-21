@@ -6,12 +6,29 @@
     z-index: 1000;
 }
 
-.impostor-map-button {
-    flex: none;
-}
-
 .impostor-role {
     flex-grow: 1;
     display: flex;
     left: 50px;
 }
+
+.impostor-map-button {
+    position: absolute;
+    top: 10px; /* Adjust the position from the top */
+    right: 10px; /* Adjust the position from the right */
+    z-index: 1;
+}
+
+.kill-button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    margin-top:20px;
+}
+
+.kill-button img {
+    width: 40px; /* Adjust size as needed */
+    height: 40px; /* Adjust size as needed */
+}
+

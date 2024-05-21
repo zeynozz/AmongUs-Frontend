@@ -8,16 +8,21 @@ import RoleAnimation from "./RoleAnimation";
 import { Game } from "../App";
 
 type Props = {
-    game: Game;
+    game: Game | null;
     onChangeSetGame(game: Game): void;
 };
 
 export function PlayGame({ game, onChangeSetGame }: Props) {
-    const [stompClient, setStompClient] = useState(null);
+    const [stompClient, setStompClient] = useState<any>(null);
     const [showAnimation, setShowAnimation] = useState(true);
     const playerId = JSON.parse(sessionStorage.getItem('currentPlayerId') || "null");
     const playerIndex = game.players.findIndex((player) => player.id === playerId);
-    const playerRole = game.players.at(playerIndex)?.role;
+    const playerRole = playerIndex !== -1 ? game.players[playerIndex].role : null;
+
+    if (!game) {
+        return <div>Loading...</div>;
+    }
+
 
     useEffect(() => {
         if (!stompClient) {
@@ -61,11 +66,25 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
                 onChangeSetGame(updatedGame);
             });
 
+            const playerKilledSubscription = stompClient.subscribe("/topic/playerKilled", (message) => {
+                const updatedGame = JSON.parse(message.body);
+                if (updatedGame) {  // Ensure updatedGame is not null
+                    onChangeSetGame(updatedGame);
+                }
+            });
+
+            const playerRemovedSubscription = stompClient.subscribe("/topic/playerRemoved", (message) => {
+                const { removedPlayerId } = JSON.parse(message.body);
+                handlePlayerRemoved(removedPlayerId);
+            });
+
             stompClient.send(`/app/${game.gameCode}/play`, {}, JSON.stringify(game));
 
             return () => {
                 positionChangeSubscription.unsubscribe();
                 gamePlaySubscription.unsubscribe();
+                playerKilledSubscription.unsubscribe();
+                playerRemovedSubscription.unsubscribe();
             };
         }
     }, [stompClient, game.gameCode]);
@@ -76,9 +95,20 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
         }
     }, [playerRole]);
 
+    const handlePlayerRemoved = (removedPlayerId: number) => {
+        const updatedPlayers = game.players.filter(player => player.id !== removedPlayerId);
+        onChangeSetGame({ ...game, players: updatedPlayers });
+    };
+
+    const handlePlayerKilled = (killedPlayerId: number) => {
+        handlePlayerRemoved(killedPlayerId);
+    };
+
     console.log('Current Player ID:', playerId);
     console.log('Player Index:', playerIndex);
     console.log('Player Role:', playerRole);
+    console.log("These are all the players in the game:", game.players.map(p => `ID: ${p.id}, Role: ${p.role}`).join(', '));
+    console.log("Updated Players:", game.players.length);
 
     return (
         <div className="landing-container">
@@ -93,7 +123,7 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
                     </li>
                 ))}
             </ul>
-            {playerRole === "IMPOSTOR" ? <Impostor /> : <Crewmate />}
+            {playerRole === "IMPOSTOR" ? <Impostor game={game} playerId={playerId} onChangeSetGame={onChangeSetGame} onPlayerKilled={handlePlayerKilled} /> : <Crewmate />}
             <GameMap map={game.map} playerList={game.players} />
         </div>
     );
