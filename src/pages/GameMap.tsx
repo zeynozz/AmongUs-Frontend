@@ -70,6 +70,16 @@ const GameMap: React.FC<Props> = ({ map, playerList }) => {
         }
     }, [playerList, currentPlayer]);
 
+    useEffect(() => {
+        const handleResize = () => {
+            // Force a re-render to update the camera style on resize
+            setPlayerPosition(prev => ({ ...prev }));
+        };
+
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
     const cameraStyle = {
         transform: `translate(-${playerPosition.x * 50 - window.innerWidth / 2}px, -${playerPosition.y * 50 - window.innerHeight / 2}px)`
     };
@@ -139,4 +149,3 @@ const GameMap: React.FC<Props> = ({ map, playerList }) => {
 };
 
 export default GameMap;
-
