@@ -39,7 +39,7 @@ const CardSwipe = ({ onClose }) => {
 
         if (status === 'valid') {
             soundAccepted.current.play();
-        } else {
+        } else if (status === 'invalid'){
             soundDenied.current.play();
         }
     };
@@ -65,8 +65,8 @@ const CardSwipe = ({ onClose }) => {
         let xDiff = finalX - initialX;
 
         cardRef.current.classList.add('slide');
-
         // Check if the card was dragged all the way to the threshold
+
         if (xDiff >= threshold) {
             readerRef.current.dataset.status = 'valid';
             playAudio('valid');
@@ -92,6 +92,7 @@ const CardSwipe = ({ onClose }) => {
 
         if (xDiff > 0) { // Make sure we only allow dragging to the right
             setTranslate(xDiff);
+            readerRef.current.dataset.status = 'invalid';
         }
     };
 
@@ -152,7 +153,7 @@ const CardSwipe = ({ onClose }) => {
                 </div>
                 <div className="bottom"></div>
             </div>
-            <div className="overlay2" onClick={() => onClose(false)}></div> {/* Call onClose with false when clicking outside */}
+            <div className="overlay2" onClick={() => onClose(false)}></div>
         </div>
     );
 };
