@@ -56,48 +56,60 @@ const CardSwipe = ({ onClose }) => {
         if (!active) return;
 
         e.preventDefault();
-        let x;
-
-        if (e.type === 'touchend') {
-            x = e.changedTouches[0].clientX - initialX;
-        } else {
-            x = e.clientX - initialX;
-        }
-
         setTimeEnd(performance.now());
+        const readerWidth = readerRef.current.offsetWidth;
+        const cardWidth = cardRef.current.offsetWidth;
+        const threshold = readerWidth - cardWidth / 2; // adjust this to set how far the card needs to be dragged
+
+        let finalX = e.type === 'touchend' ? e.changedTouches[0].clientX : e.clientX;
+        let xDiff = finalX - initialX;
+
         cardRef.current.classList.add('slide');
-        setActive(false);
-        evaluateSwipe();
-        if (x < readerRef.current.offsetWidth) {
+
+        // Check if the card was dragged all the way to the threshold
+        if (xDiff >= threshold) {
+            readerRef.current.dataset.status = 'valid';
+            playAudio('valid');
+            setTimeout(() => {
+                onClose(true);
+            }, 500);
+        } else {
             cardRef.current.style.transform = 'translateX(0px)';
+            readerRef.current.dataset.status = 'invalid';
+            playAudio('invalid');
+            onClose(false);
         }
+
+        setActive(false);
     };
 
     const handleDrag = (e) => {
         if (!active) return;
 
         e.preventDefault();
-        let x;
+        let currentX = e.type === "touchmove" ? e.touches[0].clientX : e.clientX;
+        let xDiff = currentX - initialX;
 
-        if (e.type === "touchmove") {
-            x = e.touches[0].clientX - initialX;
-        } else {
-            x = e.clientX - initialX;
+        if (xDiff > 0) { // Make sure we only allow dragging to the right
+            setTranslate(xDiff);
         }
-        setTranslate(x);
     };
 
     const setTranslate = (x) => {
-        if (x < 0) {
-            x = 0;
-        } else if (x > readerRef.current.offsetWidth) {
-            x = readerRef.current.offsetWidth;
+        const cardWidth = cardRef.current.offsetWidth;
+        const readerWidth = readerRef.current.offsetWidth;
+        const minTranslate = -cardWidth / 2; // Start position (left edge)
+        const maxTranslate = readerWidth - cardWidth / 2; // End position (right edge)
+
+        if (x < minTranslate) {
+            x = minTranslate;
+        } else if (x > maxTranslate) {
+            x = maxTranslate;
         }
 
-        x -= cardRef.current.offsetWidth / 2;
-
-        cardRef.current.style.transform = "translateX(" + x + "px)";
+        cardRef.current.style.transform = `translateX(${x}px)`;
     };
+
 
     useEffect(() => {
         document.addEventListener('mousedown', handleDragStart);
