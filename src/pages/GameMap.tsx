@@ -41,7 +41,7 @@ const GameMap: React.FC<Props> = ({ map, playerList }) => {
     ];
 
     const handleTaskClick = (cellType: number, x: number, y: number) => {
-        if (cellType === 2 && !showPopup && !completedTasks.some(task => task.x === x && task.y === y)) {
+        if ((cellType === 2 || cellType === 13) && !showPopup && !completedTasks.some(task => task.x === x && task.y === y)) {
             setCurrentTask({ x, y });
             setShowPopup(true);
         }
@@ -144,6 +144,9 @@ const GameMap: React.FC<Props> = ({ map, playerList }) => {
                                     break;
                                 case 12:
                                     cellClass = 'edge2';
+                                    break;
+                                case 13:
+                                    cellClass = completedTasks.some(task => task.x === cellIndex && task.y === rowIndex) ? 'completed-task1' : 'task1 task1-glow';
                                     break;
                                 default:
                                     cellClass = 'obstacle';

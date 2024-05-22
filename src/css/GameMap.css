@@ -127,6 +127,36 @@
     background-image: url("/public/images/edge2.png") ;
 }
 
+.task1 {
+    background-image: url("/public/images/vending.png");
+    background-size: cover;
+    background-position: center;
+    border: 3px solid yellow; /* Gelber Rahmen */
+}
+
+.task1-glow {
+    box-shadow: 0 0 20px yellow; /* Gelbes Leuchten */
+    animation: glow 1s infinite alternate; /* Leuchtanimation */
+}
+
+/* Leuchtanimation */
+@keyframes glow {
+    from {
+        box-shadow: 0 0 10px yellow;
+    }
+    to {
+        box-shadow: 0 0 20px yellow;
+    }
+}
+
+.completed-task1 {
+    background-image: url("/public/images/vending.png");
+    box-shadow: none; /* Entfernt das Leuchten */
+    animation: none; /* Entfernt die Animation */
+}
+
+
+
 .player {
     position: relative;
     display: flex;
