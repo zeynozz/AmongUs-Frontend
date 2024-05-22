@@ -87,6 +87,46 @@
 .obstacle {
 }
 
+.table1 {
+    background-image: url("/public/images/table1.png") ;
+}
+
+.table2 {
+    background-image: url("/public/images/table2.png") ;
+}
+
+.table3 {
+    background-image: url("/public/images/table3.png") ;
+}
+
+.table4 {
+    background-image: url("/public/images/table4.png") ;
+}
+
+.window {
+    background-image: url("/public/images/window.png") ;
+}
+
+.wall {
+    background-image: url("/public/images/wall.png") ;
+}
+
+.wall2 {
+    background-image: url("/public/images/wall2.png") ;
+}
+
+.wall3 {
+    background-image: url("/public/images/wall3.png") ;
+}
+
+.edge1 {
+    background-image: url("/public/images/edge1.png") ;
+}
+
+.edge2 {
+    background-image: url("/public/images/edge2.png") ;
+}
+
 .player {
     position: relative;
     display: flex;

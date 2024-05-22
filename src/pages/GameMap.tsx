@@ -33,11 +33,11 @@ const GameMap: React.FC<Props> = ({ map, playerList }) => {
     const [playerPosition, setPlayerPosition] = useState<{ x: number, y: number }>(initialPlayerPosition);
 
     const tasks = [
-        { id: 1, name: "Card Swipe 1", position: { x: 51, y: 11 } },
-        { id: 2, name: "Card Swipe 2", position: { x: 18, y: 23 } },
-        { id: 3, name: "Card Swipe 3", position: { x: 52, y: 41 } },
-        { id: 4, name: "Card Swipe 4", position: { x: 73, y: 26 } },
-        { id: 5, name: "Card Swipe 5", position: { x: 74, y: 40 } }
+        { id: 1, name: "Card Swipe 1", position: { x: 51, y: 5 } },
+        { id: 2, name: "Card Swipe 2", position: { x: 18, y: 18 } },
+        { id: 3, name: "Card Swipe 3", position: { x: 52, y: 36 } },
+        { id: 4, name: "Card Swipe 4", position: { x: 73, y: 21 } },
+        { id: 5, name: "Card Swipe 5", position: { x: 74, y: 35 } }
     ];
 
     const handleTaskClick = (cellType: number, x: number, y: number) => {
@@ -114,6 +114,36 @@ const GameMap: React.FC<Props> = ({ map, playerList }) => {
                                     break;
                                 case 2:
                                     cellClass = completedTasks.some(task => task.x === cellIndex && task.y === rowIndex) ? 'completed-task' : 'task';
+                                    break;
+                                case 3:
+                                    cellClass = 'table1';
+                                    break;
+                                case 4:
+                                    cellClass = 'table2';
+                                    break;
+                                case 5:
+                                    cellClass = 'table4';
+                                    break;
+                                case 6:
+                                    cellClass = 'table3';
+                                    break;
+                                case 7:
+                                    cellClass = 'window';
+                                    break;
+                                case 8:
+                                    cellClass = 'wall';
+                                    break;
+                                case 9:
+                                    cellClass = 'wall2';
+                                    break;
+                                case 10:
+                                    cellClass = 'wall3';
+                                    break;
+                                case 11:
+                                    cellClass = 'edge1';
+                                    break;
+                                case 12:
+                                    cellClass = 'edge2';
                                     break;
                                 default:
                                     cellClass = 'obstacle';
