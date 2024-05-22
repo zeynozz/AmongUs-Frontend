@@ -16,27 +16,24 @@ const playSound = () => {
 export default function HostPage({ setGame }: Props) {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
-  const [numPlayers, setNumPlayers] = useState(1);
-  const [numImpostors, setNumImpostors] = useState(0);
+  const [numPlayers, setNumPlayers] = useState<number>(1);
+  const [numImpostors, setNumImpostors] = useState<number>(0);
   const [map, setMap] = useState("Spaceship");
   const [buttonDisabled, setButtonDisabled] = useState(true);
+  const [figureColor, setFigureColor] = useState("white");
 
   useEffect(() => {
-    if (username && numPlayers && numImpostors >= 0 && map) {
-      if (numImpostors > numPlayers / 2) {
-        setNumImpostors(Math.floor(numPlayers / 2));
-      }
+    if (username && numPlayers > 0 && numImpostors >= 0 && numImpostors <= numPlayers / 2 && map) {
       setButtonDisabled(false);
     } else {
       setButtonDisabled(true);
     }
   }, [username, numPlayers, numImpostors, map]);
 
-  function handleSubmit(event) {
+  function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
-    // Simulated unique game code generation
-    const gameCode = Date.now();  // This is a simple approach for demonstration
+    const gameCode = Date.now();  // Simulated unique game code generation
 
     const gameData = {
       gameCode: gameCode,
@@ -45,6 +42,7 @@ export default function HostPage({ setGame }: Props) {
       map: map,
       player: {
         username: username,
+        color: figureColor,
         position: {
           x: 9,
           y: 9,
@@ -95,16 +93,38 @@ export default function HostPage({ setGame }: Props) {
           <form className="form" onSubmit={handleSubmit}>
             <div className="form-group">
               <h1 className="animated-text">Type your player name to host the game:</h1>
-              <input className="form-input" type="text" id="username" value={username}
-                     onChange={(e) => setUsername(e.target.value)} required />
+              <input
+                  className="form-input"
+                  type="text"
+                  id="username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+              />
             </div>
             <div className="form-group">
-              <h1 className="animated-text2">Max Players:</h1>
+              <h1 className="animated-text">Select Figure color:</h1>
+              <select
+                  className="form-input"
+                  id="figureColor"
+                  value={figureColor}
+                  onChange={(e) => setFigureColor(e.target.value)}
+                  required
+              >
+                <option value="green">🟩 Green</option>
+                <option value="blue">🟦 Blue</option>
+                <option value="pink">🟥 Pink</option>
+                <option value="white">⬜ White</option>
+                <option value="purple">🟪 Purple</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <h1 className="animated-text">Max Players:</h1>
               <div className="player-icons">
                 {Array.from({ length: 6 }, (_, i) => (
                     <img
                         key={i}
-                        src={i < numPlayers ? "/public/images/greenFigure.png" : "/public/images/whiteFigure.png"}
+                        src={i < numPlayers ? `/public/images/greenFigure.png` : "/public/images/whiteFigure.png"}
                         alt="Player Icon"
                         onClick={() => setNumPlayers(i + 1)}
                         className="player-icon"
@@ -113,25 +133,26 @@ export default function HostPage({ setGame }: Props) {
               </div>
             </div>
             <div className="form-group">
-              <h1 className="animated-text3">Number of Impostors:</h1>
+              <h1 className="animated-text">Number of Impostors:</h1>
               <input
                   className="form-input"
                   type="number"
                   id="numImpostors"
                   value={numImpostors}
-                  onChange={(e) => setNumImpostors(parseInt(e.target.value))}
+                  onChange={(e) => setNumImpostors(Number(e.target.value))}
                   min="0"
                   max={Math.floor(numPlayers / 2)}
                   required
               />
             </div>
             <div className="form-group">
-              <h1 className="animated-text4">Choose Map:</h1>
-              <select className="form-input"
-                      id="map"
-                      value={map}
-                      onChange={(e) => setMap(e.target.value)}
-                      required
+              <h1 className="animated-text">Choose Map:</h1>
+              <select
+                  className="form-input"
+                  id="map"
+                  value={map}
+                  onChange={(e) => setMap(e.target.value)}
+                  required
               >
                 <option value="Spaceship">🚀 Spaceship</option>
                 <option value="FHV">🏫 FHV</option>

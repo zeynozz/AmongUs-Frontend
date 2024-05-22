@@ -10,6 +10,7 @@ export default function PrivatePage() {
   const [gameCode, setGameCode] = useState("");
   const [stompClient, setStompClient] = useState(null);
   const [currentPlayerId, setCurrentPlayerId] = useState(null);
+  const [figureColor, setFigureColor] = useState("white");
 
   useEffect(() => {
     const socket = new SockJS("http://localhost:3000/ws");
@@ -44,6 +45,7 @@ export default function PrivatePage() {
     if (!isJoinDisabled && stompClient) {
       const data = {
         username: playerName,
+        color: figureColor, // Add the color to the data being sent
         position: {
           x: 10,
           y: 9,
@@ -89,6 +91,20 @@ export default function PrivatePage() {
               onChange={handlePlayerNameChange}
               className="form-input"
           />
+          <h1 className="animated-text3">Select Figure color:</h1>
+          <select
+              className="form-input"
+              id="figureColor"
+              value={figureColor}
+              onChange={(e) => setFigureColor(e.target.value)}
+              required
+          >
+            <option value="green">🟩 Green</option>
+            <option value="blue">🟦 Blue</option>
+            <option value="pink">🟥 Pink</option>
+            <option value="white">⬜ White</option>
+            <option value="purple">🟪 Purple</option>
+          </select>
           <h1 className="animated-text3">Type your code to join the game:</h1>
           <input
               type="text"
