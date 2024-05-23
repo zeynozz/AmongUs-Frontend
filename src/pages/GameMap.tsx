@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import "../css/GameMap.css";
 import "../css/CardSwipe.css";
 import CardSwipe from './CardSwipe';
+import EmergencyAnimation from './EmergencyAnimation';
+import Stomp from 'stompjs';
+import SockJS from 'sockjs-client';
 
 interface Player {
     id: number;
@@ -13,13 +16,16 @@ interface Player {
 interface Props {
     map: number[][];
     playerList: Player[];
+    gameCode: string; // Add gameCode as a prop
 }
 
-const GameMap: React.FC<Props> = ({ map, playerList }) => {
+const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
     const [showPopup, setShowPopup] = useState(false);
     const [tasksCompleted, setTasksCompleted] = useState(0);
     const [completedTasks, setCompletedTasks] = useState<{ x: number, y: number }[]>([]);
     const [currentTask, setCurrentTask] = useState<{ x: number, y: number } | null>(null);
+    const [showEmergency, setShowEmergency] = useState(false);
+    const [stompClient, setStompClient] = useState<any>(null);
 
     const playerId = JSON.parse(sessionStorage.getItem('currentPlayerId') || "null") as number;
 
@@ -33,17 +39,34 @@ const GameMap: React.FC<Props> = ({ map, playerList }) => {
     const [playerPosition, setPlayerPosition] = useState<{ x: number, y: number }>(initialPlayerPosition);
 
     const tasks = [
-        { id: 1, name: "Card Swipe 1", position: { x: 51, y: 5 } },
+        { id: 1, name: "Card Swipe", position: { x: 51, y: 5 } },
         { id: 2, name: "Card Swipe 2", position: { x: 18, y: 18 } },
         { id: 3, name: "Card Swipe 3", position: { x: 52, y: 36 } },
         { id: 4, name: "Card Swipe 4", position: { x: 73, y: 21 } },
         { id: 5, name: "Card Swipe 5", position: { x: 74, y: 35 } }
     ];
 
+    useEffect(() => {
+        if (!stompClient) {
+            const socket = new SockJS("http://localhost:3000/ws");
+            const client = Stomp.over(socket);
+            client.connect({}, () => {
+                setStompClient(client);
+            });
+
+            return () => stompClient?.disconnect();
+        }
+    }, [stompClient]);
+
     const handleTaskClick = (cellType: number, x: number, y: number) => {
-        if (cellType === 2 && !showPopup && !completedTasks.some(task => task.x === x && task.y === y)) {
+        if ((cellType === 2 || cellType === 13) && !showPopup && !completedTasks.some(task => task.x === x && task.y === y)) {
             setCurrentTask({ x, y });
             setShowPopup(true);
+        }
+        if (cellType >= 14 && cellType <= 17) {
+            if (stompClient) {
+                stompClient.send("/app/emergency", {}, gameCode);
+            }
         }
     };
 
@@ -54,6 +77,10 @@ const GameMap: React.FC<Props> = ({ map, playerList }) => {
         }
         setShowPopup(false);
         setCurrentTask(null);
+    };
+
+    const handleEmergencyClose = () => {
+        setShowEmergency(false);
     };
 
     if (!map) {
@@ -145,6 +172,21 @@ const GameMap: React.FC<Props> = ({ map, playerList }) => {
                                 case 12:
                                     cellClass = 'edge2';
                                     break;
+                                case 13:
+                                    cellClass = completedTasks.some(task => task.x === cellIndex && task.y === rowIndex) ? 'completed-task1' : 'task1 task1-glow';
+                                    break;
+                                case 14:
+                                    cellClass = 'emergency1';
+                                    break;
+                                case 15:
+                                    cellClass = 'emergency2';
+                                    break;
+                                case 16:
+                                    cellClass = 'emergency3';
+                                    break;
+                                case 17:
+                                    cellClass = 'emergency4';
+                                    break;
                                 default:
                                     cellClass = 'obstacle';
                                     break;
@@ -174,6 +216,7 @@ const GameMap: React.FC<Props> = ({ map, playerList }) => {
                     <div className="overlay2" onClick={() => handlePopupClose(false)}></div>
                 </div>
             )}
+            {showEmergency && <EmergencyAnimation onClose={handleEmergencyClose} />}
         </div>
     );
 };

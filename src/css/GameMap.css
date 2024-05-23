@@ -127,6 +127,56 @@
     background-image: url("/public/images/edge2.png") ;
 }
 
+.task1 {
+    background-image: url("/public/images/vending.png");
+    background-size: cover;
+    background-position: center;
+    border: 3px solid yellow;
+    cursor: pointer;
+}
+
+.emergency1{
+    background-image: url("/public/images/emerg1.png");
+    cursor: pointer;
+}
+
+.emergency2{
+    background-image: url("/public/images/emerg2.png");
+    cursor: pointer;
+}
+
+.emergency3{
+    background-image: url("/public/images/emerg3.png");
+    cursor: pointer;
+}
+
+.emergency4{
+    background-image: url("/public/images/emerg4.png");
+    cursor: pointer;
+}
+
+.task1-glow {
+    box-shadow: 0 0 20px yellow;
+    animation: glow 1s infinite alternate;
+}
+
+@keyframes glow {
+    from {
+        box-shadow: 0 0 10px yellow;
+    }
+    to {
+        box-shadow: 0 0 20px yellow;
+    }
+}
+
+.completed-task1 {
+    background-image: url("/public/images/vending.png");
+    box-shadow: none;
+    animation: none;
+}
+
+
+
 .player {
     position: relative;
     display: flex;

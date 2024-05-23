@@ -12,13 +12,16 @@
   "dependencies": {
     "@react-three/drei": "^9.105.6",
     "@react-three/fiber": "^8.16.6",
+    "@stomp/stompjs": "^7.0.0",
     "@types/three": "^0.164.0",
+    "gsap": "^3.12.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3",
     "react-stomp": "^5.1.0",
+    "socket.io": "^4.7.5",
+    "socket.io-client": "^4.7.5",
     "sockjs": "^0.3.24",
-    "sockjs-client": "^1.6.1",
     "three": "^0.164.1",
     "universal-cookie": "^7.1.4"
   },
