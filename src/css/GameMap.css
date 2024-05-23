@@ -371,7 +371,7 @@
 
 .sabotage-message {
     font-family: 'DSEG14Classic', sans-serif;
-    font-size: 80px;
+    font-size: 50px;
     color: white;
     animation: glowRed 1s infinite alternate;
     margin-bottom: 20px;
