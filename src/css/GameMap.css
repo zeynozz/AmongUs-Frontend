@@ -137,18 +137,22 @@
 
 .emergency1{
     background-image: url("/public/images/emerg1.png");
+    cursor: pointer;
 }
 
 .emergency2{
     background-image: url("/public/images/emerg2.png");
+    cursor: pointer;
 }
 
 .emergency3{
     background-image: url("/public/images/emerg3.png");
+    cursor: pointer;
 }
 
 .emergency4{
     background-image: url("/public/images/emerg4.png");
+    cursor: pointer;
 }
 
 .task1-glow {

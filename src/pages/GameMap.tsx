@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import "../css/GameMap.css";
 import "../css/CardSwipe.css";
 import CardSwipe from './CardSwipe';
+import EmergencyAnimation from './EmergencyAnimation';
+import Stomp from 'stompjs';
+import SockJS from 'sockjs-client';
 
 interface Player {
     id: number;
@@ -13,13 +16,16 @@ interface Player {
 interface Props {
     map: number[][];
     playerList: Player[];
+    gameCode: string; // Add gameCode as a prop
 }
 
-const GameMap: React.FC<Props> = ({ map, playerList }) => {
+const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
     const [showPopup, setShowPopup] = useState(false);
     const [tasksCompleted, setTasksCompleted] = useState(0);
     const [completedTasks, setCompletedTasks] = useState<{ x: number, y: number }[]>([]);
     const [currentTask, setCurrentTask] = useState<{ x: number, y: number } | null>(null);
+    const [showEmergency, setShowEmergency] = useState(false);
+    const [stompClient, setStompClient] = useState<any>(null);
 
     const playerId = JSON.parse(sessionStorage.getItem('currentPlayerId') || "null") as number;
 
@@ -40,10 +46,27 @@ const GameMap: React.FC<Props> = ({ map, playerList }) => {
         { id: 5, name: "Card Swipe 5", position: { x: 74, y: 35 } }
     ];
 
+    useEffect(() => {
+        if (!stompClient) {
+            const socket = new SockJS("http://localhost:3000/ws");
+            const client = Stomp.over(socket);
+            client.connect({}, () => {
+                setStompClient(client);
+            });
+
+            return () => stompClient?.disconnect();
+        }
+    }, [stompClient]);
+
     const handleTaskClick = (cellType: number, x: number, y: number) => {
         if ((cellType === 2 || cellType === 13) && !showPopup && !completedTasks.some(task => task.x === x && task.y === y)) {
             setCurrentTask({ x, y });
             setShowPopup(true);
+        }
+        if (cellType >= 14 && cellType <= 17) {
+            if (stompClient) {
+                stompClient.send("/app/emergency", {}, gameCode);
+            }
         }
     };
 
@@ -54,6 +77,10 @@ const GameMap: React.FC<Props> = ({ map, playerList }) => {
         }
         setShowPopup(false);
         setCurrentTask(null);
+    };
+
+    const handleEmergencyClose = () => {
+        setShowEmergency(false);
     };
 
     if (!map) {
@@ -189,6 +216,7 @@ const GameMap: React.FC<Props> = ({ map, playerList }) => {
                     <div className="overlay2" onClick={() => handlePopupClose(false)}></div>
                 </div>
             )}
+            {showEmergency && <EmergencyAnimation onClose={handleEmergencyClose} />}
         </div>
     );
 };

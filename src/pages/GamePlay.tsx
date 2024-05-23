@@ -5,6 +5,7 @@ import Crewmate from "./Crewmate";
 import Impostor from "./Impostor";
 import GameMap from "./GameMap";
 import RoleAnimation from "./RoleAnimation";
+import EmergencyAnimation from "./EmergencyAnimation";
 import { Game } from "../App";
 
 type Props = {
@@ -15,14 +16,14 @@ type Props = {
 export function PlayGame({ game, onChangeSetGame }: Props) {
     const [stompClient, setStompClient] = useState<any>(null);
     const [showAnimation, setShowAnimation] = useState(true);
+    const [showEmergency, setShowEmergency] = useState(false);
     const playerId = JSON.parse(sessionStorage.getItem('currentPlayerId') || "null");
-    const playerIndex = game.players.findIndex((player) => player.id === playerId);
-    const playerRole = playerIndex !== -1 ? game.players[playerIndex].role : null;
+    const playerIndex = game?.players.findIndex((player) => player.id === playerId) ?? -1;
+    const playerRole = playerIndex !== -1 ? game?.players[playerIndex].role : null;
 
     if (!game) {
         return <div>Loading...</div>;
     }
-
 
     useEffect(() => {
         if (!stompClient) {
@@ -78,6 +79,10 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
                 handlePlayerRemoved(removedPlayerId);
             });
 
+            const emergencySubscription = stompClient.subscribe(`/topic/${game.gameCode}/emergency`, () => {
+                setShowEmergency(true);
+            });
+
             stompClient.send(`/app/${game.gameCode}/play`, {}, JSON.stringify(game));
 
             return () => {
@@ -85,6 +90,7 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
                 gamePlaySubscription.unsubscribe();
                 playerKilledSubscription.unsubscribe();
                 playerRemovedSubscription.unsubscribe();
+                emergencySubscription.unsubscribe();
             };
         }
     }, [stompClient, game.gameCode]);
@@ -102,6 +108,10 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
 
     const handlePlayerKilled = (killedPlayerId: number) => {
         handlePlayerRemoved(killedPlayerId);
+    };
+
+    const handleEmergencyClose = () => {
+        setShowEmergency(false);
     };
 
     console.log('Current Player ID:', playerId);
@@ -124,7 +134,8 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
                 ))}
             </ul>
             {playerRole === "IMPOSTOR" ? <Impostor game={game} playerId={playerId} onChangeSetGame={onChangeSetGame} onPlayerKilled={handlePlayerKilled} /> : <Crewmate />}
-            <GameMap map={game.map} playerList={game.players} />
+            <GameMap map={game.map} playerList={game.players} gameCode={game.gameCode} />
+            {showEmergency && <EmergencyAnimation onClose={handleEmergencyClose} />}
         </div>
     );
 }
