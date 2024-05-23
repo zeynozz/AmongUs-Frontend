@@ -49,25 +49,28 @@
 .task {
     position: relative;
     background-color: gold;
-    animation: glow 1.5s infinite alternate;
+    animation: glowYellow 1.5s infinite alternate;
     cursor: pointer;
 }
 
-.task::after {
+.task-impostor {
+    position: relative;
+    background-color: red;
+    animation: glowRed 1.5s infinite alternate;
+    cursor: pointer;
+}
+
+.task::after,
+.task-impostor::after {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    border: 2px solid rgba(255, 223, 0, 0.8);
     border-radius: 50%;
     animation: glow 2s infinite alternate;
     pointer-events: none;
-}
-
-.MapDisplay-cell.task {
-    pointer-events: auto;
 }
 
 .completed-task {
@@ -75,7 +78,7 @@
     cursor: not-allowed;
 }
 
-@keyframes glow {
+@keyframes glowYellow {
     0% {
         box-shadow: 0 0 5px rgba(255, 215, 0, 0.75);
     }
@@ -83,6 +86,16 @@
         box-shadow: 0 0 15px rgba(255, 215, 0, 1);
     }
 }
+
+@keyframes glowRed {
+    0% {
+        box-shadow: 0 0 5px red;
+    }
+    100% {
+        box-shadow: 0 0 15px red;
+    }
+}
+
 
 .obstacle {
 }
@@ -135,47 +148,33 @@
     cursor: pointer;
 }
 
-.emergency1{
+.emergency1 {
     background-image: url("/public/images/emerg1.png");
     cursor: pointer;
 }
 
-.emergency2{
+.emergency2 {
     background-image: url("/public/images/emerg2.png");
     cursor: pointer;
 }
 
-.emergency3{
+.emergency3 {
     background-image: url("/public/images/emerg3.png");
     cursor: pointer;
 }
 
-.emergency4{
+.emergency4 {
     background-image: url("/public/images/emerg4.png");
     cursor: pointer;
 }
 
-.task1-glow {
-    box-shadow: 0 0 20px yellow;
-    animation: glow 1s infinite alternate;
-}
 
-@keyframes glow {
-    from {
-        box-shadow: 0 0 10px yellow;
-    }
-    to {
-        box-shadow: 0 0 20px yellow;
-    }
-}
 
 .completed-task1 {
     background-image: url("/public/images/vending.png");
     box-shadow: none;
     animation: none;
 }
-
-
 
 .player {
     position: relative;
@@ -291,7 +290,132 @@
     color: white;
 }
 
+.task-item1 {
+    font-family: 'DSEG14Classic', sans-serif;
+    font-size: 20px;
+    color: red;
+    margin-bottom: 20px;
+    animation: glowRed 1s infinite alternate;
+}
+
 .task-item.completed {
     font-family: 'DSEG14Classic', sans-serif;
     color: green;
+}
+
+.sabotage-container {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1000;
+}
+
+.sabotage-icon {
+    width: 300px;
+    height: 300px;
+    cursor: pointer;
+    transition: opacity 0.3s;
+    position: relative;
+}
+
+.sabotage-icon.inactive {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.sabotage-cooldown {
+    position: absolute;
+    bottom: 60%;
+    left: 50%;
+    transform: translate(-50%, 50%);
+    color: white;
+    font-size: 50px;
+    font-weight: bold;
+    z-index: 2;
+    text-shadow:
+            -4px -4px 0 #000,
+            4px -4px 0 #000,
+            -4px  4px 0 #000,
+            4px  4px 0 #000; /* Schatten in Schwarz */
+}
+
+.sabotage-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.sabotage-countdown {
+    color: red;
+    font-size: 100px;
+    font-family: 'DSEG14Classic', sans-serif;
+    font-weight: bold;
+    text-shadow:
+            -4px -4px 0 #000,
+            4px -4px 0 #000,
+            -4px 4px 0 #000,
+            4px 4px 0 #000;
+    animation: glowWhite 1s infinite alternate;
+}
+
+.sabotage-message {
+    font-family: 'DSEG14Classic', sans-serif;
+    font-size: 80px;
+    color: white;
+    animation: glowRed 1s infinite alternate;
+    margin-bottom: 20px;
+}
+
+.sabotage-image {
+    width: 200px;
+    height: 300px;
+    margin-top: 20px;
+    animation: floatLeftRight 3s infinite linear, glowWhite 1s infinite alternate;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+@keyframes glowRed {
+    from {
+        text-shadow: 0 0 10px red, 0 0 20px red, 0 0 30px red, 0 0 40px red;
+    }
+    to {
+        text-shadow: 0 0 20px red, 0 0 30px red, 0 0 40px red, 0 0 50px red;
+    }
+}
+
+@keyframes glowWhite {
+    from {
+        text-shadow: 0 0 10px white, 0 0 20px white, 0 0 30px white, 0 0 40px white;
+    }
+    to {
+        text-shadow: 0 0 20px white, 0 0 30px white, 0 0 40px white, 0 0 50px white;
+    }
+}
+
+@keyframes floatLeftRight {
+    0% {
+        transform: translateX(100%);
+    }
+    50% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
 }
