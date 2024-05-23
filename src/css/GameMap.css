@@ -131,15 +131,31 @@
     background-image: url("/public/images/vending.png");
     background-size: cover;
     background-position: center;
-    border: 3px solid yellow; /* Gelber Rahmen */
+    border: 3px solid yellow;
+    cursor: pointer;
+}
+
+.emergency1{
+    background-image: url("/public/images/emerg1.png");
+}
+
+.emergency2{
+    background-image: url("/public/images/emerg2.png");
+}
+
+.emergency3{
+    background-image: url("/public/images/emerg3.png");
+}
+
+.emergency4{
+    background-image: url("/public/images/emerg4.png");
 }
 
 .task1-glow {
-    box-shadow: 0 0 20px yellow; /* Gelbes Leuchten */
-    animation: glow 1s infinite alternate; /* Leuchtanimation */
+    box-shadow: 0 0 20px yellow;
+    animation: glow 1s infinite alternate;
 }
 
-/* Leuchtanimation */
 @keyframes glow {
     from {
         box-shadow: 0 0 10px yellow;
@@ -151,8 +167,8 @@
 
 .completed-task1 {
     background-image: url("/public/images/vending.png");
-    box-shadow: none; /* Entfernt das Leuchten */
-    animation: none; /* Entfernt die Animation */
+    box-shadow: none;
+    animation: none;
 }
 
 

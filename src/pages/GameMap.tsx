@@ -33,7 +33,7 @@ const GameMap: React.FC<Props> = ({ map, playerList }) => {
     const [playerPosition, setPlayerPosition] = useState<{ x: number, y: number }>(initialPlayerPosition);
 
     const tasks = [
-        { id: 1, name: "Card Swipe 1", position: { x: 51, y: 5 } },
+        { id: 1, name: "Card Swipe", position: { x: 51, y: 5 } },
         { id: 2, name: "Card Swipe 2", position: { x: 18, y: 18 } },
         { id: 3, name: "Card Swipe 3", position: { x: 52, y: 36 } },
         { id: 4, name: "Card Swipe 4", position: { x: 73, y: 21 } },
@@ -147,6 +147,18 @@ const GameMap: React.FC<Props> = ({ map, playerList }) => {
                                     break;
                                 case 13:
                                     cellClass = completedTasks.some(task => task.x === cellIndex && task.y === rowIndex) ? 'completed-task1' : 'task1 task1-glow';
+                                    break;
+                                case 14:
+                                    cellClass = 'emergency1';
+                                    break;
+                                case 15:
+                                    cellClass = 'emergency2';
+                                    break;
+                                case 16:
+                                    cellClass = 'emergency3';
+                                    break;
+                                case 17:
+                                    cellClass = 'emergency4';
                                     break;
                                 default:
                                     cellClass = 'obstacle';
