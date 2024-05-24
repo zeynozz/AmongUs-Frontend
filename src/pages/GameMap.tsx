@@ -64,17 +64,19 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
     }, [stompClient, gameCode]);
 
     const handleTaskClick = (cellType: number, x: number, y: number) => {
-        if (currentPlayer?.role === "IMPOSTOR") {
-            if (cellType >= 14 && cellType <= 17) {
-                if (stompClient) {
-                    stompClient.send("/app/emergency", {}, gameCode);
-                }
+        if (cellType >= 14 && cellType <= 17) {
+            if (stompClient) {
+                stompClient.send("/app/emergency", {}, gameCode);
             }
+            setShowEmergency(true);
+            return;
+        }
+
+        if (currentPlayer?.role === "IMPOSTOR") {
             return;
         }
 
         if (isSabotageActive && sabotageTriggered) {
-
             setShowTaskPopup(true);
             setTaskCountdown(10);
             const countdownInterval = setInterval(() => {
@@ -119,7 +121,6 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
 
     useEffect(() => {
         const handleResize = () => {
-
             setPlayerPosition(prev => ({ ...prev }));
         };
 
