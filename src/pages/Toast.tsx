@@ -3,6 +3,7 @@ import "../css/Toast.css";
 
 interface ToastProps {
     message: string;
+    onClose: () => void;
 }
 
 const Toast: React.FC<ToastProps> = ({ message }) => {
