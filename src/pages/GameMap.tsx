@@ -10,7 +10,7 @@ import SockJS from 'sockjs-client';
 interface Player {
     id: number;
     username: string;
-    position: { x: number; y: number };
+    position: { x: number, y: number };
     color: string;
     role: string;
 }
@@ -50,6 +50,11 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
         { id: 5, name: "Card Swipe 5", position: { x: 74, y: 35 } }
     ];
 
+    const emergencyCells = [
+        { x: 50, y: 11 }, { x: 51, y: 11 }, { x: 50, y: 12 }, { x:51, y: 12 },
+        // Add other emergency cell coordinates if necessary
+    ];
+
     useEffect(() => {
         if (!stompClient) {
             const socket = new SockJS("http://localhost:3000/ws");
@@ -68,12 +73,17 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
     }, [stompClient, gameCode]);
 
     const handleTaskClick = (cellType: number, x: number, y: number) => {
-        if (cellType >= 14 && cellType <= 17) {
+        if ((cellType >= 14 && cellType <= 17) && isNearEmergencyCell(playerPosition.x, playerPosition.y)) {
             if (stompClient) {
                 stompClient.send("/app/emergency", {}, gameCode);
+                setShowEmergency(true)
             }
             setShowEmergency(true);
             return;
+        }
+
+        if (!isNearTaskCell(x, y)) {
+            return; //
         }
 
         if (currentPlayer?.role === "IMPOSTOR") {
@@ -133,11 +143,15 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
     }, []);
 
     const isNearTaskCell = (x: number, y: number) => {
-        return tasks.some(task => Math.abs(task.position.x - x) <= 1 && Math.abs(task.position.y - y) <= 1);
+        return tasks.some(task => Math.abs(task.position.x - playerPosition.x) <= 1 && Math.abs(task.position.y - playerPosition.y) <= 1);
+    };
+
+    const isNearEmergencyCell = (x: number, y: number) => {
+        return emergencyCells.some(cell => Math.abs(cell.x - playerPosition.x) <= 1 && Math.abs(cell.y - playerPosition.y) <= 1);
     };
 
     const handleSabotageClick = () => {
-        if (sabotageCooldown === 0) {
+        if (sabotageCooldown === 0 && isNearTaskCell(playerPosition.x, playerPosition.y)) {
             setIsSabotageActive(true);
             setSabotageCooldown(30);
             setShowToast(true);
