@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import "../css/GameMap.css";
 import "../css/CardSwipe.css";
 import CardSwipe from './CardSwipe';
 import EmergencyAnimation from './EmergencyAnimation';
+import Toast from './Toast';
 import Stomp from 'stompjs';
 import SockJS from 'sockjs-client';
 
@@ -32,6 +33,9 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
     const [sabotageCooldown, setSabotageCooldown] = useState(0);
     const [isSabotageActive, setIsSabotageActive] = useState(false);
     const [sabotageTriggered, setSabotageTriggered] = useState(false);
+    const [showToast, setShowToast] = useState(false);
+
+    const audioRef = useRef<HTMLAudioElement>(null);
 
     const playerId = JSON.parse(sessionStorage.getItem('currentPlayerId') || "null") as number;
     const currentPlayer = playerList.find(player => player.id === playerId);
@@ -136,8 +140,13 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
         if (sabotageCooldown === 0) {
             setIsSabotageActive(true);
             setSabotageCooldown(30);
+            setShowToast(true);
+            setTimeout(() => setShowToast(false), 3000);
             if (stompClient) {
                 stompClient.send("/app/sabotage", {}, gameCode);
+            }
+            if (audioRef.current) {
+                audioRef.current.play();
             }
         }
     };
@@ -287,6 +296,9 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
                     <img src={`/public/images/devil.png`} alt="Devil" className="sabotage-image" />
                 </div>
             )}
+            {showToast && (
+                <Toast message="Sabotage-counter-activated" onClose={() => setShowToast(false)} />
+            )}
             {currentPlayer && currentPlayer.role === "IMPOSTOR" && (
                 <div className="sabotage-container">
                     <img
@@ -300,6 +312,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
                     )}
                 </div>
             )}
+            <audio ref={audioRef} src="/public/sounds/sabotage.mp3" />
         </div>
     );
 };
