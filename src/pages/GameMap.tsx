@@ -21,6 +21,12 @@ interface Props {
     gameCode: string;
 }
 
+interface ChatMessage {
+    sender: string;
+    content: string;
+    type: string;
+}
+
 const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
     const [showPopup, setShowPopup] = useState(false);
     const [tasksCompleted, setTasksCompleted] = useState(0);
@@ -34,6 +40,9 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
     const [isSabotageActive, setIsSabotageActive] = useState(false);
     const [sabotageTriggered, setSabotageTriggered] = useState(false);
     const [showToast, setShowToast] = useState(false);
+    const [showChatInput, setShowChatInput] = useState(false);
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
+    const [chatMessage, setChatMessage] = useState("");
 
     const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -66,6 +75,18 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
                     setIsSabotageActive(true);
                     setSabotageTriggered(true);
                 });
+
+                client.subscribe(`/topic/public`, (message) => {
+                    const receivedMessage: ChatMessage = JSON.parse(message.body);
+                    if (receivedMessage.type === 'CHAT') {
+                        setMessages(prevMessages => {
+                            if (!prevMessages.some(msg => msg.content === receivedMessage.content && msg.sender === receivedMessage.sender)) {
+                                return [...prevMessages, receivedMessage];
+                            }
+                            return prevMessages;
+                        });
+                    }
+                });
             });
 
             return () => stompClient?.disconnect();
@@ -76,14 +97,17 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
         if ((cellType >= 14 && cellType <= 17) && isNearEmergencyCell(playerPosition.x, playerPosition.y)) {
             if (stompClient) {
                 stompClient.send("/app/emergency", {}, gameCode);
-                setShowEmergency(true)
+                setShowEmergency(true);
+                setTimeout(() => {
+                    setShowEmergency(false);
+                    setShowChatInput(true);
+                }, 5000); // Show emergency animation for 5 seconds
             }
-            setShowEmergency(true);
             return;
         }
 
         if (!isNearTaskCell(x, y)) {
-            return; //
+            return;
         }
 
         if (currentPlayer?.role === "IMPOSTOR") {
@@ -123,6 +147,22 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
 
     const handleEmergencyClose = () => {
         setShowEmergency(false);
+    };
+
+    const handleSendMessage = () => {
+        if (stompClient && chatMessage.trim()) {
+            const message: ChatMessage = {
+                sender: currentPlayer?.username || 'Unknown',
+                content: chatMessage,
+                type: 'CHAT'
+            };
+            stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(message));
+            setChatMessage("");
+        }
+    };
+
+    const handleCloseChat = () => {
+        setShowChatInput(false);
     };
 
     useEffect(() => {
@@ -327,6 +367,27 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
                 </div>
             )}
             <audio ref={audioRef} src="/public/sounds/sabotage.mp3" />
+            {showChatInput && (
+                <div className="overlay">
+                    <div className="dialog">
+                        <div className="message-container">
+                            {messages.map((msg, index) => (
+                                <div key={index} className="message">
+                                    <strong>{msg.sender}:</strong> {msg.content}
+                                </div>
+                            ))}
+                        </div>
+                        <input
+                            type="text"
+                            value={chatMessage}
+                            onChange={(e) => setChatMessage(e.target.value)}
+                            placeholder="Type your message..."
+                        />
+                        <button onClick={handleSendMessage}>Send</button>
+                        <button className="close-button" onClick={handleCloseChat}>Close</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
