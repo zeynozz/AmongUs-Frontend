@@ -491,6 +491,8 @@
     margin-top: auto;
     padding-top: 10px;
     padding: 9px 9px;
+    position: absolute;
+    bottom: 20px;
 }
 
 .input-container input[type="text"] {
@@ -502,6 +504,7 @@
     font-size: 14px;
     outline: none;
     padding-right: 40px;
+    width: 470px;
 }
 
 .input-container button {
@@ -525,6 +528,5 @@
 
 .username {
     color: #0bdeae;
-    font-weight: bold;
 }
 
