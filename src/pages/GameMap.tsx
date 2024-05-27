@@ -312,6 +312,9 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
                                     case 17:
                                         cellClass = 'emergency4';
                                         break;
+                                    case 18:
+                                        cellClass = 'vent';
+                                        break;
                                     default:
                                         cellClass = 'obstacle';
                                         break;
