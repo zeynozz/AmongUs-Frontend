@@ -87,6 +87,13 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
                         });
                     }
                 });
+                client.subscribe(`/topic/${gameCode}/emergency`, () => {
+                    setShowEmergency(true);
+                    setTimeout(() => {
+                        setShowEmergency(false);
+                        setShowChatInput(true);
+                    }, 3000);
+                });
             });
 
             return () => stompClient?.disconnect();
@@ -101,7 +108,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
                 setTimeout(() => {
                     setShowEmergency(false);
                     setShowChatInput(true);
-                }, 5000); // Show emergency animation for 5 seconds
+                }, 3000);
             }
             return;
         }
