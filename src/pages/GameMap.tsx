@@ -50,6 +50,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
     const currentPlayer = playerList.find(player => player.id === playerId);
     const initialPlayerPosition = currentPlayer ? currentPlayer.position : { x: 45, y: 7 };
     const [playerPosition, setPlayerPosition] = useState<{ x: number, y: number }>(initialPlayerPosition);
+    const [players, setPlayers] = useState<Player[]>(playerList);
 
     const tasks = [
         { id: 1, name: "Card Swipe 1", position: { x: 51, y: 5 } },
@@ -61,8 +62,17 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
 
     const emergencyCells = [
         { x: 50, y: 11 }, { x: 51, y: 11 }, { x: 50, y: 12 }, { x:51, y: 12 },
-        // Add other emergency cell coordinates if necessary
     ];
+
+    useEffect(() => {
+        if (currentPlayer) {
+            console.log(`Setting initial player position to: ${currentPlayer.position.x}, ${currentPlayer.position.y}`);
+            setPlayerPosition(currentPlayer.position);
+        } else {
+            console.error("Current player not found in playerList", { playerId, playerList });
+        }
+    }, [playerList, currentPlayer]);
+
 
     useEffect(() => {
         if (!stompClient) {
@@ -76,6 +86,14 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
                     setSabotageTriggered(true);
                 });
 
+                client.subscribe(`/topic/${gameCode}/emergency`, () => {
+                    setShowEmergency(true);
+                    setTimeout(() => {
+                        setShowEmergency(false);
+                        setShowChatInput(true);
+                    }, 3000);
+                });
+
                 client.subscribe(`/topic/public`, (message) => {
                     const receivedMessage: ChatMessage = JSON.parse(message.body);
                     if (receivedMessage.type === 'CHAT') {
@@ -87,20 +105,45 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
                         });
                     }
                 });
-                client.subscribe(`/topic/${gameCode}/emergency`, () => {
-                    setShowEmergency(true);
-                    setTimeout(() => {
-                        setShowEmergency(false);
-                        setShowChatInput(true);
-                    }, 3000);
+
+                client.subscribe(`/topic/positionChange`, (message) => {
+                    const updatedGame = JSON.parse(message.body);
+                    const updatedPlayer = updatedGame.players.find((player: Player) => player.id === playerId);
+                    if (updatedPlayer) {
+                        console.log(`Received updated player position: ${updatedPlayer.position.x}, ${updatedPlayer.position.y}`);
+                        setPlayerPosition(updatedPlayer.position);
+                        setPlayers(updatedGame.players);
+                    } else {
+                        console.error("Updated player not found", { updatedGame, playerId });
+                    }
                 });
             });
 
             return () => stompClient?.disconnect();
         }
-    }, [stompClient, gameCode]);
+    }, [stompClient, gameCode, playerId]);
+
 
     const handleTaskClick = (cellType: number, x: number, y: number) => {
+        if (cellType === 18) {
+            if (currentPlayer?.role === "IMPOSTOR") {
+                if (stompClient) {
+                    const moveMessage = {
+                        id: currentPlayer?.id,
+                        gameCode: gameCode,
+                        action: 'vent'
+                    };
+                    stompClient.send("/app/vent", {}, JSON.stringify(moveMessage));
+
+                    const audio = new Audio('/public/sounds/venting.mp3');
+                    audio.play();
+                }
+            } else {
+                console.warn("Only impostors can use vents");
+            }
+            return;
+        }
+
         if ((cellType >= 14 && cellType <= 17) && isNearEmergencyCell(playerPosition.x, playerPosition.y)) {
             if (stompClient) {
                 stompClient.send("/app/emergency", {}, gameCode);
@@ -231,6 +274,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
         transform: `translate(-${playerPosition.x * 50 - window.innerWidth / 2}px, -${playerPosition.y * 50 - window.innerHeight / 2}px)`
     };
 
+
     return (
         <div className="MapDisplay-map-container">
             <div className="progress-container">
@@ -261,7 +305,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
                 {map.map((row, rowIndex) => (
                     <div key={rowIndex} className="MapDisplay-row">
                         {row.map((cell, cellIndex) => {
-                            const player = playerList.find(p => p.position.x === cellIndex && p.position.y === rowIndex);
+                            const player = players.find(p => p.position.x === cellIndex && p.position.y === rowIndex);
                             const isPlayer = Boolean(player);
                             let cellClass = '';
                             if (currentPlayer?.role === "IMPOSTOR" && (cell === 2 || cell === 13)) {
@@ -318,6 +362,9 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
                                         break;
                                     case 17:
                                         cellClass = 'emergency4';
+                                        break;
+                                    case 18:
+                                        cellClass = 'vent';
                                         break;
                                     default:
                                         cellClass = 'obstacle';

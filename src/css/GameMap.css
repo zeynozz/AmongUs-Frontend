@@ -168,7 +168,10 @@
     cursor: pointer;
 }
 
-
+.vent {
+    background-image: url("/public/images/vent.png");
+    cursor: pointer;
+}
 
 .completed-task1 {
     background-image: url("/public/images/vending.png");
