@@ -91,7 +91,7 @@ export default function PrivatePage() {
               onChange={handlePlayerNameChange}
               className="form-input"
           />
-          <h1 className="animated-text3">Select Figure color:</h1>
+          <h1 className="animated-text2">Select Figure color:</h1>
           <select
               className="form-input"
               id="figureColor"

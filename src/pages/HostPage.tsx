@@ -103,7 +103,7 @@ export default function HostPage({ setGame }: Props) {
               />
             </div>
             <div className="form-group">
-              <h1 className="animated-text">Select Figure color:</h1>
+              <h1 className="animated-text2">Select Figure color:</h1>
               <select
                   className="form-input"
                   id="figureColor"
@@ -119,7 +119,7 @@ export default function HostPage({ setGame }: Props) {
               </select>
             </div>
             <div className="form-group">
-              <h1 className="animated-text">Max Players:</h1>
+              <h1 className="animated-text4">Max Players:</h1>
               <div className="player-icons">
                 {Array.from({ length: 6 }, (_, i) => (
                     <img
@@ -133,7 +133,7 @@ export default function HostPage({ setGame }: Props) {
               </div>
             </div>
             <div className="form-group">
-              <h1 className="animated-text">Number of Impostors:</h1>
+              <h1 className="animated-text2">Number of Impostors:</h1>
               <input
                   className="form-input"
                   type="number"
@@ -146,7 +146,7 @@ export default function HostPage({ setGame }: Props) {
               />
             </div>
             <div className="form-group">
-              <h1 className="animated-text">Choose Map:</h1>
+              <h1 className="animated-text4">Choose Map:</h1>
               <select
                   className="form-input"
                   id="map"
