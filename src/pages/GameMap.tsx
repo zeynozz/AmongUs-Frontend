@@ -117,7 +117,6 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
                         console.error("Updated player not found", { updatedGame, playerId });
                     }
                 });
-
             });
 
             return () => stompClient?.disconnect();
