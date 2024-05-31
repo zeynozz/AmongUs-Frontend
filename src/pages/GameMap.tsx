@@ -428,7 +428,8 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
                             {messages.map((msg, index) => (
                                 <div key={index} className="message">
                                     <div className="text-content">
-                                        <strong className="username">{msg.sender}:</strong> {msg.content}
+                                        <strong className="username">{msg.sender}</strong>
+                                        <div className="content">{msg.content}</div>
                                     </div>
                                 </div>
                             ))}

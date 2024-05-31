@@ -531,5 +531,8 @@
 
 .username {
     color: #0bdeae;
+    font-family: 'DSEG14Classic', sans-serif;
+    font-size: 11px;
+    text-shadow: 0 1px 10px rgba(80, 87, 108, 0.7);
 }
 
