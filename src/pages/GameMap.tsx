@@ -44,6 +44,11 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [chatMessage, setChatMessage] = useState("");
 
+    const [showVoting, setShowVoting] = useState(false);
+    const [votingTimer, setVotingTimer] = useState(30);
+    const [chatTimer, setChatTimer] = useState(30);
+    const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
+
     const audioRef = useRef<HTMLAudioElement>(null);
 
     const playerId = JSON.parse(sessionStorage.getItem('currentPlayerId') || "null") as number;
@@ -73,7 +78,6 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
         }
     }, [playerList, currentPlayer]);
 
-
     useEffect(() => {
         if (!stompClient) {
             const socket = new SockJS("http://localhost:3000/ws");
@@ -91,6 +95,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
                     setTimeout(() => {
                         setShowEmergency(false);
                         setShowChatInput(true);
+                        startChatTimer();
                     }, 3000);
                 });
 
@@ -117,12 +122,20 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
                         console.error("Updated player not found", { updatedGame, playerId });
                     }
                 });
+
             });
 
             return () => stompClient?.disconnect();
         }
     }, [stompClient, gameCode, playerId]);
 
+    useEffect(() => {
+        if (chatTimer === 0) {
+            setShowChatInput(false);
+            setShowVoting(true);
+            startVotingTimer();
+        }
+    }, [chatTimer]);
 
     const handleTaskClick = (cellType: number, x: number, y: number) => {
         if (cellType === 18) {
@@ -151,6 +164,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
                 setTimeout(() => {
                     setShowEmergency(false);
                     setShowChatInput(true);
+                    startChatTimer();
                 }, 3000);
             }
             return;
@@ -215,6 +229,15 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
         setShowChatInput(false);
     };
 
+    const handleCloseVoting = () => {
+        setShowVoting(false);
+    };
+
+    const handleOpenChat = () => {
+        setShowVoting(false);
+        setShowChatInput(true);
+    };
+
     useEffect(() => {
         if (currentPlayer) {
             setPlayerPosition(currentPlayer.position);
@@ -270,10 +293,42 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
         };
     }, [sabotageCooldown]);
 
+    const startVotingTimer = () => {
+        let countdown = 30;
+        const interval = setInterval(() => {
+            setVotingTimer(countdown);
+            if (countdown === 0) {
+                clearInterval(interval);
+                setShowVoting(false);
+            }
+            countdown--;
+        }, 1000);
+    };
+
+    const startChatTimer = () => {
+        let countdown = 30;
+        const interval = setInterval(() => {
+            setChatTimer(countdown);
+            if (countdown === 0) {
+                clearInterval(interval);
+                setShowChatInput(false);
+                setShowVoting(true);
+                startVotingTimer();
+            }
+            countdown--;
+        }, 1000);
+    };
+
+    const handleVote = (playerName: string) => {
+        if (stompClient) {
+            stompClient.send("/app/castVote", {}, JSON.stringify({ gameCode, votedPlayer: playerName }));
+            setSelectedPlayer(playerName);
+        }
+    };
+
     const cameraStyle = {
         transform: `translate(-${playerPosition.x * 50 - window.innerWidth / 2}px, -${playerPosition.y * 50 - window.innerHeight / 2}px)`
     };
-
 
     return (
         <div className="MapDisplay-map-container">
@@ -424,6 +479,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
             {showChatInput && (
                 <div className="overlay">
                     <div className="dialog">
+                        <div className="timer">Time left: {chatTimer}</div>
                         <div className="message-container">
                             {messages.map((msg, index) => (
                                 <div key={index} className="message">
@@ -461,6 +517,38 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
                     </div>
                 </div>
 
+            )}
+            {showVoting && (
+                <div className="overlay">
+                    <div className="voting-dialog">
+                        <div className="voting-timer">Time left: {votingTimer}</div>
+                        <div className="player-list">
+                            {playerList.map(player => (
+                                <button
+                                    key={player.id}
+                                    className={`player-button ${selectedPlayer === player.username ? 'selected' : ''}`}
+                                    onClick={() => handleVote(player.username)}
+                                >
+                                    {player.username}
+                                </button>
+                            ))}
+                        </div>
+                        <div className="dialog-buttons">
+                            <div className="chat-button" onClick={handleOpenChat}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" className="bi bi-chat-dots" viewBox="0 0 16 16">
+                                    <path d="M5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/>
+                                    <path d="m2.165 15.803.02-.004c1.83-.363 2.948-.842 3.468-1.105A9 9 0 0 0 8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6a10.4 10.4 0 0 1-.524 2.318l-.003.011a11 11 0 0 1-.244.637c-.079.186.074.394.273.362a22 22 0 0 0 .693-.125m.8-3.108a1 1 0 0 0-.287-.801C1.618 10.83 1 9.468 1 8c0-3.192 3.004-6 7-6s7 2.808 7 6-3.004 6-7 6a8 8 0 0 1-2.088-.272 1 1 0 0 0-.711.074c-.387.196-1.24.57-2.634.893a11 11 0 0 0 .398-2"/>
+                                </svg>
+                            </div>
+                            <div className="close-button" onClick={handleCloseVoting}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" className="bi bi-x-circle" viewBox="0 0 16 16">
+                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );
