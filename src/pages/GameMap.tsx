@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import "../css/GameMap.css";
 import "../css/CardSwipe.css";
 import CardSwipe from './CardSwipe';
@@ -6,19 +6,13 @@ import EmergencyAnimation from './EmergencyAnimation';
 import Toast from './Toast';
 import Stomp from 'stompjs';
 import SockJS from 'sockjs-client';
-
-interface Player {
-    id: number;
-    username: string;
-    position: { x: number, y: number };
-    color: string;
-    role: string;
-}
+import { Player } from "../App";
 
 interface Props {
     map: number[][];
     playerList: Player[];
     gameCode: string;
+    onPlayerKilled: (killedPlayerId: number) => void;
 }
 
 interface ChatMessage {
@@ -27,7 +21,8 @@ interface ChatMessage {
     type: string;
 }
 
-const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
+
+const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled }) => {
     const [showPopup, setShowPopup] = useState(false);
     const [tasksCompleted, setTasksCompleted] = useState(0);
     const [completedTasks, setCompletedTasks] = useState<{ x: number, y: number }[]>([]);
@@ -47,7 +42,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
     const audioRef = useRef<HTMLAudioElement>(null);
 
     const playerId = JSON.parse(sessionStorage.getItem('currentPlayerId') || "null") as number;
-    const currentPlayer = playerList.find(player => player.id === playerId);
+    const currentPlayer = playerList?.find(player => player.id === playerId);
     const initialPlayerPosition = currentPlayer ? currentPlayer.position : { x: 45, y: 7 };
     const [playerPosition, setPlayerPosition] = useState<{ x: number, y: number }>(initialPlayerPosition);
     const [players, setPlayers] = useState<Player[]>(playerList);
@@ -72,7 +67,6 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
             console.error("Current player not found in playerList", { playerId, playerList });
         }
     }, [playerList, currentPlayer]);
-
 
     useEffect(() => {
         if (!stompClient) {
@@ -108,7 +102,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
 
                 client.subscribe(`/topic/positionChange`, (message) => {
                     const updatedGame = JSON.parse(message.body);
-                    const updatedPlayer = updatedGame.players.find((player: Player) => player.id === playerId);
+                    const updatedPlayer = updatedGame.players?.find((player: Player) => player.id === playerId);
                     if (updatedPlayer) {
                         console.log(`Received updated player position: ${updatedPlayer.position.x}, ${updatedPlayer.position.y}`);
                         setPlayerPosition(updatedPlayer.position);
@@ -122,7 +116,6 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
             return () => stompClient?.disconnect();
         }
     }, [stompClient, gameCode, playerId]);
-
 
     const handleTaskClick = (cellType: number, x: number, y: number) => {
         if (cellType === 18) {
@@ -255,6 +248,18 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
         }
     };
 
+    const handleKillClick = (victimId: number) => {
+        if (stompClient) {
+            const killMessage = {
+                killerId: currentPlayer?.id,
+                victimId: victimId,
+                gameCode: gameCode,
+            };
+            stompClient.send("/app/game/kill", {}, JSON.stringify(killMessage));
+            onPlayerKilled(victimId);
+        }
+    };
+
     useEffect(() => {
         let timer: NodeJS.Timeout | null = null;
         if (sabotageCooldown > 0) {
@@ -273,7 +278,6 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
     const cameraStyle = {
         transform: `translate(-${playerPosition.x * 50 - window.innerWidth / 2}px, -${playerPosition.y * 50 - window.innerHeight / 2}px)`
     };
-
 
     return (
         <div className="MapDisplay-map-container">
@@ -305,7 +309,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
                 {map.map((row, rowIndex) => (
                     <div key={rowIndex} className="MapDisplay-row">
                         {row.map((cell, cellIndex) => {
-                            const player = players.find(p => p.position.x === cellIndex && p.position.y === rowIndex);
+                            const player = players?.find(p => p.position.x === cellIndex && p.position.y === rowIndex);
                             const isPlayer = Boolean(player);
                             let cellClass = '';
                             if (currentPlayer?.role === "IMPOSTOR" && (cell === 2 || cell === 13)) {
@@ -374,12 +378,38 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
                             let cellContent = null;
                             if (isPlayer) {
                                 cellClass += ' player';
-                                cellContent = (
-                                    <>
-                                        <img src={`/images/${player.color}Figure.png`} alt="Player" className="player-image" />
-                                        <div className="player-name">{player.username}</div>
-                                    </>
-                                );
+                                if (player.status === 'GHOST' && player.id === currentPlayer?.id) {
+                                    cellContent = (
+                                        <>
+                                            <img src='../images/whiteGhost.png' alt="Ghost" className="player-image" />
+                                            <div className="player-name">{player.username}</div>
+                                        </>
+                                    );
+                                } else if (player.status === 'DEAD') {
+                                    cellContent = (
+                                        <>
+                                            <img src='../images/killedFigure.jpg'alt="Killed" className="player-image killed-image" />
+                                            <div className="player-name">{player.username}</div>
+                                        </>
+                                    );
+                                } else if (player.status === 'GHOST') {
+                                    cellContent = (
+                                        <>
+                                            <img src='../images/whiteGhost.png' alt="Ghost" className="player-image" />
+                                            <div className="player-name">{player.username}</div>
+                                        </>
+                                    );
+                                } else {
+                                    cellContent = (
+                                        <>
+                                            <img src={`/images/${player.color}Figure.png`} alt="Player" className="player-image" />
+                                            <div className="player-name">{player.username}</div>
+                                            {currentPlayer?.role === "IMPOSTOR" && currentPlayer?.status === "ALIVE" && player.status === "ALIVE" && (
+                                                <button onClick={() => handleKillClick(player.id)}></button>
+                                            )}
+                                        </>
+                                    );
+                                }
                             }
                             return (
                                 <div key={cellIndex} className={`MapDisplay-cell ${cellClass}`} onClick={() => handleTaskClick(cell, cellIndex, rowIndex)}>
@@ -406,19 +436,6 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
             )}
             {showToast && (
                 <Toast message="Sabotage-counter-activated" onClose={() => setShowToast(false)} />
-            )}
-            {currentPlayer && currentPlayer.role === "IMPOSTOR" && (
-                <div className="sabotage-container">
-                    <img
-                        src={`/public/images/sabotage.png`}
-                        alt="Sabotage"
-                        className={`sabotage-icon ${isNearTaskCell(playerPosition.x, playerPosition.y) && sabotageCooldown === 0 ? '' : 'inactive'}`}
-                        onClick={handleSabotageClick}
-                    />
-                    {sabotageCooldown > 0 && (
-                        <div className="sabotage-cooldown">{sabotageCooldown}</div>
-                    )}
-                </div>
             )}
             <audio ref={audioRef} src="/public/sounds/sabotage.mp3" />
             {showChatInput && (
@@ -460,7 +477,6 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
                         </div>
                     </div>
                 </div>
-
             )}
         </div>
     );

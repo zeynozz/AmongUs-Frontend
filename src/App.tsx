@@ -23,6 +23,7 @@ export type Player = {
     position: { x: number; y: number };
     color: string;
     role: "IMPOSTOR" | "CREWMATE";
+    status: "ALIVE" | "DEAD" | "GHOST";
 };
 
 export default function App() {

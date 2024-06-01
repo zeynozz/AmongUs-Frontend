@@ -85,7 +85,7 @@ const getCrewmateId = (game: Game): number | null => {
         console.error('Game or players data is undefined');
         return null;
     }
-    const crewmate = game.players.find(player => player.role === "CREWMATE");
+    const crewmate = game.players.find(player => player.role === "CREWMATE" && player.status === "ALIVE");
     return crewmate ? crewmate.id : null;
 };
 
