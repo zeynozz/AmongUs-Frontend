@@ -18,7 +18,7 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
     const [showAnimation, setShowAnimation] = useState(true);
     const [showEmergency, setShowEmergency] = useState(false);
     const playerId = JSON.parse(sessionStorage.getItem('currentPlayerId') || "null");
-    const playerIndex = game?.players.findIndex((player) => player.id === playerId) ?? -1;
+    const playerIndex = game?.players?.findIndex((player) => player.id === playerId) ?? -1;
     const playerRole = playerIndex !== -1 ? game?.players[playerIndex].role : null;
 
     if (!game) {
@@ -41,7 +41,7 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
         const handleKeyDown = (event: KeyboardEvent) => {
             const playerId = JSON.parse(sessionStorage.getItem('currentPlayerId') || "null");
             const keyCode = event.code;
-            if (playerId && stompClient && game.players.length > 0) {
+            if (playerId && stompClient && game?.players?.length > 0) {
                 const moveMessage = {
                     id: playerId,
                     keyCode: keyCode,
@@ -53,7 +53,7 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
 
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [stompClient, game.players]);
+    }, [stompClient, game?.players]);
 
     useEffect(() => {
         if (stompClient) {
@@ -69,7 +69,7 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
 
             const playerKilledSubscription = stompClient.subscribe("/topic/playerKilled", (message) => {
                 const updatedGame = JSON.parse(message.body);
-                if (updatedGame) {  // Ensure updatedGame is not null
+                if (updatedGame) {
                     onChangeSetGame(updatedGame);
                 }
             });
@@ -102,12 +102,17 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
     }, [playerRole]);
 
     const handlePlayerRemoved = (removedPlayerId: number) => {
-        const updatedPlayers = game.players.filter(player => player.id !== removedPlayerId);
+        const updatedPlayers = game?.players?.filter(player => player.id !== removedPlayerId) ?? [];
         onChangeSetGame({ ...game, players: updatedPlayers });
     };
 
     const handlePlayerKilled = (killedPlayerId: number) => {
-        handlePlayerRemoved(killedPlayerId);
+        const killMessage = {
+            killerId: playerId,
+            victimId: killedPlayerId,
+            gameCode: game.gameCode,
+        };
+        stompClient.send("/app/kill", {}, JSON.stringify(killMessage));
     };
 
     const handleEmergencyClose = () => {
@@ -127,14 +132,27 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
                 Your browser does not support the video tag.
             </video>
             <ul>
-                {game.players.map((player) => (
+                {game.players?.map((player) => (
                     <li key={player.id}>
                         Username: {player.username} {player.id === playerId ? " (you)" : ""}
                     </li>
                 ))}
             </ul>
-            {playerRole === "IMPOSTOR" ? <Impostor game={game} playerId={playerId} onChangeSetGame={onChangeSetGame} onPlayerKilled={handlePlayerKilled} /> : <Crewmate />}
-            <GameMap map={game.map} playerList={game.players} gameCode={game.gameCode} />
+            {playerRole === "IMPOSTOR" ? (
+                <Impostor
+                    game={game}
+                    playerId={playerId}
+                    onPlayerKilled={handlePlayerKilled}
+                    onChangeSetGame={onChangeSetGame}/>
+            ) : (
+                <Crewmate />
+            )}
+            <GameMap
+                map={game.map}
+                playerList={game.players}
+                gameCode={game.gameCode}
+                onPlayerKilled={handlePlayerKilled}
+            />
             {showEmergency && <EmergencyAnimation onClose={handleEmergencyClose} />}
         </div>
     );

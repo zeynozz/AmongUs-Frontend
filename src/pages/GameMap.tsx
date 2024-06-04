@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import "../css/GameMap.css";
 import "../css/CardSwipe.css";
 import CardSwipe from './CardSwipe';
@@ -8,6 +8,7 @@ import Stomp from 'stompjs';
 import SockJS from 'sockjs-client';
 
 interface Player {
+    status: string;
     id: number;
     username: string;
     position: { x: number, y: number };
@@ -19,6 +20,8 @@ interface Props {
     map: number[][];
     playerList: Player[];
     gameCode: string;
+    onPlayerKilled: (killedPlayerId: number) => void;
+
 }
 
 interface ChatMessage {
@@ -27,7 +30,11 @@ interface ChatMessage {
     type: string;
 }
 
-const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
+interface GameMapProps {
+    playerList?: Player[];
+}
+
+const GameMap: React.FC<Props> = ({map, playerList, gameCode, onPlayerKilled}) => {
     const [showPopup, setShowPopup] = useState(false);
     const [tasksCompleted, setTasksCompleted] = useState(0);
     const [completedTasks, setCompletedTasks] = useState<{ x: number, y: number }[]>([]);
@@ -53,21 +60,22 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
     const audioRef = useRef<HTMLAudioElement>(null);
 
     const playerId = JSON.parse(sessionStorage.getItem('currentPlayerId') || "null") as number;
-    const currentPlayer = playerList.find(player => player.id === playerId);
-    const initialPlayerPosition = currentPlayer ? currentPlayer.position : { x: 45, y: 7 };
+    const currentPlayer = playerList?.find(player => player.id === playerId);
+    const initialPlayerPosition = currentPlayer ? currentPlayer.position : {x: 45, y: 7};
     const [playerPosition, setPlayerPosition] = useState<{ x: number, y: number }>(initialPlayerPosition);
     const [players, setPlayers] = useState<Player[]>(playerList);
+    const [playerStatus, setPlayerStatus] = useState(currentPlayer?.status || 'ALIVE');
 
     const tasks = [
-        { id: 1, name: "Card Swipe 1", position: { x: 51, y: 5 } },
-        { id: 2, name: "Card Swipe 2", position: { x: 18, y: 18 } },
-        { id: 3, name: "Card Swipe 3", position: { x: 52, y: 36 } },
-        { id: 4, name: "Card Swipe 4", position: { x: 73, y: 21 } },
-        { id: 5, name: "Card Swipe 5", position: { x: 74, y: 35 } }
+        {id: 1, name: "Card Swipe 1", position: {x: 51, y: 5}},
+        {id: 2, name: "Card Swipe 2", position: {x: 18, y: 18}},
+        {id: 3, name: "Card Swipe 3", position: {x: 52, y: 36}},
+        {id: 4, name: "Card Swipe 4", position: {x: 73, y: 21}},
+        {id: 5, name: "Card Swipe 5", position: {x: 74, y: 35}}
     ];
 
     const emergencyCells = [
-        { x: 50, y: 11 }, { x: 51, y: 11 }, { x: 50, y: 12 }, { x: 51, y: 12 },
+        {x: 50, y: 11}, {x: 51, y: 11}, {x: 50, y: 12}, {x: 51, y: 12},
     ];
 
     useEffect(() => {
@@ -75,7 +83,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
             console.log(`Setting initial player position to: ${currentPlayer.position.x}, ${currentPlayer.position.y}`);
             setPlayerPosition(currentPlayer.position);
         } else {
-            console.error("Current player not found in playerList", { playerId, playerList });
+            console.error("Current player not found in playerList", {playerId, playerList});
         }
     }, [playerList, currentPlayer]);
 
@@ -120,7 +128,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
                         setPlayerPosition(updatedPlayer.position);
                         setPlayers(updatedGame.players);
                     } else {
-                        console.error("Updated player not found", { updatedGame, playerId });
+                        console.error("Updated player not found", {updatedGame, playerId});
                     }
                 });
 
@@ -207,7 +215,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
         }
 
         if ((cellType === 2 || cellType === 13) && !showPopup && !completedTasks.some(task => task.x === x && task.y === y)) {
-            setCurrentTask({ x, y });
+            setCurrentTask({x, y});
             setShowPopup(true);
         }
     };
@@ -254,13 +262,13 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
         if (currentPlayer) {
             setPlayerPosition(currentPlayer.position);
         } else {
-            console.error("Current player not found in playerList", { playerId, playerList });
+            console.error("Current player not found in playerList", {playerId, playerList});
         }
     }, [playerList, currentPlayer]);
 
     useEffect(() => {
         const handleResize = () => {
-            setPlayerPosition(prev => ({ ...prev }));
+            setPlayerPosition(prev => ({...prev}));
         };
 
         window.addEventListener("resize", handleResize);
@@ -305,6 +313,28 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
         };
     }, [sabotageCooldown]);
 
+    const handleKillClick = (victimId: number) => {
+        if (stompClient) {
+            const killMessage = {
+                killerId: currentPlayer?.id,
+                victimId: victimId,
+                gameCode: gameCode,
+            };
+            stompClient.send("/app/game/kill", {}, JSON.stringify(killMessage));
+            onPlayerKilled(victimId);
+        }
+    };
+
+
+    useEffect(() => {
+        if (playerStatus === 'DEAD') {
+            setTimeout(() => {
+                setPlayerStatus('GHOST');
+            }, 3000); // Assuming 3 seconds to transition from DEAD to GHOST
+        }
+    }, [playerStatus]);
+
+
     const startVotingTimer = () => {
         let countdown = 30;
         const interval = setInterval(() => {
@@ -333,7 +363,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
 
     const handleVote = (playerName: string) => {
         if (stompClient) {
-            stompClient.send("/app/castVote", {}, JSON.stringify({ gameCode, votedPlayer: playerName }));
+            stompClient.send("/app/castVote", {}, JSON.stringify({gameCode, votedPlayer: playerName}));
             setSelectedPlayer(playerName);
             setVoteMessage(`You voted for ${playerName} `);
         } else {
@@ -348,13 +378,16 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
     return (
         <div className="MapDisplay-map-container">
             <div className="progress-container">
-                <div className="progress" role="progressbar" aria-valuenow={(tasksCompleted / 5) * 100} aria-valuemin={0} aria-valuemax={100}>
-                    <div className="progress-bar" style={{ width: `${(tasksCompleted / 5) * 100}%` }}>{(tasksCompleted / 5) * 100}% Complete</div>
+                <div className="progress" role="progressbar" aria-valuenow={(tasksCompleted / 5) * 100}
+                     aria-valuemin={0} aria-valuemax={100}>
+                    <div className="progress-bar"
+                         style={{width: `${(tasksCompleted / 5) * 100}%`}}>{(tasksCompleted / 5) * 100}% Complete
+                    </div>
                 </div>
                 {currentPlayer?.role === "IMPOSTOR" ? (
                     <div className="task-list">
                         <div className="task-item1">Sabotage-and-kill-everyone</div>
-                        <div className="task-item">Fake  tasks</div>
+                        <div className="task-item">Fake tasks</div>
                         {tasks.map(task => (
                             <div key={task.id} className="task-item">{task.name}</div>
                         ))}
@@ -362,7 +395,8 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
                 ) : (
                     <div className="task-list">
                         {tasks.map(task => (
-                            <div key={task.id} className={`task-item ${completedTasks.some(t => t.x === task.position.x && t.y === task.position.y) ? 'completed' : ''}`}>
+                            <div key={task.id}
+                                 className={`task-item ${completedTasks.some(t => t.x === task.position.x && t.y === task.position.y) ? 'completed' : ''}`}>
                                 {task.name}</div>
                         ))}
                     </div>
@@ -375,7 +409,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
                 {map.map((row, rowIndex) => (
                     <div key={rowIndex} className="MapDisplay-row">
                         {row.map((cell, cellIndex) => {
-                            const player = players.find(p => p.position.x === cellIndex && p.position.y === rowIndex);
+                            const player = players?.find(p => p.position.x === cellIndex && p.position.y === rowIndex);
                             const isPlayer = Boolean(player);
                             let cellClass = '';
                             if (currentPlayer?.role === "IMPOSTOR" && (cell === 2 || cell === 13)) {
@@ -444,15 +478,45 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
                             let cellContent = null;
                             if (isPlayer) {
                                 cellClass += ' player';
-                                cellContent = (
-                                    <>
-                                        <img src={`/images/${player.color}Figure.png`} alt="Player" className="player-image" />
-                                        <div className="player-name">{player.username}</div>
-                                    </>
-                                );
+                                if (player.status === 'GHOST' && player.id === currentPlayer?.id) {
+                                    cellContent = (
+                                        <>
+                                            <img src='../images/whiteGhost.png' alt="Ghost" className="player-image"/>
+                                            <div className="player-name">{player.username}</div>
+                                        </>
+                                    );
+                                } else if (player.status === 'DEAD') {
+                                    cellContent = (
+                                        <>
+                                            <img src='../images/killedFigure.jpg' alt="Killed"
+                                                 className="player-image killed-image"/>
+                                            <div className="player-name">{player.username}</div>
+                                        </>
+                                    );
+                                } else if (player.status === 'GHOST') {
+                                    cellContent = (
+                                        <>
+                                            <img src='../images/whiteGhost.png' alt="Ghost" className="player-image"/>
+                                            <div className="player-name">{player.username}</div>
+                                        </>
+                                    );
+                                } else {
+                                    cellContent = (
+                                        <>
+                                            <img src={`/images/${player.color}Figure.png`} alt="Player"
+                                                 className="player-image"/>
+                                            <div className="player-name">{player.username}</div>
+                                            {currentPlayer?.role === "IMPOSTOR" && currentPlayer?.status === "ALIVE" && player.status === "ALIVE" && (
+                                                <button onClick={() => handleKillClick(player.id)}></button>
+                                            )}
+                                        </>
+                                    );
+                                }
                             }
+
                             return (
-                                <div key={cellIndex} className={`MapDisplay-cell ${cellClass}`} onClick={() => handleTaskClick(cell, cellIndex, rowIndex)}>
+                                <div key={cellIndex} className={`MapDisplay-cell ${cellClass}`}
+                                     onClick={() => handleTaskClick(cell, cellIndex, rowIndex)}>
                                     {cellContent}
                                 </div>
                             );
@@ -462,20 +526,20 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
             </div>
             {showPopup && (
                 <div className="popup" id="popup">
-                    <CardSwipe onClose={handlePopupClose} />
+                    <CardSwipe onClose={handlePopupClose}/>
                     <div className="overlay2" onClick={() => handlePopupClose(false)}></div>
                 </div>
             )}
-            {showEmergency && <EmergencyAnimation onClose={handleEmergencyClose} />}
+            {showEmergency && <EmergencyAnimation onClose={handleEmergencyClose}/>}
             {showTaskPopup && (
                 <div className="sabotage-popup">
                     <div className="sabotage-message">Oops, This task has been sabotaged</div>
                     <div className="sabotage-countdown">{taskCountdown}</div>
-                    <img src={`/public/images/devil.png`} alt="Devil" className="sabotage-image" />
+                    <img src={`/public/images/devil.png`} alt="Devil" className="sabotage-image"/>
                 </div>
             )}
             {showToast && (
-                <Toast message="Sabotage-counter-activated" onClose={() => setShowToast(false)} />
+                <Toast message="Sabotage-counter-activated" onClose={() => setShowToast(false)}/>
             )}
             {currentPlayer && currentPlayer.role === "IMPOSTOR" && (
                 <div className="sabotage-container">
@@ -490,7 +554,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
                     )}
                 </div>
             )}
-            <audio ref={audioRef} src="/public/sounds/sabotage.mp3" />
+            <audio ref={audioRef} src="/public/sounds/sabotage.mp3"/>
             {showChatInput && (
                 <div className="overlay">
                     <div className="dialog">
@@ -518,15 +582,19 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
                                 }}
                             />
                             <button onClick={handleSendMessage}>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-send" viewBox="0 0 16 16">
-                                    <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576zm6.787-8.201L1.591 6.602l4.339 2.76z"/>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     className="bi bi-send" viewBox="0 0 16 16">
+                                    <path
+                                        d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576zm6.787-8.201L1.591 6.602l4.339 2.76z"/>
                                 </svg>
                             </button>
                         </div>
                         <div className="close-button" onClick={handleCloseChat}>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" className="bi bi-x-circle" viewBox="0 0 16 16">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor"
+                                 className="bi bi-x-circle" viewBox="0 0 16 16">
                                 <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+                                <path
+                                    d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
                             </svg>
                         </div>
                     </div>
@@ -554,15 +622,20 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
                         )}
                         <div className="dialog-buttons">
                             <div className="chat-button" onClick={handleOpenChat}>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" className="bi bi-chat-dots" viewBox="0 0 16 16">
-                                    <path d="M5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/>
-                                    <path d="m2.165 15.803.02-.004c1.83-.363 2.948-.842 3.468-1.105A9 9 0 0 0 8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6a10.4 10.4 0 0 1-.524 2.318l-.003.011a11 11 0 0 1-.244.637c-.079.186.074.394.273.362a22 22 0 0 0 .693-.125m.8-3.108a1 1 0 0 0-.287-.801C1.618 10.83 1 9.468 1 8c0-3.192 3.004-6 7-6s7 2.808 7 6-3.004 6-7 6a8 8 0 0 1-2.088-.272 1 1 0 0 0-.711.074c-.387.196-1.24.57-2.634.893a11 11 0 0 0 .398-2"/>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor"
+                                     className="bi bi-chat-dots" viewBox="0 0 16 16">
+                                    <path
+                                        d="M5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/>
+                                    <path
+                                        d="m2.165 15.803.02-.004c1.83-.363 2.948-.842 3.468-1.105A9 9 0 0 0 8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6a10.4 10.4 0 0 1-.524 2.318l-.003.011a11 11 0 0 1-.244.637c-.079.186.074.394.273.362a22 22 0 0 0 .693-.125m.8-3.108a1 1 0 0 0-.287-.801C1.618 10.83 1 9.468 1 8c0-3.192 3.004-6 7-6s7 2.808 7 6-3.004 6-7 6a8 8 0 0 1-2.088-.272 1 1 0 0 0-.711.074c-.387.196-1.24.57-2.634.893a11 11 0 0 0 .398-2"/>
                                 </svg>
                             </div>
                             <div className="close-button" onClick={handleCloseVoting}>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" className="bi bi-x-circle" viewBox="0 0 16 16">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor"
+                                     className="bi bi-x-circle" viewBox="0 0 16 16">
                                     <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                                    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+                                    <path
+                                        d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
                                 </svg>
                             </div>
                         </div>
