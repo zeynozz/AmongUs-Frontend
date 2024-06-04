@@ -48,6 +48,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
     const [votingTimer, setVotingTimer] = useState(30);
     const [chatTimer, setChatTimer] = useState(30);
     const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
+    const [voteMessage, setVoteMessage] = useState<string | null>(null);
 
     const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -66,7 +67,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
     ];
 
     const emergencyCells = [
-        { x: 50, y: 11 }, { x: 51, y: 11 }, { x: 50, y: 12 }, { x:51, y: 12 },
+        { x: 50, y: 11 }, { x: 51, y: 11 }, { x: 50, y: 12 }, { x: 51, y: 12 },
     ];
 
     useEffect(() => {
@@ -121,6 +122,17 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
                     } else {
                         console.error("Updated player not found", { updatedGame, playerId });
                     }
+                });
+
+                client.subscribe(`/topic/${gameCode}/votingResults`, (message) => {
+                    const votedOutPlayer = message.body;
+                    alert(`${votedOutPlayer} has been voted out!`);
+                    setPlayers(prevPlayers => prevPlayers.filter(player => player.username !== votedOutPlayer));
+                });
+
+                client.subscribe(`/topic/${gameCode}/voteConfirmation`, (message) => {
+                    const confirmationMessage = message.body;
+                    console.log(`Backend confirmation: ${confirmationMessage}`);
                 });
 
             });
@@ -323,6 +335,9 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
         if (stompClient) {
             stompClient.send("/app/castVote", {}, JSON.stringify({ gameCode, votedPlayer: playerName }));
             setSelectedPlayer(playerName);
+            setVoteMessage(`You voted for ${playerName} `);
+        } else {
+            console.error("StompClient is not connected");
         }
     };
 
@@ -522,17 +537,21 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode }) => {
                 <div className="overlay">
                     <div className="voting-dialog">
                         <div className="voting-timer">Time left: {votingTimer}</div>
-                        <div className="player-list">
-                            {playerList.map(player => (
-                                <button
-                                    key={player.id}
-                                    className={`player-button ${selectedPlayer === player.username ? 'selected' : ''}`}
-                                    onClick={() => handleVote(player.username)}
-                                >
-                                    {player.username}
-                                </button>
-                            ))}
-                        </div>
+                        {voteMessage ? (
+                            <div className="vote-message">{voteMessage}</div>
+                        ) : (
+                            <div className="player-list">
+                                {playerList.map(player => (
+                                    <button
+                                        key={player.id}
+                                        className={`player-button ${selectedPlayer === player.username ? 'selected' : ''}`}
+                                        onClick={() => handleVote(player.username)}
+                                    >
+                                        {player.username}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                         <div className="dialog-buttons">
                             <div className="chat-button" onClick={handleOpenChat}>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" className="bi bi-chat-dots" viewBox="0 0 16 16">
