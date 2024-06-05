@@ -8,12 +8,14 @@ import Stomp from 'stompjs';
 import SockJS from 'sockjs-client';
 
 interface Player {
-    status: string;
+    status: "ALIVE" | "DEAD" | "GHOST";
     id: number;
     username: string;
     position: { x: number, y: number };
     color: string;
     role: string;
+    direction: string;
+    imageIndex: number;
 }
 
 interface Props {
@@ -77,7 +79,6 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
 
     useEffect(() => {
         if (currentPlayer) {
-            console.log(`Setting initial player position to: ${currentPlayer.position.x}, ${currentPlayer.position.y}`);
             setPlayerPosition(currentPlayer.position);
         } else {
             console.error("Current player not found in playerList", { playerId, playerList });
@@ -271,6 +272,88 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
     }, []);
+
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (currentPlayer.status == "ALIVE") {
+                const keyCode = event.code;
+                const playerImageIndex = currentPlayer.imageIndex;
+
+                let newDirection = currentPlayer.direction;
+                let newIndex = playerImageIndex;
+
+                if (keyCode === 'KeyA') {
+                    newDirection = 'left';
+                    newIndex = (playerImageIndex + 1) % 4;
+                } else if (keyCode === 'KeyD') {
+                    newDirection = 'right';
+                    newIndex = (playerImageIndex + 1) % 4;
+                } else if (keyCode === 'KeyW' || keyCode === 'KeyS') {
+                    newDirection = 'upDown';
+                    newIndex = 0;
+                }
+
+                const newPlayerState = {
+                    ...currentPlayer,
+                    direction: newDirection,
+                    imageIndex: newIndex,
+                    position: calculateNewPosition(currentPlayer.position, keyCode)
+                };
+
+                // Send the updated position and animation state to the server
+                if (stompClient && currentPlayer) {
+                    stompClient.send("/app/positionChange", {}, JSON.stringify(newPlayerState));
+                }
+
+                setPlayerPosition(newPlayerState.position);
+                const updatedPlayers = players.map(p => (p.id === currentPlayer.id ? newPlayerState : p));
+                setPlayers(updatedPlayers);
+            }
+            else {
+                console.log("Move attempted by player ID: " + playerId + " who is DEAD.");
+
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [stompClient, currentPlayer, players]);
+
+    const calculateNewPosition = (currentPosition: { x: number, y: number }, keyCode: string) => {
+        let deltaX = 0, deltaY = 0;
+        switch (keyCode) {
+            case "KeyA":
+                deltaX = -1;
+                break;
+            case "KeyW":
+                deltaY = -1;
+                break;
+            case "KeyD":
+                deltaX = 1;
+                break;
+            case "KeyS":
+                deltaY = 1;
+                break;
+            default:
+                break;
+        }
+        return { x: currentPosition.x + deltaX, y: currentPosition.y + deltaY };
+    };
+
+    const getPlayerImageSrc = (player: Player) => {
+        const { direction, imageIndex } = player;
+        const basePath = `/images/movement/${player.color}`;
+        if (direction === 'left') {
+            return `${basePath}/left${imageIndex + 1}.png`;
+        } else if (direction === 'right') {
+            return `${basePath}/right${imageIndex + 1}.png`;
+        } else {
+            return `${basePath}/upDown.png`;
+        }
+    };
 
     const isNearTaskCell = (x: number, y: number) => {
         return tasks.some(task => Math.abs(task.position.x - playerPosition.x) <= 1 && Math.abs(task.position.y - playerPosition.y) <= 1);
@@ -500,14 +583,14 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                                 if (player.status === 'GHOST' && player.id === currentPlayer?.id) {
                                     cellContent = (
                                         <>
-                                            <img src='../images/whiteGhost.png' alt="Ghost" className="player-image" />
+                                            <img src='/public/images/impostor/whiteGhost.png' alt="Ghost" className="player-image" />
                                             <div className="player-name">{player.username}</div>
                                         </>
                                     );
                                 } else if (player.status === 'DEAD') {
                                     cellContent = (
                                         <>
-                                            <img src='../images/killedFigure.jpg' alt="Killed"
+                                            <img src='/public/images/impostor/playerKilled.png' alt="Killed"
                                                  className="player-image killed-image" />
                                             <div className="player-name">{player.username}</div>
                                         </>
@@ -515,15 +598,16 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                                 } else if (player.status === 'GHOST') {
                                     cellContent = (
                                         <>
-                                            <img src='../images/whiteGhost.png' alt="Ghost" className="player-image" />
+                                            <img src='public/images/impostor/whiteGhost.png' alt="Ghost" className="player-image" />
                                             <div className="player-name">{player.username}</div>
                                         </>
                                     );
                                 } else {
+                                    cellClass += ' player';
+                                    const playerImageSrc = getPlayerImageSrc(player);
                                     cellContent = (
                                         <>
-                                            <img src={`/images/${player.color}Figure.png`} alt="Player"
-                                                 className="player-image" />
+                                            <img src={playerImageSrc} alt="Player" className="player-image" />
                                             <div className="player-name">{player.username}</div>
                                             {currentPlayer?.role === "IMPOSTOR" && currentPlayer?.status === "ALIVE" && player.status === "ALIVE" && (
                                                 <button onClick={() => handleKillClick(player.id)}></button>
@@ -554,7 +638,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                 <div className="sabotage-popup">
                     <div className="sabotage-message">Oops, This task has been sabotaged</div>
                     <div className="sabotage-countdown">{taskCountdown}</div>
-                    <img src={`/public/images/devil.png`} alt="Devil" className="sabotage-image" />
+                    <img src={`/public/images/impostor/devil.png`} alt="Devil" className="sabotage-image" />
                 </div>
             )}
             {showToast && (
@@ -563,7 +647,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
             {currentPlayer && currentPlayer.role === "IMPOSTOR" && (
                 <div className="sabotage-container">
                     <img
-                        src={`/public/images/sabotage.png`}
+                        src={`/public/images/impostor/sabotage.png`}
                         alt="Sabotage"
                         className={`sabotage-icon ${isNearTaskCell(playerPosition.x, playerPosition.y) && sabotageCooldown === 0 ? '' : 'inactive'}`}
                         onClick={handleSabotageClick}

@@ -201,4 +201,23 @@
     margin-right: 0;
 }
 
+option.cyan {
+    color: cyan;
+    font-weight: bold;
+}
+
+option.red {
+    color: red;
+    font-weight: bold;
+}
+
+option.purple {
+    color: purple;
+    font-weight: bold;
+}
+
+option.blue {
+    color: blue;
+    font-weight: bold;
+}
 

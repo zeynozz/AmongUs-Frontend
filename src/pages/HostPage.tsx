@@ -81,6 +81,11 @@ export default function HostPage({ setGame }: Props) {
         });
   }
 
+  const handleColorChange = (e) => {
+    setFigureColor(e.target.value);
+    document.getElementById('figureColor').style.color = e.target.value;
+  };
+
   return (
       <div className="host-container">
         <video autoPlay loop muted className="background-video" src="/public/videos/stars.mp4">
@@ -108,14 +113,13 @@ export default function HostPage({ setGame }: Props) {
                   className="form-input"
                   id="figureColor"
                   value={figureColor}
-                  onChange={(e) => setFigureColor(e.target.value)}
+                  onChange={handleColorChange}
                   required
               >
-                <option value="green">🟩 Green</option>
-                <option value="blue">🟦 Blue</option>
-                <option value="pink">🟥 Pink</option>
-                <option value="white">⬜ White</option>
-                <option value="purple">🟪 Purple</option>
+                <option value="red" className="red">Red</option>
+                <option value="purple" className="purple">Purple</option>
+                <option value="blue" className="blue">Blue</option>
+                <option value="cyan" className="cyan">Cyan</option>
               </select>
             </div>
             <div className="form-group">
@@ -124,7 +128,7 @@ export default function HostPage({ setGame }: Props) {
                 {Array.from({ length: 6 }, (_, i) => (
                     <img
                         key={i}
-                        src={i < numPlayers ? `/public/images/greenFigure.png` : "/public/images/whiteFigure.png"}
+                        src={i < numPlayers ? `/public/images/setup/greenFigure.png` : "/public/images/setup/whiteFigure.png"}
                         alt="Player Icon"
                         onClick={() => setNumPlayers(i + 1)}
                         className="player-icon"

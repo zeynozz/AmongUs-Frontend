@@ -30,7 +30,7 @@ export default function HomePage() {
 
     return (
         <div className="landing-container">
-            <img src="/images/logo.png" alt="Logo" className="logo"/>
+            <img src="/images/setup/logo.png" alt="Logo" className="logo"/>
             <video autoPlay loop muted className="background-video" src="/public/videos/stars.mp4">
                 Your browser does not support the video tag.
             </video>

@@ -31,7 +31,7 @@
 }
 
 .walkable {
-    background-image: url("/public/images/floor.png");
+    background-image: url("/public/images/map/floor.png");
 }
 
 @keyframes pulse {
@@ -101,47 +101,47 @@
 }
 
 .table1 {
-    background-image: url("/public/images/table1.png") ;
+    background-image: url("/public/images/map/table1.png") ;
 }
 
 .table2 {
-    background-image: url("/public/images/table2.png") ;
+    background-image: url("/public/images/map/table2.png") ;
 }
 
 .table3 {
-    background-image: url("/public/images/table3.png") ;
+    background-image: url("/public/images/map/table3.png") ;
 }
 
 .table4 {
-    background-image: url("/public/images/table4.png") ;
+    background-image: url("/public/images/map/table4.png") ;
 }
 
 .window {
-    background-image: url("/public/images/window.png") ;
+    background-image: url("/public/images/map/window.png") ;
 }
 
 .wall {
-    background-image: url("/public/images/wall.png") ;
+    background-image: url("/public/images/map/wall.png") ;
 }
 
 .wall2 {
-    background-image: url("/public/images/wall2.png") ;
+    background-image: url("/public/images/map/wall2.png") ;
 }
 
 .wall3 {
-    background-image: url("/public/images/wall3.png") ;
+    background-image: url("/public/images/map/wall3.png") ;
 }
 
 .edge1 {
-    background-image: url("/public/images/edge1.png") ;
+    background-image: url("/public/images/map/edge1.png") ;
 }
 
 .edge2 {
-    background-image: url("/public/images/edge2.png") ;
+    background-image: url("/public/images/map/edge2.png") ;
 }
 
 .task1 {
-    background-image: url("/public/images/vending.png");
+    background-image: url("/public/images/map/vending.png");
     background-size: cover;
     background-position: center;
     border: 3px solid yellow;
@@ -149,32 +149,32 @@
 }
 
 .emergency1 {
-    background-image: url("/public/images/emerg1.png");
+    background-image: url("/public/images/map/emerg1.png");
     cursor: pointer;
 }
 
 .emergency2 {
-    background-image: url("/public/images/emerg2.png");
+    background-image: url("/public/images/map/emerg2.png");
     cursor: pointer;
 }
 
 .emergency3 {
-    background-image: url("/public/images/emerg3.png");
+    background-image: url("/public/images/map/emerg3.png");
     cursor: pointer;
 }
 
 .emergency4 {
-    background-image: url("/public/images/emerg4.png");
+    background-image: url("/public/images/map/emerg4.png");
     cursor: pointer;
 }
 
 .vent {
-    background-image: url("/public/images/vent.png");
+    background-image: url("/public/images/map/vent.png");
     cursor: pointer;
 }
 
 .completed-task1 {
-    background-image: url("/public/images/vending.png");
+    background-image: url("/public/images/map/vending.png");
     box-shadow: none;
     animation: none;
 }
@@ -624,11 +624,8 @@
     height: 25px;
 }
 
-.killed-image{
-    width: 40px;
-    height: 40px;
+.killed-image {
     object-fit: cover;
-    border-radius:50%;
-    border:2px solid #ff0000;
 }
+
 

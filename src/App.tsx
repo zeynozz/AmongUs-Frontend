@@ -24,6 +24,8 @@ export type Player = {
     color: string;
     role: "IMPOSTOR" | "CREWMATE";
     status: "ALIVE" | "DEAD" | "GHOST";
+    direction: string;
+    imageIndex: number;
 };
 
 export default function App() {

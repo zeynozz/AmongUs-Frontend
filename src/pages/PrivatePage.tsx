@@ -75,6 +75,11 @@ export default function PrivatePage() {
     }
   }, [stompClient]);
 
+  const handleColorChange = (e) => {
+    setFigureColor(e.target.value);
+    document.getElementById('figureColor').style.color = e.target.value;
+  };
+
   return (
       <div className="private-container">
         <video autoPlay loop muted className="background-video" src="/public/videos/stars.mp4">
@@ -96,14 +101,13 @@ export default function PrivatePage() {
               className="form-input"
               id="figureColor"
               value={figureColor}
-              onChange={(e) => setFigureColor(e.target.value)}
+              onChange={handleColorChange}
               required
           >
-            <option value="green">🟩 Green</option>
-            <option value="blue">🟦 Blue</option>
-            <option value="pink">🟥 Pink</option>
-            <option value="white">⬜ White</option>
-            <option value="purple">🟪 Purple</option>
+            <option value="red" className="red">Red</option>
+            <option value="purple" className="purple">Purple</option>
+            <option value="blue" className="blue">Blue</option>
+            <option value="cyan" className="cyan">Cyan</option>
           </select>
           <h1 className="animated-text3">Type your code to join the game:</h1>
           <input
@@ -115,11 +119,7 @@ export default function PrivatePage() {
           />
         </div>
         <button
-            className={`join-button ${
-                !isJoinDisabled
-                    ? "hover:border-black hover:bg-cyan-500"
-                    : "cursor-default"
-            }`}
+            className={`join-button ${!isJoinDisabled ? "hover:border-black hover:bg-cyan-500" : "cursor-default"}`}
             onClick={handleJoinGame}
             disabled={isJoinDisabled}
         >

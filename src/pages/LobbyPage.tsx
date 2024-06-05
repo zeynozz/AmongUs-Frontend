@@ -121,7 +121,7 @@ export default function LobbyPage({ game, onChangeSetGame }: Props) {
             {game.players.map((player, index) => (
                 <div key={player.id} className={`player player-${index + 1}`}>
                   <img
-                      src={`/public/images/${player.color}Figure.png`}
+                      src={`/public/images/movement/${player.color}/sit.png`}
                       alt={`${player.username} avatar`}
                       className="player-avatar"
                       style={{ transform: `translateX(${player.position.x}px) translateY(${player.position.y}px)` }}
@@ -133,13 +133,13 @@ export default function LobbyPage({ game, onChangeSetGame }: Props) {
           <div className="game-info">
             <div className="game-code" onClick={(e) => copyToClipboard(gameCode, e.currentTarget)}>CODE: {gameCode}</div>
             <div className="players-info">
-              <img src="/public/images/whiteFigure.png" alt="Player Icon" className="player-icon" />
+              <img src="/public/images/setup/whiteFigure.png" alt="Player Icon" className="player-icon" />
               <span className="player-count">
               {game.players.length}/{game.numberOfPlayers}
             </span>
             </div>
             <button onClick={handleStartGame} disabled={!isGameReadyToStart} className="start-game-button">
-              <img src="/public/images/start.png" alt="Start Game" />
+              <img src="/public/images/setup/start.png" alt="Start Game" />
             </button>
           </div>
         </div>

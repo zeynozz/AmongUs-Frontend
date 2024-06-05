@@ -72,7 +72,7 @@ const Impostor = ({ game, playerId, onChangeSetGame, onPlayerKilled }: ImpostorP
             <div className="impostor-role">
                 <Role role="IMPOSTOR"/>
                 <button className="kill-button" onClick={handleKill}>
-                    <img src="/public/images/kill.png" alt="Kill"/>
+                    <img src="/public/images/impostor/kill.png" alt="Kill"/>
                 </button>
                 {showKillAnimation && <KillAnimation/>}
             </div>

@@ -17,7 +17,7 @@ const EmergencyAnimation: React.FC<EmergencyAnimationProps> = ({ onClose }) => {
     return (
         <div className="emergency-animation" onClick={onClose}>
             <div className="emergency-content">
-                <img src="/public/images/emergAni.png" alt="Emergency Meeting" className="emergency-image" />
+                <img src="/public/images/map/emergAni.png" alt="Emergency Meeting" className="emergency-image" />
                 <div className="emergency-text">Emergency Meeting</div>
             </div>
             <audio ref={audioRef} src="/public/sounds/emerg.mp3" />

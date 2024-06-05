@@ -6,7 +6,7 @@ import Impostor from "./Impostor";
 import GameMap from "./GameMap";
 import RoleAnimation from "./RoleAnimation";
 import EmergencyAnimation from "./EmergencyAnimation";
-import { Game } from "../App";
+import { Game, Player } from "../App";
 
 type Props = {
     game: Game | null;

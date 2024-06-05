@@ -50,12 +50,12 @@
 }
 
 .host-button .game-mode-icon {
-    background-image: url('/public/images/host.png');
+    background-image: url('/public/images/setup/host.png');
 }
 
 
 .private-button .game-mode-icon {
-    background-image: url('/public/images/private.png');
+    background-image: url('/public/images/setup/private.png');
 }
 
 .back-button {
