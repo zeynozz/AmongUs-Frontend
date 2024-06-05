@@ -31,6 +31,119 @@ interface ChatMessage {
     type: string;
 }
 
+const MiniMap: React.FC<{ map: number[][]; playerPosition: any; tasks: any[]; players: Player[]; completedTasks: any[]; currentPlayer: Player }> = ({ map, playerPosition, tasks, players, completedTasks, currentPlayer }) => {
+    const mapSize = 500; // Size of the mini-map
+
+    const renderMiniMap = () => {
+        const miniMap = map.flatMap((row, rowIndex) =>
+            row.map((cell, cellIndex) => {
+                let cellColor;
+                switch (cell) {
+                    case 1:
+                        cellColor = "beige";
+                        break;
+                    case 2:
+                        cellColor = "darkorange";
+                        break;
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                        cellColor = "gray";
+                        break;
+                    case 7:
+                    case 8:
+                    case 9:
+                    case 10:
+                    case 11:
+                    case 12:
+                        cellColor = "darkgray";
+                        break;
+                    case 13:
+                        cellColor = "red";
+                        break;
+                    case 14:
+                    case 15:
+                    case 16:
+                    case 17:
+                        cellColor = "blue";
+                        break;
+                    case 18:
+                        cellColor = "purple";
+                        break;
+                    default:
+                        cellColor = "transparent";
+                        break;
+                }
+
+                const x = (cellIndex / map[0].length) * mapSize;
+                const y = (rowIndex / map.length) * mapSize;
+
+                return (
+                    <div
+                        key={`${rowIndex}-${cellIndex}`}
+                        className="mini-map-cell"
+                        style={{
+                            backgroundColor: cellColor,
+                            left: `${x}px`,
+                            top: `${y}px`,
+                        }}
+                    ></div>
+                );
+            })
+        );
+
+        // Add tasks
+        tasks.forEach((task) => {
+            const x = (task.position.x / map[0].length) * mapSize;
+            const y = (task.position.y / map.length) * mapSize;
+            miniMap.push(
+                <div
+                    key={`task-${task.id}`}
+                    className="mini-map-task"
+                    style={{
+                        backgroundColor: completedTasks.some(t => t.x === task.position.x && t.y === task.position.y) ? "green" : "darkorange",
+                        left: `${x}px`,
+                        top: `${y}px`,
+                    }}
+                ></div>
+            );
+        });
+
+        // Add players
+        players.forEach((player) => {
+            const x = (player.position.x / map[0].length) * mapSize;
+            const y = (player.position.y / map.length) * mapSize;
+            let playerColor = "black";
+
+            if (player.id === currentPlayer.id) {
+                playerColor = currentPlayer.role === "CREWMATE" ? "cyan" : "red";
+            }
+
+            miniMap.push(
+                <div
+                    key={`player-${player.id}`}
+                    className="mini-map-player"
+                    style={{
+                        left: `${x}px`,
+                        top: `${y}px`,
+                        backgroundColor: playerColor,
+                        transform: `rotate(${player.id === playerPosition.id ? playerPosition.direction : 0}deg)`,
+                    }}
+                ></div>
+            );
+        });
+
+        return miniMap;
+    };
+
+    return (
+        <div className="mini-map" style={{ width: mapSize, height: mapSize }}>
+            {renderMiniMap()}
+        </div>
+    );
+};
+
 const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled }) => {
     const [showPopup, setShowPopup] = useState(false);
     const [tasksCompleted, setTasksCompleted] = useState(0);
@@ -486,22 +599,22 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                          style={{ width: `${(tasksCompleted / 5) * 100}%` }}>{(tasksCompleted / 5) * 100}% Complete
                     </div>
                 </div>
-                {currentPlayer?.role === "IMPOSTOR" ? (
-                    <div className="task-list">
-                        <div className="task-item1">Sabotage-and-kill-everyone</div>
-                        <div className="task-item">Fake tasks</div>
-                        {tasks.map(task => (
-                            <div key={task.id} className="task-item">{task.name}</div>
-                        ))}
-                    </div>
-                ) : (
-                    <div className="task-list">
-                        {tasks.map(task => (
-                            <div key={task.id}
-                                 className={`task-item ${completedTasks.some(t => t.x === task.position.x && t.y === task.position.y) ? 'completed' : ''}`}>
-                                {task.name}</div>
-                        ))}
-                    </div>
+                <div className="task-list">
+                    {tasks.map(task => (
+                        <div key={task.id} className={`task-item ${completedTasks.some(t => t.x === task.position.x && t.y === task.position.y) ? 'completed' : ''}`}>
+                            {task.name}
+                        </div>
+                    ))}
+                </div>
+                {currentPlayer && (
+                    <MiniMap
+                        map={map}
+                        playerPosition={playerPosition}
+                        tasks={tasks}
+                        players={players}
+                        completedTasks={completedTasks}
+                        currentPlayer={currentPlayer}
+                    />
                 )}
             </div>
             <video autoPlay loop muted className="background-video" src="/public/videos/stars.mp4">
