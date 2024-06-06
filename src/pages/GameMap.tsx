@@ -40,10 +40,10 @@ const MiniMap: React.FC<{ map: number[][]; playerPosition: any; tasks: any[]; pl
                 let cellColor;
                 switch (cell) {
                     case 1:
-                        cellColor = "beige";
+                        cellColor = "#E0E8D6";
                         break;
                     case 2:
-                        cellColor = "darkorange";
+                        cellColor = "beige";
                         break;
                     case 3:
                     case 4:
@@ -100,13 +100,16 @@ const MiniMap: React.FC<{ map: number[][]; playerPosition: any; tasks: any[]; pl
             miniMap.push(
                 <div
                     key={`task-${task.id}`}
-                    className="mini-map-task"
+                    className={`mini-map-task ${completedTasks.some(t => t.x === task.position.x && t.y === task.position.y) ? 'completed' : 'pulse'}`}
                     style={{
-                        backgroundColor: completedTasks.some(t => t.x === task.position.x && t.y === task.position.y) ? "green" : "darkorange",
+                        backgroundColor: completedTasks.some(t => t.x === task.position.x && t.y === task.position.y) ? "green" : "#E0E8D6",
                         left: `${x}px`,
                         top: `${y}px`,
                     }}
-                ></div>
+                >
+                    {!completedTasks.some(t => t.x === task.position.x && t.y === task.position.y) && <span>!</span>}
+                </div>
+
             );
         });
 

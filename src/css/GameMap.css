@@ -628,7 +628,7 @@
     object-fit: cover;
 }
 .mini-map {
-    margin-top: 200px;
+    margin-top: 30px;
     border: 2px solid #fff;
     border-radius: 50%;
     background-color: rgba(0, 0, 0, 0.5);
@@ -637,23 +637,47 @@
 .mini-map-cell,
 .mini-map-task,
 .mini-map-player {
-    margin-top: 420px;
+    margin-top: 250px;
     position: absolute;
-    width: 5px;
-    height: 5px;
+    width: 6px;
+    height: 6px;
 }
 
 .mini-map-player {
-    margin-top: 420px;
-    width: 9px;
-    height: 9px;
+    margin-top: 250px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
 }
 
-.mini-map-task {
-    margin-top: 420px;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
+.mini-map-task span {
+    color: #F58A1E;
+    font-weight: bold;
+    font-size: 1.3em;
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: pulseOrange 2s infinite;
 }
 
+.mini-map-task.completed{
+    animation: none;
+}
+
+@keyframes pulseOrange {
+    0% {
+        box-shadow: 0 0 0 0 #F0C01D;
+    }
+    70% {
+        box-shadow: 0 0 0 10px #F0C01D;
+    }
+    100% {
+        box-shadow: 0 0 0 0 #F0C01D;
+    }
+}
+
+.pulseOrange {
+    animation: pulse 2s infinite;
+}
