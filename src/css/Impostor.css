@@ -2,7 +2,7 @@
     position: absolute;
     top: 50px;
     left: 170px;
-    width: auto; /* Change to auto for better flexibility */
+    width: auto;
     z-index: 1000;
 }
 
@@ -10,13 +10,14 @@
     display: flex;
     align-items: center;
     flex-grow: 1;
-    position: relative; /* Ensure proper positioning for children */
+    position: relative;
+    margin-left: -40px;
 }
 
 .impostor-map-button {
     position: absolute;
-    top: 10px; /* Adjust the position from the top */
-    right: 10px; /* Adjust the position from the right */
+    top: 10px;
+    right: 10px;
     z-index: 1;
 }
 

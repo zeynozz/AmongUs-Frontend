@@ -12,7 +12,10 @@
 }
 
 .crewmate-role {
-    flex-grow: 1;
     display: flex;
-    left: 50px;
+    align-items: center;
+    flex-grow: 1;
+    position: relative;
+    margin-left: -40px;
+    margin-top:10px;
 }
