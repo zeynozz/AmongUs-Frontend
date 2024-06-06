@@ -628,7 +628,7 @@
     object-fit: cover;
 }
 .mini-map {
-    margin-top: 30px;
+    margin-top: 15vh;
     border: 2px solid #fff;
     border-radius: 50%;
     background-color: rgba(0, 0, 0, 0.5);
@@ -637,14 +637,14 @@
 .mini-map-cell,
 .mini-map-task,
 .mini-map-player {
-    margin-top: 250px;
+    margin-top: 35vh;
     position: absolute;
     width: 6px;
     height: 6px;
 }
 
 .mini-map-player {
-    margin-top: 250px;
+    margin-top: 35vh;
     width: 6px;
     height: 6px;
     border-radius: 50%;
