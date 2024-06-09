@@ -10,7 +10,7 @@ export default function PrivatePage() {
   const [gameCode, setGameCode] = useState("");
   const [stompClient, setStompClient] = useState(null);
   const [currentPlayerId, setCurrentPlayerId] = useState(null);
-  const [figureColor, setFigureColor] = useState("white");
+  const [figureColor, setFigureColor] = useState("red");
 
   useEffect(() => {
     const socket = new SockJS("http://localhost:3000/ws");

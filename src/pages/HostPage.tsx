@@ -20,7 +20,7 @@ export default function HostPage({ setGame }: Props) {
   const [numImpostors, setNumImpostors] = useState<number>(0);
   const [map, setMap] = useState("Spaceship");
   const [buttonDisabled, setButtonDisabled] = useState(true);
-  const [figureColor, setFigureColor] = useState("white");
+  const [figureColor, setFigureColor] = useState("red");
 
   useEffect(() => {
     if (username && numPlayers > 0 && numImpostors >= 0 && numImpostors <= numPlayers / 2 && map) {
@@ -77,7 +77,7 @@ export default function HostPage({ setGame }: Props) {
         })
         .catch(error => {
           console.error("Error creating game:", error);
-          alert("Failed to create game: " + error.message); // User feedback
+          alert("Failed to create game: " + error.message);
         });
   }
 
