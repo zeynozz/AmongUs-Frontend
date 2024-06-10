@@ -31,7 +31,7 @@ export default function PrivatePage() {
   };
 
   const playSound = () => {
-    const audio = new Audio('/public/sounds/press.mp3');
+    const audio = new Audio('/public/sounds/boom.mp3');
     audio.play();
   };
 

@@ -5,7 +5,7 @@ import "../css/GameTypePage.css"
 export default function GameTypePage() {
 
     const playSound = () => {
-        const audio = new Audio('/public/sounds/press.mp3');
+        const audio = new Audio('/public/sounds/boom.mp3');
         audio.play();
     };
 
@@ -14,11 +14,11 @@ export default function GameTypePage() {
             <video autoPlay loop muted className="background-video" src="/public/videos/stars.mp4">
                 Your browser does not support the video tag.
             </video>
-            <Link to="/host" className="game-mode-button host-button" onClick={playSound}>
+            <Link to="/host" className="game-mode-button host-button">
                 <span>HOST</span>
                 <div className="game-mode-icon"></div>
             </Link>
-            <Link to="/join" className="game-mode-button private-button" onClick={playSound}>
+            <Link to="/join" className="game-mode-button private-button">
                 <span>PRIVATE</span>
                 <div className="game-mode-icon"></div>
             </Link>

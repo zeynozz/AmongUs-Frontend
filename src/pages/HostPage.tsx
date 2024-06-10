@@ -9,7 +9,7 @@ type Props = {
 var currentPlayerId = 0;
 
 const playSound = () => {
-  const audio = new Audio('/public/sounds/press.mp3');
+  const audio = new Audio('/public/sounds/boom.mp3');
   audio.play();
 };
 
@@ -163,7 +163,7 @@ export default function HostPage({ setGame }: Props) {
                 <option value="Ocean">🌊 Ocean</option>
               </select>
             </div>
-            <button type="submit" className="host-create-button" onClick={playSound} disabled={buttonDisabled}>
+            <button type="submit" className="host-create-button"disabled={buttonDisabled}>
               HOST
             </button>
           </form>
