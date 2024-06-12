@@ -6,7 +6,11 @@ import Impostor from "./Impostor";
 import GameMap from "./GameMap";
 import RoleAnimation from "./RoleAnimation";
 import EmergencyAnimation from "./EmergencyAnimation";
-import { Game, Player } from "../App";
+import ReportAnimation from "./ReportAnimation";
+import { Game } from "../App";
+import VotedOutAnimation from "./VotingAnimation";
+import CrewmateAnimation from './CrewmatesAnimation';
+import ImpostorAnimation from './ImpostorAnimation';
 
 type Props = {
     game: Game | null;
@@ -17,6 +21,12 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
     const [stompClient, setStompClient] = useState<any>(null);
     const [showAnimation, setShowAnimation] = useState(true);
     const [showEmergency, setShowEmergency] = useState(false);
+    const [showReport, setShowReport] = useState(false);
+    const [showVotedOutAnimation, setShowVotedOutAnimation] = useState(false);
+    const [votedOutPlayer, setVotedOutPlayer] = useState<string | null>(null);
+    const [votedOutPlayerColor, setVotedOutPlayerColor] = useState<string | null>(null);
+    const [showCrewmatesWinAnimation, setShowCrewmatesWinAnimation] = useState(false);
+    const [showImpostorsWinAnimation, setShowImpostorsWinAnimation] = useState(false);
     const playerId = JSON.parse(sessionStorage.getItem('currentPlayerId') || "null");
     const playerIndex = game?.players?.findIndex((player) => player.id === playerId) ?? -1;
     const playerRole = playerIndex !== -1 ? game?.players[playerIndex].role : null;
@@ -83,6 +93,32 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
                 setShowEmergency(true);
             });
 
+            const reportSubscription = stompClient.subscribe(`/topic/${game.gameCode}/report`, () => {
+                setShowReport(true);
+                setTimeout(() => {
+                    setShowReport(false);
+                }, 3000);
+            });
+
+            const votingResultsSubscription = stompClient.subscribe(`/topic/${game.gameCode}/votingResults`, (message) => {
+                const eliminatedPlayer = JSON.parse(message.body);
+                setVotedOutPlayer(eliminatedPlayer.username);
+                setVotedOutPlayerColor(eliminatedPlayer.color);
+                setShowVotedOutAnimation(true);
+            });
+
+            const gameEndSubscription = stompClient.subscribe(`/topic/${game.gameCode}/gameEnd`, (message) => {
+                const result = message.body;
+                if (result === "CREWMATES_WIN") {
+                    setShowCrewmatesWinAnimation(true);
+                } else if (result === "IMPOSTORS_WIN") {
+                    setShowImpostorsWinAnimation(true);
+                }
+                setTimeout(() => {
+                    window.location.href = "/";
+                }, 7000); // Show the end game animation for 7 seconds
+            });
+
             stompClient.send(`/app/${game.gameCode}/play`, {}, JSON.stringify(game));
 
             return () => {
@@ -91,6 +127,9 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
                 playerKilledSubscription.unsubscribe();
                 playerRemovedSubscription.unsubscribe();
                 emergencySubscription.unsubscribe();
+                reportSubscription.unsubscribe();
+                votingResultsSubscription.unsubscribe();
+                gameEndSubscription.unsubscribe();
             };
         }
     }, [stompClient, game.gameCode]);
@@ -119,6 +158,14 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
         setShowEmergency(false);
     };
 
+    const handleReportClose = () => {
+        setShowReport(false);
+    };
+
+    const handleVotedOutClose = () => {
+        setShowVotedOutAnimation(false);
+    };
+
     console.log('Current Player ID:', playerId);
     console.log('Player Index:', playerIndex);
     console.log('Player Role:', playerRole);
@@ -145,7 +192,7 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
                     onPlayerKilled={handlePlayerKilled}
                     onChangeSetGame={onChangeSetGame}/>
             ) : (
-                <Crewmate />
+                <Crewmate game={undefined} playerId={undefined} />
             )}
             <GameMap
                 map={game.map}
@@ -154,6 +201,20 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
                 onPlayerKilled={handlePlayerKilled}
             />
             {showEmergency && <EmergencyAnimation onClose={handleEmergencyClose} />}
+            {showReport && <ReportAnimation onClose={handleReportClose} />}
+            {showVotedOutAnimation && votedOutPlayer && votedOutPlayerColor && (
+                <VotedOutAnimation
+                    votedOutPlayer={votedOutPlayer}
+                    playerColor={votedOutPlayerColor}
+                    onClose={handleVotedOutClose}
+                />
+            )}
+            {showCrewmatesWinAnimation && (
+                <CrewmateAnimation onClose={() => setShowCrewmatesWinAnimation(false)} />
+            )}
+            {showImpostorsWinAnimation && (
+                <ImpostorAnimation onClose={() => setShowImpostorsWinAnimation(false)} playerColor={''} />
+            )}
         </div>
     );
 }

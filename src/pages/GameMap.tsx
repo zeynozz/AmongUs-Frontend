@@ -6,6 +6,11 @@ import EmergencyAnimation from './EmergencyAnimation';
 import Toast from './Toast';
 import Stomp from 'stompjs';
 import SockJS from 'sockjs-client';
+import KillAnimation from "./KillAnimation";
+import ReportAnimation from "./ReportAnimation";
+import VotedOutAnimation from "./VotingAnimation";
+import CrewmateAnimation from './CrewmatesAnimation';
+import ImpostorAnimation from './ImpostorAnimation';
 
 interface Player {
     status: "ALIVE" | "DEAD" | "GHOST";
@@ -16,6 +21,13 @@ interface Player {
     role: string;
     direction: string;
     imageIndex: number;
+}
+
+interface VotingResult {
+    username: string;
+    color: string;
+    role: string;
+    isLastImpostor: boolean;
 }
 
 interface Props {
@@ -109,7 +121,6 @@ const MiniMap: React.FC<{ map: number[][]; playerPosition: any; tasks: any[]; pl
                 >
                     {!completedTasks.some(t => t.x === task.position.x && t.y === task.position.y) && <span>!</span>}
                 </div>
-
             );
         });
 
@@ -153,6 +164,8 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
     const [completedTasks, setCompletedTasks] = useState<{ x: number, y: number }[]>([]);
     const [currentTask, setCurrentTask] = useState<{ x: number, y: number } | null>(null);
     const [showEmergency, setShowEmergency] = useState(false);
+    const [showReport, setShowReport] = useState(false);
+    const [isReportEnabled, setIsReportEnabled] = useState(false);
     const [showTaskPopup, setShowTaskPopup] = useState(false);
     const [taskCountdown, setTaskCountdown] = useState(0);
     const [stompClient, setStompClient] = useState<any>(null);
@@ -163,6 +176,9 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
     const [showChatInput, setShowChatInput] = useState(false);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [chatMessage, setChatMessage] = useState("");
+    const [showKillAnimation, setShowKillAnimation] = useState(false);
+    const [impostorImage, setImpostorImage] = useState<string>('');
+    const [victimImage, setVictimImage] = useState<string>('');
 
     const [showVoting, setShowVoting] = useState(false);
     const [votingTimer, setVotingTimer] = useState(30);
@@ -170,34 +186,39 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
     const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
     const [voteMessage, setVoteMessage] = useState<string | null>(null);
 
+    const [showCrewmatesWinAnimation, setShowCrewmatesWinAnimation] = useState(false);
+    const [showImpostorsWinAnimation, setShowImpostorsWinAnimation] = useState(false);
+
     const audioRef = useRef<HTMLAudioElement>(null);
 
     const playerId = JSON.parse(sessionStorage.getItem('currentPlayerId') || "null") as number;
     const currentPlayer = playerList?.find(player => player.id === playerId);
-    const initialPlayerPosition = currentPlayer ? currentPlayer.position : {x: 45, y: 7};
+    const initialPlayerPosition = currentPlayer ? currentPlayer.position : { x: 45, y: 7 };
     const [playerPosition, setPlayerPosition] = useState<{ x: number, y: number }>(initialPlayerPosition);
     const [players, setPlayers] = useState<Player[]>(playerList);
     const [playerStatus, setPlayerStatus] = useState(currentPlayer?.status || 'ALIVE');
 
-    const [votes, setVotes] = useState<{ [key: string]: string }>({}); // Store votes locally
+    const [showVotedOutAnimation, setShowVotedOutAnimation] = useState(false);
+    const [votedOutPlayer, setVotedOutPlayer] = useState<string | null>(null);
+    const [votedOutPlayerColor, setVotedOutPlayerColor] = useState<string | null>(null);
 
     const tasks = [
-        {id: 1, name: "Card Swipe 1", position: {x: 51, y: 5}},
-        {id: 2, name: "Card Swipe 2", position: {x: 18, y: 18}},
-        {id: 3, name: "Card Swipe 3", position: {x: 52, y: 36}},
-        {id: 4, name: "Card Swipe 4", position: {x: 73, y: 21}},
-        {id: 5, name: "Card Swipe 5", position: {x: 74, y: 35}}
+        { id: 1, name: "Card Swipe 1", position: { x: 51, y: 5 } },
+        { id: 2, name: "Card Swipe 2", position: { x: 18, y: 18 } },
+        { id: 3, name: "Card Swipe 3", position: { x: 52, y: 36 } },
+        { id: 4, name: "Card Swipe 4", position: { x: 73, y: 21 } },
+        { id: 5, name: "Card Swipe 5", position: { x: 74, y: 35 } }
     ];
 
     const emergencyCells = [
-        {x: 50, y: 11}, {x: 51, y: 11}, {x: 50, y: 12}, {x: 51, y: 12},
+        { x: 50, y: 11 }, { x: 51, y: 11 }, { x: 50, y: 12 }, { x: 51, y: 12 },
     ];
 
     useEffect(() => {
         if (currentPlayer) {
             setPlayerPosition(currentPlayer.position);
         } else {
-            console.error("Current player not found in playerList", {playerId, playerList});
+            console.error("Current player not found in playerList", { playerId, playerList });
         }
     }, [playerList, currentPlayer]);
 
@@ -242,20 +263,55 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                         setPlayerPosition(updatedPlayer.position);
                         setPlayers(updatedGame.players);
                     } else {
-                        console.error("Updated player not found", {updatedGame, playerId});
+                        console.error("Updated player not found", { updatedGame, playerId });
                     }
                 });
 
                 client.subscribe(`/topic/${gameCode}/votingResults`, (message) => {
-                    const votedOutPlayer = message.body;
-                    alert(`${votedOutPlayer} has been voted out!`);
-                    setPlayers(prevPlayers => prevPlayers.filter(player => player.username !== votedOutPlayer));
-                    resetVotingState();
+                    const eliminatedPlayer = JSON.parse(message.body);
+                    setVotedOutPlayer(eliminatedPlayer.username);
+                    setVotedOutPlayerColor(eliminatedPlayer.color);
+                    setShowVotedOutAnimation(true);
+                });
+
+                client.subscribe(`/topic/${gameCode}/gameEnd`, (message) => {
+                    const result = message.body;
+                    setShowVotedOutAnimation(false);
+                    if (result === "CREWMATES_WIN") {
+                        setShowCrewmatesWinAnimation(true);
+                    } else {
+                        setShowImpostorsWinAnimation(true);
+                    }
+                    setTimeout(() => {
+                        window.location.href = "/";
+                    }, 7000); // Show the end game animation for 7 seconds
+                });
+
+                client.subscribe(`/topic/${gameCode}/report`, () => {
+                    setShowReport(true);
+                    setTimeout(() => {
+                        setShowReport(false);
+                        setShowChatInput(true);
+                        startChatTimer();
+                    }, 5000);
                 });
 
                 client.subscribe(`/topic/${gameCode}/voteConfirmation`, (message) => {
                     const confirmationMessage = message.body;
                     console.log(`Backend confirmation: ${confirmationMessage}`);
+                });
+
+                client.subscribe(`/user/queue/killAnimation`, (message) => {
+                    if (message.body === "KILL_ANIMATION") {
+                        const victim = players.find(p => p.id === playerId);
+                        const impostor = players.find(p => p.role === "IMPOSTOR" && p.status === "ALIVE");
+                        if (impostor && victim) {
+                            setImpostorImage(`/images/movement/${impostor.color}/upDown.png`);
+                            setVictimImage(`/images/movement/${victim.color}/sit.png`);
+                            setShowKillAnimation(true);
+                            setTimeout(() => setShowKillAnimation(false), 5000); // Duration of the animation
+                        }
+                    }
                 });
 
             });
@@ -267,6 +323,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
     useEffect(() => {
         if (chatTimer === 0) {
             setShowChatInput(false);
+            setShowVoting(true);
             startVoting();
         }
     }, [chatTimer]);
@@ -324,12 +381,12 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                     }
                     return prev - 1;
                 });
-            }, 1000);
+            }, 3000);
             return;
         }
 
         if ((cellType === 2 || cellType === 13) && !showPopup && !completedTasks.some(task => task.x === x && task.y === y)) {
-            setCurrentTask({x, y});
+            setCurrentTask({ x, y });
             setShowPopup(true);
         }
     };
@@ -376,18 +433,19 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
         if (currentPlayer) {
             setPlayerPosition(currentPlayer.position);
         } else {
-            console.error("Current player not found in playerList", {playerId, playerList});
+            console.error("Current player not found in playerList", { playerId, playerList });
         }
     }, [playerList, currentPlayer]);
 
     useEffect(() => {
         const handleResize = () => {
-            setPlayerPosition(prev => ({...prev}));
+            setPlayerPosition(prev => ({ ...prev }));
         };
 
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
     }, []);
+
 
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -424,9 +482,9 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                 setPlayerPosition(newPlayerState.position);
                 const updatedPlayers = players.map(p => (p.id === currentPlayer.id ? newPlayerState : p));
                 setPlayers(updatedPlayers);
-            } else {
+            }
+            else {
                 console.log("Move attempted by player ID: " + playerId + " who is DEAD.");
-
             }
         };
 
@@ -455,12 +513,12 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
             default:
                 break;
         }
-        return {x: currentPosition.x + deltaX, y: currentPosition.y + deltaY};
+        return { x: currentPosition.x + deltaX, y: currentPosition.y + deltaY };
     };
 
     const getPlayerImageSrc = (player: Player) => {
-        const {direction, imageIndex} = player;
-        const basePath = `/images/movement/${player.color}`;
+        const { direction, imageIndex } = player;
+        const basePath = `/public/images/movement/${player.color}`;
         if (direction === 'left') {
             return `${basePath}/left${imageIndex + 1}.png`;
         } else if (direction === 'right') {
@@ -498,7 +556,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
         if (sabotageCooldown > 0) {
             timer = setInterval(() => {
                 setSabotageCooldown(prev => prev - 1);
-            }, 1000);
+            }, 3000);
         } else {
             setIsSabotageActive(false);
             if (timer) clearInterval(timer);
@@ -509,16 +567,57 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
     }, [sabotageCooldown]);
 
     const handleKillClick = (victimId: number) => {
-        if (stompClient) {
+        const impostor = currentPlayer;
+        const victim = players.find(player => player.id === victimId);
+        if (stompClient && impostor && victim) {
             const killMessage = {
-                killerId: currentPlayer?.id,
-                victimId: victimId,
+                killerId: impostor.id,
+                victimId: victim.id,
                 gameCode: gameCode,
             };
             stompClient.send("/app/game/kill", {}, JSON.stringify(killMessage));
-            onPlayerKilled(victimId);
+            onPlayerKilled(victim.id);
+
+            // Construct image paths
+            const impostorImagePath = `/public/images/movement/${impostor.color}/upDown.png`;
+            const victimImagePath = `/public/images/movement/${victim.color}/upDown.png`;
+
+            // Log the paths to verify
+            console.log("Impostor Image Path:", impostorImagePath);
+            console.log("Victim Image Path:", victimImagePath);
+
+            // Set images for kill animation
+            setImpostorImage(impostorImagePath);
+            setVictimImage(victimImagePath);
+            setShowKillAnimation(true);
+
+            setTimeout(() => {
+                setShowKillAnimation(false);
+            }, 6000); // Duration of the animation
         }
     };
+
+    const handleReportClick = () => {
+        if (stompClient) {
+            stompClient.send("/app/report", {}, gameCode);
+        }
+        setShowReport(true);
+        setTimeout(() => {
+            setShowReport(false);
+            setShowChatInput(true);
+            startChatTimer();
+        }, 5000);
+        setShowVotedOutAnimation(true);
+    };
+
+    useEffect(() => {
+        if (showVotedOutAnimation) {
+            const timeout = setTimeout(() => {
+                setShowVotedOutAnimation(false);
+            }, 6000); // Dauer der Animation
+            return () => clearTimeout(timeout);
+        }
+    }, [showVotedOutAnimation]);
 
     useEffect(() => {
         if (playerStatus === 'DEAD') {
@@ -527,6 +626,13 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
             }, 3000); // Assuming 3 seconds to transition from DEAD to GHOST
         }
     }, [playerStatus]);
+
+    useEffect(() => {
+        const isNearDeadPlayer = players.some(player => player.status === 'DEAD' &&
+            Math.abs(player.position.x - playerPosition.x) <= 1 &&
+            Math.abs(player.position.y - playerPosition.y) <= 1);
+        setIsReportEnabled(isNearDeadPlayer && currentPlayer?.status === 'ALIVE' && currentPlayer?.role !== 'IMPOSTOR');
+    }, [playerPosition, players, currentPlayer]);
 
     const startVoting = () => {
         resetVotingState();
@@ -544,7 +650,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                 sendVotesToBackend();
             }
             countdown--;
-        }, 1000);
+        }, 3000);
     };
 
     const startChatTimer = () => {
@@ -557,7 +663,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                 startVoting();
             }
             countdown--;
-        }, 1000);
+        }, 3000);
     };
 
     const handleVote = (playerName: string) => {
@@ -567,7 +673,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                 votedPlayer: playerName,
                 voter: currentPlayer.username
             };
-            stompClient.send("/app/castVote", {}, JSON.stringify(voteMessage));
+            stompClient.send(`/app/${gameCode}/castVote`, {}, JSON.stringify(voteMessage));
             setSelectedPlayer(playerName);
             setVoteMessage(`You voted for ${playerName}`);
         } else {
@@ -576,8 +682,8 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
     };
 
     const sendVotesToBackend = () => {
-        if (stompClient) {
-            stompClient.send("/app/collectVotes", {}, gameCode);
+        if (stompClient && stompClient.connected) {
+            stompClient.send(`/app/${gameCode}/collectVotes`, {}, JSON.stringify({ gameCode }));
         } else {
             console.error("StompClient is not connected");
         }
@@ -598,28 +704,16 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                 <div className="progress" role="progressbar" aria-valuenow={(tasksCompleted / 5) * 100}
                      aria-valuemin={0} aria-valuemax={100}>
                     <div className="progress-bar"
-                         style={{width: `${(tasksCompleted / 5) * 100}%`}}>{(tasksCompleted / 5) * 100}% Complete
+                         style={{ width: `${(tasksCompleted / 5) * 100}%` }}>{(tasksCompleted / 5) * 100}% Complete
                     </div>
                 </div>
-
-                {currentPlayer?.role === "IMPOSTOR" ? (
-                    <div className="task-list">
-                        <div className="task-item1">Sabotage-and-kill</div>
-                        {/*<div className="task-item">Fake tasks</div>*/}
-                        {tasks.map(task => (
-                            <div key={task.id} className="task-item">{task.name}</div>
-                        ))}
-                    </div>
-                ) : (
-                    <div className="task-list">
-                        {tasks.map(task => (
-                            <div key={task.id}
-                                 className={`task-item ${completedTasks.some(t => t.x === task.position.x && t.y === task.position.y) ? 'completed' : ''}`}>
-                                {task.name}
-                            </div>
-                        ))}
-                    </div>
-                )}
+                <div className="task-list">
+                    {tasks.map(task => (
+                        <div key={task.id} className={`task-item ${completedTasks.some(t => t.x === task.position.x && t.y === task.position.y) ? 'completed' : ''}`}>
+                            {task.name}
+                        </div>
+                    ))}
+                </div>
                 {currentPlayer && (
                     <MiniMap
                         map={map}
@@ -710,8 +804,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                                 if (player.status === 'GHOST' && player.id === currentPlayer?.id) {
                                     cellContent = (
                                         <>
-                                            <img src='/public/images/impostor/whiteGhost.png' alt="Ghost"
-                                                 className="player-image"/>
+                                            <img src='/public/images/impostor/whiteGhost.png' alt="Ghost" className="player-image" />
                                             <div className="player-name">{player.username}</div>
                                         </>
                                     );
@@ -719,24 +812,15 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                                     cellContent = (
                                         <>
                                             <img src='/public/images/impostor/playerKilled.png' alt="Killed"
-                                                 className="player-image killed-image"/>
+                                                 className="player-image killed-image" />
                                             <div className="player-name">{player.username}</div>
                                         </>
                                     );
-                                } else if (player.status === 'GHOST') {
+                                }else {
                                     cellContent = (
                                         <>
-                                            <img src='public/images/impostor/whiteGhost.png' alt="Ghost"
-                                                 className="player-image"/>
-                                            <div className="player-name">{player.username}</div>
-                                        </>
-                                    );
-                                } else {
-                                    cellClass += ' player';
-                                    const playerImageSrc = getPlayerImageSrc(player);
-                                    cellContent = (
-                                        <>
-                                            <img src={playerImageSrc} alt="Player" className="player-image"/>
+                                            <img src={getPlayerImageSrc(player)} alt="Player"
+                                                 className="player-image" />
                                             <div className="player-name">{player.username}</div>
                                             {currentPlayer?.role === "IMPOSTOR" && currentPlayer?.status === "ALIVE" && player.status === "ALIVE" && (
                                                 <button onClick={() => handleKillClick(player.id)}></button>
@@ -758,20 +842,21 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
             </div>
             {showPopup && (
                 <div className="popup" id="popup">
-                    <CardSwipe onClose={handlePopupClose}/>
+                    <CardSwipe onClose={handlePopupClose} />
                     <div className="overlay2" onClick={() => handlePopupClose(false)}></div>
                 </div>
             )}
-            {showEmergency && <EmergencyAnimation onClose={handleEmergencyClose}/>}
+            {showEmergency && <EmergencyAnimation onClose={handleEmergencyClose} />}
+            {showReport && <ReportAnimation onClose={() => setShowReport(false)} />}
             {showTaskPopup && (
                 <div className="sabotage-popup">
                     <div className="sabotage-message">Oops, This task has been sabotaged</div>
                     <div className="sabotage-countdown">{taskCountdown}</div>
-                    <img src={`/public/images/impostor/devil.png`} alt="Devil" className="sabotage-image"/>
+                    <img src={`/public/images/impostor/devil.png`} alt="Devil" className="sabotage-image" />
                 </div>
             )}
             {showToast && (
-                <Toast message="Sabotage-counter-activated" onClose={() => setShowToast(false)}/>
+                <Toast message="Sabotage-counter-activated" onClose={() => setShowToast(false)} />
             )}
             {currentPlayer && currentPlayer.role === "IMPOSTOR" && (
                 <div className="sabotage-container">
@@ -786,7 +871,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                     )}
                 </div>
             )}
-            <audio ref={audioRef} src="/public/sounds/sabotage.mp3"/>
+            <audio ref={audioRef} src="/public/sounds/sabotage.mp3" />
             {showChatInput && (
                 <div className="overlay">
                     <div className="dialog">
@@ -817,16 +902,16 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                      className="bi bi-send" viewBox="0 0 16 16">
                                     <path
-                                        d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576zm6.787-8.201L1.591 6.602l4.339 2.76z"/>
+                                        d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576zm6.787-8.201L1.591 6.602l4.339 2.76z" />
                                 </svg>
                             </button>
                         </div>
                         <div className="close-button" onClick={handleCloseChat}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor"
                                  className="bi bi-x-circle" viewBox="0 0 16 16">
-                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
                                 <path
-                                    d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+                                    d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708" />
                             </svg>
                         </div>
                     </div>
@@ -857,27 +942,53 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                                 <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor"
                                      className="bi bi-chat-dots" viewBox="0 0 16 16">
                                     <path
-                                        d="M5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/>
+                                        d="M5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2" />
                                     <path
-                                        d="m2.165 15.803.02-.004c1.83-.363 2.948-.842 3.468-1.105A9 9 0 0 0 8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6a10.4 10.4 0 0 1-.524 2.318l-.003.011a11 11 0 0 1-.244.637c-.079.186.074.394.273.362a22 22 0 0 0 .693-.125m.8-3.108a1 1 0 0 0-.287-.801C1.618 10.83 1 9.468 1 8c0-3.192 3.004-6 7-6s7 2.808 7 6-3.004 6-7 6a8 8 0 0 1-2.088-.272 1 1 0 0 0-.711.074c-.387.196-1.24.57-2.634.893a11 11 0 0 0 .398-2"/>
+                                        d="m2.165 15.803.02-.004c1.83-.363 2.948-.842 3.468-1.105A9 9 0 0 0 8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6a10.4 10.4 0 0 1-.524 2.318l-.003.011a11 11 0 0 1-.244.637c-.079.186.074.394.273.362a22 22 0 0 0 .693-.125m.8-3.108a1 1 0 0 0-.287-.801C1.618 10.83 1 9.468 1 8c0-3.192 3.004-6 7-6s7 2.808 7 6-3.004 6-7 6a8 8 0 0 1-2.088-.272 1 1 0 0 0-.711.074c-.387.196-1.24.57-2.634.893a11 11 0 0 0 .398-2" />
                                 </svg>
                             </div>
                             <div className="close-button" onClick={handleCloseVoting}>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor"
                                      className="bi bi-x-circle" viewBox="0 0 16 16">
-                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
                                     <path
-                                        d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+                                        d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708" />
                                 </svg>
                             </div>
                         </div>
                     </div>
                 </div>
             )}
+            {showVotedOutAnimation && votedOutPlayer && votedOutPlayerColor && (
+                <VotedOutAnimation
+                    votedOutPlayer={votedOutPlayer}
+                    playerColor={votedOutPlayerColor}
+                    onClose={() => setShowVotedOutAnimation(false)}
+                />
+            )}
+
+            {currentPlayer?.status === "ALIVE" && currentPlayer?.role !== "IMPOSTOR" && (
+                <div className="report-container">
+                    <button className={`report-button ${isReportEnabled ? '' : 'report-button-disabled'}`} onClick={isReportEnabled ? handleReportClick : undefined}>
+                        <img src="/images/Report.webp" alt="Report" />
+                    </button>
+                </div>
+            )}
+            {showKillAnimation && (
+                <KillAnimation
+                    onClose={() => setShowKillAnimation(false)}
+                    impostorImage={impostorImage}
+                    victimImage={victimImage}
+                />
+            )}
+            {showCrewmatesWinAnimation && (
+                <CrewmateAnimation onClose={() => setShowCrewmatesWinAnimation(false)} />
+            )}
+            {showImpostorsWinAnimation && (
+                <ImpostorAnimation onClose={() => setShowImpostorsWinAnimation(false)} playerColor={''} />
+            )}
         </div>
     );
+};
 
-}
 export default GameMap;
-
-

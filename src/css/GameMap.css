@@ -96,47 +96,48 @@
     }
 }
 
+
 .obstacle {
 }
 
 .table1 {
-    background-image: url("/public/images/map/table1.png");
+    background-image: url("/public/images/map/table1.png") ;
 }
 
 .table2 {
-    background-image: url("/public/images/map/table2.png");
+    background-image: url("/public/images/map/table2.png") ;
 }
 
 .table3 {
-    background-image: url("/public/images/map/table3.png");
+    background-image: url("/public/images/map/table3.png") ;
 }
 
 .table4 {
-    background-image: url("/public/images/map/table4.png");
+    background-image: url("/public/images/map/table4.png") ;
 }
 
 .window {
-    background-image: url("/public/images/map/window.png");
+    background-image: url("/public/images/map/window.png") ;
 }
 
 .wall {
-    background-image: url("/public/images/map/wall.png");
+    background-image: url("/public/images/map/wall.png") ;
 }
 
 .wall2 {
-    background-image: url("/public/images/map/wall2.png");
+    background-image: url("/public/images/map/wall2.png") ;
 }
 
 .wall3 {
-    background-image: url("/public/images/map/wall3.png");
+    background-image: url("/public/images/map/wall3.png") ;
 }
 
 .edge1 {
-    background-image: url("/public/images/map/edge1.png");
+    background-image: url("/public/images/map/edge1.png") ;
 }
 
 .edge2 {
-    background-image: url("/public/images/map/edge2.png");
+    background-image: url("/public/images/map/edge2.png") ;
 }
 
 .task1 {
@@ -288,13 +289,13 @@
 
 .task-item {
     font-family: 'DSEG14Classic', sans-serif;
-    font-size: 16px;
+    font-size: 19px;
     color: white;
 }
 
 .task-item1 {
     font-family: 'DSEG14Classic', sans-serif;
-    font-size: 17px;
+    font-size: 20px;
     color: red;
     margin-bottom: 20px;
     animation: glowRed 1s infinite alternate;
@@ -308,7 +309,7 @@
 .sabotage-container {
     position: absolute;
     bottom: 10px;
-    right: 10px;
+    right: 100px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -316,8 +317,8 @@
 }
 
 .sabotage-icon {
-    width: 300px;
-    height: 300px;
+    width: 150px;
+    height: 150px;
     cursor: pointer;
     transition: opacity 0.3s;
     position: relative;
@@ -517,7 +518,7 @@
     text-shadow: 0 1px 10px rgba(80, 87, 108, 0.7);
 }
 
-.voting-dialog {
+.voting-dialog{
     background: rgba(23, 22, 22, 0.5);
     padding: 20px;
     border-radius: 10px;
@@ -528,22 +529,19 @@
     box-shadow: 0 0 10px rgba(210, 201, 201, 0.5);
     position: relative;
 }
-
 .voting-timer {
     color: red;
     font-family: 'DSEG14Classic', sans-serif;
     font-size: 13px;
     text-shadow: 0 1px 10px rgb(73, 11, 23);
 }
-
 .timer {
     color: red;
     font-family: 'DSEG14Classic', sans-serif;
     font-size: 13px;
     text-shadow: 0 1px 10px rgb(105, 11, 11);
 }
-
-.voting-player-username {
+.voting-player-username{
     background-color: white;
     font-size: 18px;
     border-radius: 5px;
@@ -574,7 +572,6 @@
     margin-right: 5px;
     margin-left: 10px;
 }
-
 .player-button:nth-child(3n+1) {
     margin-left: 0;
 }
@@ -591,7 +588,6 @@
     background-color: #bb3c3c;
     border-color: white;
 }
-
 .dialog-buttons {
     position: absolute;
     top: 10px;
@@ -619,7 +615,7 @@
 }
 
 .chat-button {
-    color: white;
+    color:white;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -631,7 +627,6 @@
 .killed-image {
     object-fit: cover;
 }
-
 .mini-map {
     margin-top: 15vh;
     border: 2px solid #fff;
@@ -667,7 +662,7 @@
     animation: pulseOrange 2s infinite;
 }
 
-.mini-map-task.completed {
+.mini-map-task.completed{
     animation: none;
 }
 
@@ -687,4 +682,26 @@
     animation: pulse 2s infinite;
 }
 
+.report-button, .report-button-disabled {
+    position: fixed;
+    bottom: 50px;
+    right: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    height: 10%;
+    width: 10%;
+    transition: opacity 0.3s;
+}
 
+.report-button {
+    opacity: 1;
+    cursor: pointer;
+}
+
+.report-button-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

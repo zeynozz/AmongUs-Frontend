@@ -3,90 +3,102 @@ import "../css/Impostor.css";
 import Role from "./Role";
 import KillAnimation from "./KillAnimation";
 import { useStompClient } from "./StompClientProvider";
-import { Game } from "../App";
 
-type ImpostorProps = {
-    game: Game | null;
-    playerId: number;
-    onChangeSetGame(updatedGame: Game): void;
-    onPlayerKilled(killedPlayerId: number): void;
-};
-
-const Impostor = ({ game, playerId, onChangeSetGame, onPlayerKilled }: ImpostorProps) => {
+const Impostor = ({ game, playerId, onChangeSetGame, onPlayerKilled }) => {
     const [showKillAnimation, setShowKillAnimation] = useState(false);
+    const [impostorImage, setImpostorImage] = useState("");
+    const [victimImage, setVictimImage] = useState("");
     const stompClient = useStompClient();
 
     useEffect(() => {
-        if (!stompClient || !stompClient.connected) {
-            console.error('Stomp client is not defined or not connected');
-            return;
-        }
-
-        const handlePlayerKilled = (updatedGame: Game) => {
-            onChangeSetGame(updatedGame);
-        };
-
         const subscription = stompClient.subscribe("/topic/playerKilled", (message) => {
             const updatedGame = JSON.parse(message.body);
-            console.log(updatedGame);
-            handlePlayerKilled(updatedGame);
+            onChangeSetGame(updatedGame);
+        });
+
+        const killAnimationSubscription = stompClient.subscribe("/user/queue/killAnimation", () => {
+            setShowKillAnimation(true);
+            setTimeout(() => setShowKillAnimation(false), 3000);
         });
 
         return () => {
-            if (subscription) {
-                subscription.unsubscribe();
-            }
+            subscription.unsubscribe();
+            killAnimationSubscription.unsubscribe();
         };
     }, [stompClient, onChangeSetGame]);
 
+    const isAdjacent = (player1, player2) => {
+        return (
+            Math.abs(player1.position.x - player2.position.x) <= 1 &&
+            Math.abs(player1.position.y - player2.position.y) <= 1
+        );
+    };
+
+    const isCrewmateAdjacent = () => {
+        const impostor = game?.players.find((p) => p.id === playerId);
+        if (!impostor) return false;
+
+        return game.players.some(
+            (player) =>
+                player.role === "CREWMATE" &&
+                player.status === "ALIVE" &&
+                isAdjacent(player, impostor)
+        );
+    };
+
     const handleKill = () => {
         if (!stompClient || !game) {
-            console.error('Stomp client or game is not defined');
+            console.error("Stomp client or game is not defined");
             return;
         }
 
-        const victimId = getCrewmateId(game);
-        if (victimId === null) {
-            console.error('No crewmate found to kill');
+        const victim = game.players.find(
+            (player) =>
+                player.role === "CREWMATE" &&
+                player.status === "ALIVE" &&
+                isAdjacent(player, game.players.find((p) => p.id === playerId))
+        );
+
+        if (!victim) {
+            console.error("No adjacent crewmate found to kill");
             return;
         }
 
         const killMessage = {
             killerId: playerId,
-            victimId: victimId,
+            victimId: victim.id,
             gameCode: game.gameCode,
         };
 
-        try {
-            stompClient.send("/app/game/kill", {}, JSON.stringify(killMessage));
-            setShowKillAnimation(true);
-            onPlayerKilled(victimId);
-            setTimeout(() => setShowKillAnimation(false), 3000);
-        } catch (error) {
-            console.error('Error occurred while sending kill message:', error);
-        }
+        stompClient.send("/app/game/kill", {}, JSON.stringify(killMessage));
+        setShowKillAnimation(true);
+        onPlayerKilled(victim.id);
+
+        // Set images for kill animation
+        const impostor = game.players.find((p) => p.id === playerId);
+        setImpostorImage(`/images/movement/${impostor.color}/upDown.png`);
+        setVictimImage(`/images/movement/${victim.color}/sit.png`);
+
+        setTimeout(() => setShowKillAnimation(false), 3000);
     };
 
     return (
         <div className="impostor-container">
-            <div className="impostor-role">
-                <Role role="IMPOSTOR"/>
-                <button className="kill-button" onClick={handleKill}>
-                    <img src="/public/images/impostor/kill.png" alt="Kill"/>
-                </button>
-                {showKillAnimation && <KillAnimation/>}
-            </div>
+            <Role role="IMPOSTOR" />
+            <button
+                className={`kill-button ${isCrewmateAdjacent() ? "" : "disabled"}`}
+                onClick={handleKill}
+            >
+            </button>
+            {showKillAnimation && (
+                <KillAnimation
+                    onClose={() => setShowKillAnimation(false)}
+                    impostorImage={impostorImage}
+                    victimImage={victimImage}
+                />
+            )}
         </div>
     );
-};
-
-const getCrewmateId = (game: Game): number | null => {
-    if (!game || !game.players) {
-        console.error('Game or players data is undefined');
-        return null;
-    }
-    const crewmate = game.players.find(player => player.role === "CREWMATE" && player.status === "ALIVE");
-    return crewmate ? crewmate.id : null;
 };
 
 export default Impostor;

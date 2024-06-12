@@ -2,7 +2,7 @@
     position: absolute;
     top: 50px;
     left: 170px;
-    width: auto;
+    width: auto; /* Change to auto for better flexibility */
     z-index: 1000;
 }
 
@@ -10,26 +10,39 @@
     display: flex;
     align-items: center;
     flex-grow: 1;
-    position: relative;
-    margin-left: -45px;
+    position: relative; /* Ensure proper positioning for children */
 }
 
 .impostor-map-button {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 10px; /* Adjust the position from the top */
+    right: 10px; /* Adjust the position from the right */
     z-index: 1;
 }
 
 .kill-button {
-    background: none;
-    border: none;
-    padding: 0;
+    position: fixed;
+    right: 20px; /* Closer to the right edge */
+    bottom: 40px; /* Align vertically with the sabotage button */
+    width: 100px;
+    height: 100px;
     cursor: pointer;
-    margin-left: 10px; /* Adjust spacing between text and button */
+    z-index: 1000;
+    background: url('/public/images/impostor/kill.png') no-repeat center / contain;
+    border: none;
 }
 
+
 .kill-button img {
-    width: 40px; /* Adjust size as needed */
-    height: 40px; /* Adjust size as needed */
+    width: 70%;            /* Size of the image within the button */
+    height: auto;          /* Maintains the aspect ratio of the image */
 }
+
+.kill-button.disabled {
+    opacity: 0.5; /* Makes the button look disabled */
+    pointer-events: none; /* Disables button interaction */
+}
+
+
+
+

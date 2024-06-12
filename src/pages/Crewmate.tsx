@@ -2,9 +2,12 @@ import React, { useEffect, useState } from "react";
 import "../css/Crewmate.css";
 import { useStompClient } from "./StompClientProvider";
 import Role from "./Role";
+import KillAnimation from "./KillAnimation";
 
-const Crewmate = () => {
+const Crewmate = ({ game, playerId }) => {
     const [showKillAnimation, setShowKillAnimation] = useState(false);
+    const [impostorImage, setImpostorImage] = useState("");
+    const [victimImage, setVictimImage] = useState("");
     const stompClient = useStompClient();
 
     useEffect(() => {
@@ -15,15 +18,21 @@ const Crewmate = () => {
 
         const killAnimationSubscription = stompClient.subscribe(`/user/queue/killAnimation`, (message) => {
             if (message.body === "KILL_ANIMATION") {
-                setShowKillAnimation(true);
-                setTimeout(() => setShowKillAnimation(false), 3000);
+                const victim = game.players.find(p => p.id === playerId);
+                const impostor = game.players.find(p => p.role === "IMPOSTOR"); // Ensure to get the correct impostor here
+                if (impostor && victim) {
+                    setImpostorImage(`/images/movement/${impostor.color}/upDown.png`);
+                    setVictimImage(`/images/movement/${victim.color}/sit.png`);
+                    setShowKillAnimation(true);
+                    setTimeout(() => setShowKillAnimation(false), 3000);
+                }
             }
         });
 
         return () => {
             killAnimationSubscription.unsubscribe();
         };
-    }, [stompClient]);
+    }, [stompClient, game, playerId]);
 
     return (
         <div className="crewmate-container">
@@ -34,6 +43,13 @@ const Crewmate = () => {
             </div>
             <div className="crewmate-map-button">
             </div>
+            {showKillAnimation && (
+                <KillAnimation
+                    onClose={() => setShowKillAnimation(false)}
+                    impostorImage={impostorImage}
+                    victimImage={victimImage}
+                />
+            )}
         </div>
     );
 };
