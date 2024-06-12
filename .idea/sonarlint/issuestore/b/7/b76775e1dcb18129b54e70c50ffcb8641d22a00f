@@ -1,0 +1,7 @@
+
+Ntypescript:S1128	"&Remove this unused import of 'Player'.(˜¸õÕÿÿÿÿÿ8ğĞŒä€2
+Utypescript:S6759"-Mark the props of the component as read-only.(§ä îøÿÿÿÿ8ğĞŒä€2
+¥typescript:S6440"}React Hook "useEffect" is called conditionally. React Hooks must be called in the exact same order in every component render.(ùëİ¯ùÿÿÿÿ8ğĞŒä€2
+¥typescript:S6440("}React Hook "useEffect" is called conditionally. React Hooks must be called in the exact same order in every component render.(ùëİ¯ùÿÿÿÿ8ğĞŒä€2
+ätypescript:S6440:"»React Hook "useEffect" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?(ùëİ¯ùÿÿÿÿ8ğĞŒä€2
+ätypescript:S6440b"»React Hook "useEffect" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?(ùëİ¯ùÿÿÿÿ8òĞŒä€2

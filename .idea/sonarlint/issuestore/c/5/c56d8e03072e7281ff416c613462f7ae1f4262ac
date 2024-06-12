@@ -1,0 +1,27 @@
+
+‚typescript:S1854¶"3Remove this useless assignment to variable "votes".(ª„Ì­ùÿÿÿÿ8ƒËŒä€2J$023040ff-d8aa-4dc0-8fed-948531acc681
+…typescript:S1854¶"6Remove this useless assignment to variable "setVotes".(ª„Ì­ùÿÿÿÿ8ƒËŒä€2J$c9eaa3f6-4832-4818-bb6d-77fe9e08e3ab
+‹typescript:S2004Ú"ARefactor this code to not nest functions more than 4 levels deep.(´Ñáì8„ËŒä€2J$d9a1b312-d77f-41f7-812b-77bf45d4c426
+Štypescript:S2004ä"ARefactor this code to not nest functions more than 4 levels deep.(»Î48„ËŒä€2J$5e78051c-f9f8-4a76-9f35-762fe6e5eef4
+typescript:S2004ï"ARefactor this code to not nest functions more than 4 levels deep.(¥Ÿıùÿÿÿÿ8„ËŒä€2J$ad672fff-b1c3-4cb7-aaa8-70549d3876e5
+typescript:S2004ü"ARefactor this code to not nest functions more than 4 levels deep.(™ÏÅíùÿÿÿÿ8„ËŒä€2J$f033fa0e-77ac-4c8a-a5cb-cd00a11f18a0
+£typescript:S3776’"TRefactor this function to reduce its Cognitive Complexity from 18 to the 15 allowed.(ïÛÄúÿÿÿÿ8…ËŒä€2J$85582b25-0fc9-44f0-b6d7-66323cbb8bb9
+¦typescript:S6819Ö"\Use <progress> instead of the "progressbar" role to ensure accessibility across all devices.(êØùÛ8…ËŒä€2J$0762fe65-780c-4c97-9500-ed66b7cf5b14
+mtypescript:S6479ÿ"Do not use Array index in keys(Ÿ–úÿÿÿÿ8…ËŒä€2J$4bf2f7fa-28b7-412f-b798-14515a77882d
+typescript:S3776€"TRefactor this function to reduce its Cognitive Complexity from 19 to the 15 allowed.(ÏŞş¯8ŠËŒä€2J$f1cb6d54-6fd7-4011-86a1-c1d7af241a8b
+’typescript:S6848î"ÂAvoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element.(ºÙ°ğüÿÿÿÿ8ŠËŒä€2J$aebfeddf-f014-44a8-8ae2-2963c3257063
+®typescript:S1082î"_Visible, non-interactive elements with click handlers must have at least one keyboard listener.(ºÙ°ğüÿÿÿÿ8ŠËŒä€2J$14a34ba3-bcb5-4a3b-b39f-1a55e5371709
+mtypescript:S6479î"Do not use Array index in keys(ºÙ°ğüÿÿÿÿ8ŠËŒä€2J$cd1202a1-2d09-49b7-902e-e055c101ab11
+’typescript:S6848ú"ÂAvoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element.(µ§€Îùÿÿÿÿ8ŠËŒä€2J$55eb9284-5986-4180-8708-6a3d2c5d835a
+®typescript:S1082ú"_Visible, non-interactive elements with click handlers must have at least one keyboard listener.(µ§€Îùÿÿÿÿ8ŠËŒä€2J$26ec2d96-37f6-4b32-aa27-cc851a0bf22c
+œtypescript:S6847Š"RNon-interactive elements should not be assigned mouse or keyboard event listeners.(Æœ¢Ã8ŠËŒä€2J$261a6637-425e-41b0-8f66-7a21bd95a92a
+©typescript:S1082Š"_Visible, non-interactive elements with click handlers must have at least one keyboard listener.(Æœ¢Ã8‹ËŒä€2J$4b1df54d-45e3-4547-bbde-26039cebf1a0
+–typescript:S4084•"LMedia elements such as <audio> and <video> must have a <track> for captions.(ÄÊÃÀ8‹ËŒä€2J$0c5c0416-1ba4-4e8e-8ac4-a2cd5ac4adaa
+htypescript:S6479œ"Do not use Array index in keys(½•’Å8‹ËŒä€2J$dfca02d4-97f2-4554-85f5-b138f3e8d728
+etypescript:S1874ª"'onKeyPress' is deprecated.(âÌå¸8‹ËŒä€2J$394552ef-b3ee-47b7-a1dd-395c2d3c67ff
+’typescript:S6848¸"ÂAvoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element.(†ïÏ¥üÿÿÿÿ8‹ËŒä€2J$1d18bdb3-6be3-43ed-9d79-efc1827b515a
+®typescript:S1082¸"_Visible, non-interactive elements with click handlers must have at least one keyboard listener.(†ïÏ¥üÿÿÿÿ8‹ËŒä€2J$bc5e4e80-7fbe-4baa-ac51-1e34fd741e2f
+’typescript:S6848Ø"ÂAvoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element.(´Ù÷éÿÿÿÿÿ8‹ËŒä€2J$2566768e-a6db-48ec-8be3-cae00fe9cdf4
+®typescript:S1082Ø"_Visible, non-interactive elements with click handlers must have at least one keyboard listener.(´Ù÷éÿÿÿÿÿ8‹ËŒä€2J$ee8006c2-8c7f-43f6-8ce6-4f96c6fa480b
+typescript:S6848á"ÂAvoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element.(Ì›áô8‹ËŒä€2J$5c3a014d-622b-4fc4-99e2-021af495d578
+©typescript:S1082á"_Visible, non-interactive elements with click handlers must have at least one keyboard listener.(Ì›áô8ŒËŒä€2J$f8059d71-d20e-4fd5-8a51-fe87a904279e
