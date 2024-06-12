@@ -707,13 +707,24 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                          style={{ width: `${(tasksCompleted / 5) * 100}%` }}>{(tasksCompleted / 5) * 100}% Complete
                     </div>
                 </div>
-                <div className="task-list">
-                    {tasks.map(task => (
-                        <div key={task.id} className={`task-item ${completedTasks.some(t => t.x === task.position.x && t.y === task.position.y) ? 'completed' : ''}`}>
-                            {task.name}
-                        </div>
-                    ))}
-                </div>
+                {currentPlayer?.role === "IMPOSTOR" ? (
+                    <div className="task-list">
+                        <div className="task-item1">Sabotage-and-kill</div>
+                        {/*<div className="task-item">Fake tasks</div>*/}
+                        {tasks.map(task => (
+                            <div key={task.id} className="task-item">{task.name}</div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="task-list">
+                        {tasks.map(task => (
+                            <div key={task.id}
+                                 className={`task-item ${completedTasks.some(t => t.x === task.position.x && t.y === task.position.y) ? 'completed' : ''}`}>
+                                {task.name}
+                            </div>
+                        ))}
+                    </div>
+                )}
                 {currentPlayer && (
                     <MiniMap
                         map={map}

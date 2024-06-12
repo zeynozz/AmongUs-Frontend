@@ -11,6 +11,7 @@
     align-items: center;
     flex-grow: 1;
     position: relative; /* Ensure proper positioning for children */
+    margin-left:-45px;
 }
 
 .impostor-map-button {

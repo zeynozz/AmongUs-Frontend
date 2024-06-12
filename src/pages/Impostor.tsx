@@ -84,6 +84,7 @@ const Impostor = ({ game, playerId, onChangeSetGame, onPlayerKilled }) => {
 
     return (
         <div className="impostor-container">
+            <div className="impostor-role">
             <Role role="IMPOSTOR" />
             <button
                 className={`kill-button ${isCrewmateAdjacent() ? "" : "disabled"}`}
@@ -97,6 +98,7 @@ const Impostor = ({ game, playerId, onChangeSetGame, onPlayerKilled }) => {
                     victimImage={victimImage}
                 />
             )}
+            </div>
         </div>
     );
 };

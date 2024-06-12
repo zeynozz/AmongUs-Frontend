@@ -295,7 +295,7 @@
 
 .task-item1 {
     font-family: 'DSEG14Classic', sans-serif;
-    font-size: 20px;
+    font-size: 17px;
     color: red;
     margin-bottom: 20px;
     animation: glowRed 1s infinite alternate;
@@ -628,7 +628,7 @@
     object-fit: cover;
 }
 .mini-map {
-    margin-top: 15vh;
+    margin-top: 5vh;
     border: 2px solid #fff;
     border-radius: 50%;
     background-color: rgba(0, 0, 0, 0.5);
