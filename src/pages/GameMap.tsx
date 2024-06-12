@@ -240,7 +240,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                         setShowEmergency(false);
                         setShowChatInput(true);
                         startChatTimer();
-                    }, 3000);
+                    }, 1000);
                 });
 
                 client.subscribe(`/topic/public`, (message) => {
@@ -356,7 +356,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                     setShowEmergency(false);
                     setShowChatInput(true);
                     startChatTimer();
-                }, 3000);
+                }, 1000);
             }
             return;
         }
@@ -650,7 +650,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                 sendVotesToBackend();
             }
             countdown--;
-        }, 3000);
+        }, 1000);
     };
 
     const startChatTimer = () => {
@@ -663,7 +663,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                 startVoting();
             }
             countdown--;
-        }, 3000);
+        }, 1000);
     };
 
     const handleVote = (playerName: string) => {
