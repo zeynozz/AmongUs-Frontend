@@ -272,6 +272,11 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                     setVotedOutPlayer(eliminatedPlayer.username);
                     setVotedOutPlayerColor(eliminatedPlayer.color);
                     setShowVotedOutAnimation(true);
+
+                    // Update the player list to reflect the elimination
+                    setPlayers(prevPlayers => prevPlayers.map(player =>
+                        player.username === eliminatedPlayer.username ? { ...player, status: "DEAD" } : player
+                    ));
                 });
 
                 client.subscribe(`/topic/${gameCode}/gameEnd`, (message) => {
@@ -937,7 +942,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                             <div className="vote-message">{voteMessage}</div>
                         ) : (
                             <div className="player-list">
-                                {players.map(player => (
+                                {players.filter(player => player.status === "ALIVE").map(player => (
                                     <button
                                         key={player.id}
                                         className={`player-button ${selectedPlayer === player.username ? 'selected' : ''}`}
