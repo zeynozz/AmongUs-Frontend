@@ -1,3 +1,4 @@
+/* CrewmatesAnimation.css */
 .animation-container {
     position: fixed;
     top: 0;
@@ -7,10 +8,15 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-image: url("/public/images/victoryCrewmates.jpg");
     z-index: 1000;
     padding: 20px;
     box-sizing: border-box;
+}
+
+.animation-content {
+    text-align: center;
+    color: white;
 }
 
 .animation-image {
@@ -20,8 +26,25 @@
     margin-bottom: 20px;
 }
 
-h1 {
-    color: #fff;
-    font-size: 2.5rem;
+.crewmate-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.crewmate-item {
     text-align: center;
+}
+
+.crewmate-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.crewmate-name {
+    font-family: 'DSEG14Classic', sans-serif;
+    font-size: 18px;
 }

@@ -1,12 +1,18 @@
 import React, { useEffect, useRef } from 'react';
 import '../css/ImpostorAnimation.css';
 
-interface ImpostorAnimationProps {
-    onClose: () => void;
-    playerColor: string;
+interface ImpostorPlayer {
+    id: number;
+    username: string;
+    color: string;
 }
 
-const ImpostorAnimation: React.FC<ImpostorAnimationProps> = ({ onClose, playerColor }) => {
+interface ImpostorAnimationProps {
+    onClose: () => void;
+    impostorPlayers: ImpostorPlayer[];
+}
+
+const ImpostorAnimation: React.FC<ImpostorAnimationProps> = ({ onClose, impostorPlayers }) => {
     const audioRef = useRef<HTMLAudioElement>(null);
 
     useEffect(() => {
@@ -25,9 +31,17 @@ const ImpostorAnimation: React.FC<ImpostorAnimationProps> = ({ onClose, playerCo
     return (
         <div className="animation-container">
             <div className="animation-content">
-                <img src="/public/images/DefeatImpostor.webp" alt="Impostor Defeat" className="animation-image" />
+                <h1>Impostors Win!</h1>
+                <div className="impostor-players">
+                    {impostorPlayers.map((player) => (
+                        <div key={player.id} className="impostor-player">
+                            <img src={`/public/images/movement/${player.color}/upDown.png`} alt={player.username} className="impostor-player-image" />
+                            <div className="impostor-player-name">{player.username}</div>
+                        </div>
+                    ))}
+                </div>
             </div>
-            <audio ref={audioRef} src="/public/sounds/defeat.mp3"/>
+            <audio ref={audioRef} src="/public/sounds/defeat.mp3" />
             <div className="animation-overlay" onClick={onClose}></div>
         </div>
     );

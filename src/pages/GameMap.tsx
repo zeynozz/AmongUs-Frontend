@@ -44,7 +44,7 @@ interface ChatMessage {
 }
 
 const MiniMap: React.FC<{ map: number[][]; playerPosition: any; tasks: any[]; players: Player[]; completedTasks: any[]; currentPlayer: Player }> = ({ map, playerPosition, tasks, players, completedTasks, currentPlayer }) => {
-    const mapSize = 500; // Size of the mini-map
+    const mapSize = 500; // Größe der Mini-Map
 
     const renderMiniMap = () => {
         const miniMap = map.flatMap((row, rowIndex) =>
@@ -105,7 +105,7 @@ const MiniMap: React.FC<{ map: number[][]; playerPosition: any; tasks: any[]; pl
             })
         );
 
-        // Add tasks
+        // Aufgaben hinzufügen
         tasks.forEach((task) => {
             const x = (task.position.x / map[0].length) * mapSize;
             const y = (task.position.y / map.length) * mapSize;
@@ -124,7 +124,7 @@ const MiniMap: React.FC<{ map: number[][]; playerPosition: any; tasks: any[]; pl
             );
         });
 
-        // Add players
+        // Spieler hinzufügen
         players.forEach((player) => {
             const x = (player.position.x / map[0].length) * mapSize;
             const y = (player.position.y / map.length) * mapSize;
@@ -188,6 +188,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
 
     const [showCrewmatesWinAnimation, setShowCrewmatesWinAnimation] = useState(false);
     const [showImpostorsWinAnimation, setShowImpostorsWinAnimation] = useState(false);
+    const [killAnimationFinished, setKillAnimationFinished] = useState(false); // Zustand für KillAnimation
 
     const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -197,10 +198,14 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
     const [playerPosition, setPlayerPosition] = useState<{ x: number, y: number }>(initialPlayerPosition);
     const [players, setPlayers] = useState<Player[]>(playerList);
     const [playerStatus, setPlayerStatus] = useState(currentPlayer?.status || 'ALIVE');
+    const [votingAnimationFinished, setVotingAnimationFinished] = useState(false); // Zustand für VotingAnimation
 
     const [showVotedOutAnimation, setShowVotedOutAnimation] = useState(false);
     const [votedOutPlayer, setVotedOutPlayer] = useState<string | null>(null);
     const [votedOutPlayerColor, setVotedOutPlayerColor] = useState<string | null>(null);
+    const [votedOutPlayerRole, setVotedOutPlayerRole] = useState<string | null>(null); // Add state for player's role
+    const [impostors, setImpostors] = useState<Player[]>([]); // Add state to track impostors
+    const [crewmates, setCrewmates] = useState<Player[]>([]); // Add state to track crewmates
 
     const tasks = [
         { id: 1, name: "Card Swipe 1", position: { x: 51, y: 5 } },
@@ -271,25 +276,59 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                     const eliminatedPlayer = JSON.parse(message.body);
                     setVotedOutPlayer(eliminatedPlayer.username);
                     setVotedOutPlayerColor(eliminatedPlayer.color);
+                    setVotedOutPlayerRole(eliminatedPlayer.role);
                     setShowVotedOutAnimation(true);
 
-                    // Update the player list to reflect the elimination
-                    setPlayers(prevPlayers => prevPlayers.map(player =>
-                        player.username === eliminatedPlayer.username ? { ...player, status: "DEAD" } : player
-                    ));
+                    setPlayers(prevPlayers => {
+                        const updatedPlayers = prevPlayers.filter(player => player.username !== eliminatedPlayer.username);
+                        console.log('Updated Players:', updatedPlayers);
+                        return updatedPlayers;
+                    });
+
+                    const remainingCrewmates = players.filter(player => player.role === 'CREWMATE' && player.status === 'ALIVE');
+                    console.log('Remaining Crewmates:', remainingCrewmates);
+
+                    if (remainingCrewmates.length === 0) {
+                        setTimeout(() => {
+                            console.log('Impostors Win');
+                            setShowImpostorsWinAnimation(true);
+                            setTimeout(() => {
+                                setShowImpostorsWinAnimation(true);
+                            }, 6000); // ImpostorAnimation für 6 Sekunden anzeigen
+                        }, 6000);
+                    }
+
+                    const remainingImpostors = players.filter(player => player.role === 'IMPOSTOR' && player.status === 'ALIVE');
+                    console.log('Remaining Impostors:', remainingImpostors);
+
+                    if (remainingImpostors.length === 0) {
+                        setTimeout(() => {
+                            console.log('Crewmates Win');
+                            setShowCrewmatesWinAnimation(true);
+                            setTimeout(() => {
+                                setShowCrewmatesWinAnimation(true);
+                            }, 6000); // CrewmateAnimation für 6 Sekunden anzeigen
+                        }, 6000);
+                    }
+
+                    resetVotingState();
                 });
 
                 client.subscribe(`/topic/${gameCode}/gameEnd`, (message) => {
                     const result = message.body;
                     setShowVotedOutAnimation(false);
                     if (result === "CREWMATES_WIN") {
+                        const crewmatePlayers = players.filter(p => p.role === 'CREWMATE');
+                        setCrewmates(crewmatePlayers); // Set the crewmates state
                         setShowCrewmatesWinAnimation(true);
                     } else {
+                        const impostorPlayers = players.filter(p => p.role === 'IMPOSTOR');
+                        setImpostors(impostorPlayers); // Set the impostors state
                         setShowImpostorsWinAnimation(true);
                     }
                     setTimeout(() => {
                         window.location.href = "/";
-                    }, 7000); // Show the end game animation for 7 seconds
+                    }, 7000); // Zeige die Endspielanimation für 7 Sekunden an
                 });
 
                 client.subscribe(`/topic/${gameCode}/report`, () => {
@@ -314,7 +353,10 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                             setImpostorImage(`/images/movement/${impostor.color}/upDown.png`);
                             setVictimImage(`/images/movement/${victim.color}/sit.png`);
                             setShowKillAnimation(true);
-                            setTimeout(() => setShowKillAnimation(false), 5000); // Duration of the animation
+                            setTimeout(() => {
+                                setShowKillAnimation(false);
+                                setKillAnimationFinished(true); // Setze den Zustand auf true, wenn die KillAnimation fertig ist
+                            }, 7000); // Dauer der Animation
                         }
                     }
                 });
@@ -348,7 +390,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                     audio.play();
                 }
             } else {
-                console.warn("Only impostors can use vents");
+                console.warn("Nur Betrüger können Lüftungsschächte benutzen");
             }
             return;
         }
@@ -479,7 +521,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                     position: calculateNewPosition(currentPlayer.position, keyCode)
                 };
 
-                // Send the updated position and animation state to the server
+                // Sende die aktualisierte Position und den Animationszustand an den Server
                 if (stompClient && currentPlayer) {
                     stompClient.send("/app/positionChange", {}, JSON.stringify(newPlayerState));
                 }
@@ -583,22 +625,23 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
             stompClient.send("/app/game/kill", {}, JSON.stringify(killMessage));
             onPlayerKilled(victim.id);
 
-            // Construct image paths
+            // Bildpfade konstruieren
             const impostorImagePath = `/public/images/movement/${impostor.color}/upDown.png`;
             const victimImagePath = `/public/images/movement/${victim.color}/upDown.png`;
 
-            // Log the paths to verify
+            // Loggen Sie die Pfade zur Überprüfung
             console.log("Impostor Image Path:", impostorImagePath);
             console.log("Victim Image Path:", victimImagePath);
 
-            // Set images for kill animation
+            // Setze Bilder für die Kill-Animation
             setImpostorImage(impostorImagePath);
             setVictimImage(victimImagePath);
             setShowKillAnimation(true);
 
             setTimeout(() => {
                 setShowKillAnimation(false);
-            }, 6000); // Duration of the animation
+                setKillAnimationFinished(true); // Setze den Zustand auf true, wenn die KillAnimation fertig ist
+            }, 7000); // Dauer der Animation
         }
     };
 
@@ -628,7 +671,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
         if (playerStatus === 'DEAD') {
             setTimeout(() => {
                 setPlayerStatus('GHOST');
-            }, 3000); // Assuming 3 seconds to transition from DEAD to GHOST
+            }, 3000); // Annahme von 3 Sekunden, um von DEAD zu GHOST zu wechseln
         }
     }, [playerStatus]);
 
@@ -682,7 +725,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
             setSelectedPlayer(playerName);
             setVoteMessage(`You voted for ${playerName}`);
         } else {
-            console.error("StompClient is not connected or currentPlayer is not defined");
+            console.error("StompClient ist nicht verbunden oder currentPlayer ist nicht definiert");
         }
     };
 
@@ -690,7 +733,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
         if (stompClient && stompClient.connected) {
             stompClient.send(`/app/${gameCode}/collectVotes`, {}, JSON.stringify({ gameCode }));
         } else {
-            console.error("StompClient is not connected");
+            console.error("StompClient ist nicht verbunden");
         }
     };
 
@@ -702,6 +745,17 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
     const cameraStyle = {
         transform: `translate(-${playerPosition.x * 50 - window.innerWidth / 2}px, -${playerPosition.y * 50 - window.innerHeight / 2}px)`
     };
+
+    useEffect(() => {
+        if (votingAnimationFinished) {
+            if (showCrewmatesWinAnimation) {
+                setTimeout(() => setShowCrewmatesWinAnimation(false), 6000); // CrewmateAnimation für 6 Sekunden anzeigen
+            }
+            if (showImpostorsWinAnimation) {
+                setTimeout(() => setShowImpostorsWinAnimation(false), 6000); // ImpostorAnimation für 6 Sekunden anzeigen
+            }
+        }
+    }, [votingAnimationFinished, showCrewmatesWinAnimation, showImpostorsWinAnimation]);
 
     return (
         <div className="MapDisplay-map-container">
@@ -954,15 +1008,6 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                             </div>
                         )}
                         <div className="dialog-buttons">
-                            <div className="chat-button" onClick={handleOpenChat}>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor"
-                                     className="bi bi-chat-dots" viewBox="0 0 16 16">
-                                    <path
-                                        d="M5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2" />
-                                    <path
-                                        d="m2.165 15.803.02-.004c1.83-.363 2.948-.842 3.468-1.105A9 9 0 0 0 8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6a10.4 10.4 0 0 1-.524 2.318l-.003.011a11 11 0 0 1-.244.637c-.079.186.074.394.273.362a22 22 0 0 0 .693-.125m.8-3.108a1 1 0 0 0-.287-.801C1.618 10.83 1 9.468 1 8c0-3.192 3.004-6 7-6s7 2.808 7 6-3.004 6-7 6a8 8 0 0 1-2.088-.272 1 1 0 0 0-.711.074c-.387.196-1.24.57-2.634.893a11 11 0 0 0 .398-2" />
-                                </svg>
-                            </div>
                             <div className="close-button" onClick={handleCloseVoting}>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor"
                                      className="bi bi-x-circle" viewBox="0 0 16 16">
@@ -979,6 +1024,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                 <VotedOutAnimation
                     votedOutPlayer={votedOutPlayer}
                     playerColor={votedOutPlayerColor}
+                    playerRole={votedOutPlayerRole}
                     onClose={() => setShowVotedOutAnimation(false)}
                 />
             )}
@@ -997,11 +1043,14 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                     victimImage={victimImage}
                 />
             )}
-            {showCrewmatesWinAnimation && (
-                <CrewmateAnimation onClose={() => setShowCrewmatesWinAnimation(false)} />
+            {killAnimationFinished && ( // Zeige ImpostorAnimation nur, wenn die KillAnimation beendet ist
+                <ImpostorAnimation onClose={() => setShowImpostorsWinAnimation(false)} impostorPlayers={impostors}  />
             )}
-            {showImpostorsWinAnimation && (
-                <ImpostorAnimation onClose={() => setShowImpostorsWinAnimation(false)} playerColor={''} />
+            {showCrewmatesWinAnimation && (
+                <CrewmateAnimation onClose={() => setShowCrewmatesWinAnimation(false)} crewmatePlayers={crewmates}/>
+            )}
+            {showImpostorsWinAnimation && !killAnimationFinished && ( // Nur anzeigen, wenn die KillAnimation nicht angezeigt wird
+                <ImpostorAnimation onClose={() => setShowImpostorsWinAnimation(false)} impostorPlayers={impostors}  />
             )}
         </div>
     );

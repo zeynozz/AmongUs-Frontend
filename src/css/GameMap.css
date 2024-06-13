@@ -446,6 +446,7 @@
     height: 420px;
     box-shadow: 0 0 10px rgba(210, 201, 201, 0.5);
     position: relative;
+    margin-left:300px;
 }
 
 .message-container {
@@ -528,6 +529,7 @@
     height: 420px;
     box-shadow: 0 0 10px rgba(210, 201, 201, 0.5);
     position: relative;
+    margin-left:300px;
 }
 .voting-timer {
     color: red;
@@ -535,6 +537,16 @@
     font-size: 13px;
     text-shadow: 0 1px 10px rgb(73, 11, 23);
 }
+
+.vote-message{
+    color: white;
+    margin-top:90px;
+    font-size: 24px;
+    font-family: 'DSEG14Classic', sans-serif;
+    text-shadow: 0 1px 10px rgb(0, 180, 75);
+
+}
+
 .timer {
     color: red;
     font-family: 'DSEG14Classic', sans-serif;

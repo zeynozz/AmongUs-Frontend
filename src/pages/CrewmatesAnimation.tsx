@@ -1,35 +1,51 @@
-import React, { useEffect } from 'react';
+// CrewmateAnimation.tsx
+import React, {useEffect, useRef} from 'react';
 import '../css/CrewmatesAnimation.css';
 
-interface CrewmateAnimationProps {
-    onClose: () => void;
-}
+type Crewmate = {
+    id: number;
+    username: string;
+    color: string;
+};
 
-const CrewmateAnimation: React.FC<CrewmateAnimationProps> = ({ onClose }) => {
+type CrewmateAnimationProps = {
+    crewmatePlayers: Crewmate[];
+    onClose: () => void;
+};
+
+const CrewmateAnimation: React.FC<CrewmateAnimationProps> = ({ crewmatePlayers, onClose }) => {
+    const audioRef = useRef<HTMLAudioElement>(null);
+
     useEffect(() => {
+        if (audioRef.current) {
+            audioRef.current.play().catch(error => console.log("Audio play error:", error));
+        }
         const timer = setTimeout(() => {
             onClose();
-        }, 7000); // Animation duration 7 seconds
+        }, 7000);
 
         return () => clearTimeout(timer);
     }, [onClose]);
 
-    useEffect(() => {
-        const audio = new Audio('/public/sounds/victory.mp3');
-        audio.play();
-
-        return () => {
-            audio.pause();
-            audio.currentTime = 0;
-        };
-    }, []);
-
     return (
         <div className="animation-container">
-            <div>
-                <img src="/public/images/victoryCrewmates.jpg" alt="Crewmates Victory" className="animation-image" />
-                <h1>Crewmates Win!</h1>
+            <div className="animation-content">
+                <h2>Crewmates Win!</h2>
+                <div className="crewmate-list">
+                    {crewmatePlayers.map(crewmate => (
+                        <div key={crewmate.id} className="crewmate-item">
+                            <img
+                                src={`/public/images/movement/${crewmate.color}/upDown.png`}
+                                alt={crewmate.username}
+                                className="crewmate-image"
+                            />
+                            <div className="crewmate-name">{crewmate.username}</div>
+                        </div>
+                    ))}
+                </div>
             </div>
+            <audio ref={audioRef} src="/public/sounds/victory.mp3" />
+            <div className="animation-overlay" onClick={onClose}></div>
         </div>
     );
 };

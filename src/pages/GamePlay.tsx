@@ -17,6 +17,14 @@ type Props = {
     onChangeSetGame(game: Game): void;
 };
 
+type Player = {
+    id: number;
+    username: string;
+    color: string;
+    role: string;
+    status: "ALIVE" | "DEAD" | "GHOST";
+};
+
 export function PlayGame({ game, onChangeSetGame }: Props) {
     const [stompClient, setStompClient] = useState<any>(null);
     const [showAnimation, setShowAnimation] = useState(true);
@@ -25,8 +33,12 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
     const [showVotedOutAnimation, setShowVotedOutAnimation] = useState(false);
     const [votedOutPlayer, setVotedOutPlayer] = useState<string | null>(null);
     const [votedOutPlayerColor, setVotedOutPlayerColor] = useState<string | null>(null);
+    const [votedOutPlayerRole, setVotedOutPlayerRole] = useState<string | null>(null);
     const [showCrewmatesWinAnimation, setShowCrewmatesWinAnimation] = useState(false);
     const [showImpostorsWinAnimation, setShowImpostorsWinAnimation] = useState(false);
+    const [impostors, setImpostors] = useState<Player[]>([]);
+    const [crewmates, setCrewmates] = useState<Player[]>([]);
+
     const playerId = JSON.parse(sessionStorage.getItem('currentPlayerId') || "null");
     const playerIndex = game?.players?.findIndex((player) => player.id === playerId) ?? -1;
     const playerRole = playerIndex !== -1 ? game?.players[playerIndex].role : null;
@@ -67,24 +79,24 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
 
     useEffect(() => {
         if (stompClient) {
-            const positionChangeSubscription = stompClient.subscribe("/topic/positionChange", (message) => {
+            const positionChangeSubscription = stompClient.subscribe("/topic/positionChange", (message: Stomp.Message) => {
                 const receivedMessage = JSON.parse(message.body);
                 onChangeSetGame(receivedMessage);
             });
 
-            const gamePlaySubscription = stompClient.subscribe(`/topic/${game.gameCode}/play`, (message) => {
+            const gamePlaySubscription = stompClient.subscribe(`/topic/${game.gameCode}/play`, (message: Stomp.Message) => {
                 const updatedGame = JSON.parse(message.body);
                 onChangeSetGame(updatedGame);
             });
 
-            const playerKilledSubscription = stompClient.subscribe("/topic/playerKilled", (message) => {
+            const playerKilledSubscription = stompClient.subscribe("/topic/playerKilled", (message: Stomp.Message) => {
                 const updatedGame = JSON.parse(message.body);
                 if (updatedGame) {
                     onChangeSetGame(updatedGame);
                 }
             });
 
-            const playerRemovedSubscription = stompClient.subscribe("/topic/playerRemoved", (message) => {
+            const playerRemovedSubscription = stompClient.subscribe("/topic/playerRemoved", (message: Stomp.Message) => {
                 const { removedPlayerId } = JSON.parse(message.body);
                 handlePlayerRemoved(removedPlayerId);
             });
@@ -100,18 +112,46 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
                 }, 3000);
             });
 
-            const votingResultsSubscription = stompClient.subscribe(`/topic/${game.gameCode}/votingResults`, (message) => {
+            const votingResultsSubscription = stompClient.subscribe(`/topic/${game.gameCode}/votingResults`, (message: Stomp.Message) => {
                 const eliminatedPlayer = JSON.parse(message.body);
+                handlePlayerRemoved(eliminatedPlayer.id); // Entfernen Sie den Spieler direkt
                 setVotedOutPlayer(eliminatedPlayer.username);
                 setVotedOutPlayerColor(eliminatedPlayer.color);
+                setVotedOutPlayerRole(eliminatedPlayer.role);
                 setShowVotedOutAnimation(true);
+
+                // Kurze Verzögerung, um sicherzustellen, dass der Zustand aktualisiert wurde
+                setTimeout(() => {
+                    // Überprüfen, ob alle Crewmates oder alle Impostors eliminiert wurden
+                    const remainingCrewmates = game.players.filter(player => player.role === 'CREWMATE' && player.status === 'ALIVE');
+                    const remainingImpostors = game.players.filter(player => player.role === 'IMPOSTOR' && player.status === 'ALIVE');
+                    if (remainingCrewmates.length === 0) {
+                        setTimeout(() => {
+                            setShowImpostorsWinAnimation(true);
+                            setTimeout(() => {
+                                setShowImpostorsWinAnimation(false);
+                            }, 6000); // ImpostorAnimation für 6 Sekunden anzeigen
+                        }, 6000); // Warte, bis die VotingAnimation abgeschlossen ist
+                    } else if (remainingImpostors.length === 0) {
+                        setTimeout(() => {
+                            setShowCrewmatesWinAnimation(true);
+                            setTimeout(() => {
+                                setShowCrewmatesWinAnimation(false);
+                            }, 6000); // CrewmateAnimation für 6 Sekunden anzeigen
+                        }, 6000); // Warte, bis die VotingAnimation abgeschlossen ist
+                    }
+                }, 3000); // Verzögerung von 100 ms, um den Zustand zu aktualisieren
             });
 
-            const gameEndSubscription = stompClient.subscribe(`/topic/${game.gameCode}/gameEnd`, (message) => {
+            const gameEndSubscription = stompClient.subscribe(`/topic/${game.gameCode}/gameEnd`, (message: Stomp.Message) => {
                 const result = message.body;
                 if (result === "CREWMATES_WIN") {
+                    const crewmatePlayers = game.players.filter(player => player.role === 'CREWMATE');
+                    setCrewmates(crewmatePlayers);
                     setShowCrewmatesWinAnimation(true);
                 } else if (result === "IMPOSTORS_WIN") {
+                    const impostorPlayers = game.players.filter(player => player.role === 'IMPOSTOR');
+                    setImpostors(impostorPlayers);
                     setShowImpostorsWinAnimation(true);
                 }
                 setTimeout(() => {
@@ -151,7 +191,7 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
             victimId: killedPlayerId,
             gameCode: game.gameCode,
         };
-        stompClient.send("/app/kill", {}, JSON.stringify(killMessage));
+        stompClient.send('/app/kill', {}, JSON.stringify(killMessage));
     };
 
     const handleEmergencyClose = () => {
@@ -190,9 +230,10 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
                     game={game}
                     playerId={playerId}
                     onPlayerKilled={handlePlayerKilled}
-                    onChangeSetGame={onChangeSetGame}/>
+                    onChangeSetGame={onChangeSetGame}
+                />
             ) : (
-                <Crewmate game={undefined} playerId={undefined} />
+                <Crewmate game={game} playerId={playerId} />
             )}
             <GameMap
                 map={game.map}
@@ -202,18 +243,25 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
             />
             {showEmergency && <EmergencyAnimation onClose={handleEmergencyClose} />}
             {showReport && <ReportAnimation onClose={handleReportClose} />}
-            {showVotedOutAnimation && votedOutPlayer && votedOutPlayerColor && (
+            {showVotedOutAnimation && votedOutPlayer && votedOutPlayerColor && votedOutPlayerRole && (
                 <VotedOutAnimation
                     votedOutPlayer={votedOutPlayer}
                     playerColor={votedOutPlayerColor}
+                    playerRole={votedOutPlayerRole}
                     onClose={handleVotedOutClose}
                 />
             )}
             {showCrewmatesWinAnimation && (
-                <CrewmateAnimation onClose={() => setShowCrewmatesWinAnimation(false)} />
+                <CrewmateAnimation
+                    onClose={() => setShowCrewmatesWinAnimation(false)}
+                    crewmatePlayers={crewmates} // Pass the list of crewmates
+                />
             )}
             {showImpostorsWinAnimation && (
-                <ImpostorAnimation onClose={() => setShowImpostorsWinAnimation(false)} playerColor={''} />
+                <ImpostorAnimation
+                    onClose={() => setShowImpostorsWinAnimation(false)}
+                    impostorPlayers={impostors}
+                />
             )}
         </div>
     );
