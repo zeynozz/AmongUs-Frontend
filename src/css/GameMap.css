@@ -620,9 +620,19 @@
     justify-content: center;
     align-items: center;
     cursor: pointer;
+    color: rgba(0, 0, 0, 0.5);
 }
 
 .close-button:hover {
+    background-color: #d96f38;
+}
+.close-button2{
+    cursor: pointer;
+    color:white;
+    border-radius: 50%;
+}
+
+.close-button2:hover{
     background-color: #d96f38;
 }
 
@@ -634,6 +644,11 @@
     justify-content: center;
     width: 25px;
     height: 25px;
+    border-radius: 80%;
+}
+
+.chat-button:hover{
+    background-color: #d96f38;
 }
 
 .killed-image {
