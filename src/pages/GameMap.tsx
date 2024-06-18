@@ -283,7 +283,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
             return;
         }
 
-        if ((cellType >= 14 && cellType <= 17) && isNearEmergencyCell(playerPosition.x, playerPosition.y)) {
+        if ((cellType >= 13 && cellType <= 17) && isNearEmergencyCell(playerPosition.x, playerPosition.y)) {
             if (stompClient) {
                 stompClient.send("/app/emergency", {}, gameCode);
                 setShowEmergency(true);
@@ -463,8 +463,11 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
         }
     };
 
-    const isNearTaskCell = (x: number, y: number) => {
-        return tasks.some(task => Math.abs(task.position.x - playerPosition.x) <= 1 && Math.abs(task.position.y - playerPosition.y) <= 1);
+    const isNearTaskCell = (taskX: number, taskY: number) => {
+        return (
+            Math.abs(taskX - playerPosition.x) <= 1 &&
+            Math.abs(taskY - playerPosition.y) <= 1
+        );
     };
 
     const isNearEmergencyCell = (x: number, y: number) => {
@@ -747,7 +750,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                                         cellClass = 'edge2';
                                         break;
                                     case 13:
-                                        cellClass = completedTasks.some(task => task.x === cellIndex && task.y === rowIndex) ? 'completed-task1' : 'task1 task1-glow';
+                                        cellClass = completedTasks.some(task => task.x === cellIndex && task.y === rowIndex) ? 'completed-task' : 'task task-glow';
                                         break;
                                     case 14:
                                         cellClass = 'emergency1';

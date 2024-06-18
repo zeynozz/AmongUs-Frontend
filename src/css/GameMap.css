@@ -30,7 +30,7 @@
     width: 100vw;
     height: 100vh;
     overflow: hidden;
-    animation: spaceshipSwing 3s infinite ease-in-out;
+    animation: spaceshipSwing 4s infinite ease-in-out;
 
 }
 
@@ -160,7 +160,7 @@
     background-image: url("/public/images/map/edge2.png") ;
 }
 
-.task1 {
+.task {
     background-image: url("/public/images/map/vending.png");
     background-size: cover;
     background-position: center;
@@ -193,7 +193,7 @@
     cursor: pointer;
 }
 
-.completed-task1 {
+.completed-task {
     background-image: url("/public/images/map/vending.png");
     box-shadow: none;
     animation: none;
