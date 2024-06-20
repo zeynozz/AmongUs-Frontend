@@ -61,7 +61,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
     const [sabotageTriggered, setSabotageTriggered] = useState(false);
     const [showToast, setShowToast] = useState(false);
     const [showChatInput, setShowChatInput] = useState(false);
-    const [showChatInputTopRight, setShowChatInputTopRight] = useState(false); // For top-right chat
+    const [showChatInputTopRight, setShowChatInputTopRight] = useState(false);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [chatMessage, setChatMessage] = useState("");
 
@@ -369,7 +369,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
         setShowChatInput(true);
     };
 
-    const handleOpenChatTopRight = () => { 
+    const handleOpenChatTopRight = () => {
         setShowChatInputTopRight(true);
     };
 
@@ -912,7 +912,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                     </div>
                 </div>
             )}
-            {showChatInputTopRight && ( // Chat dialog for top-right corner button
+            {showChatInputTopRight && (
                 <div className="overlay">
                     <div className="dialog">
                         <div className="message-container">
