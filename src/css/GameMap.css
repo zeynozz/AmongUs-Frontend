@@ -51,9 +51,26 @@
     background-position: center;
 }
 
-.walkable {
+.walkable1 {
     background-image: url("/public/images/map/floor.png");
 }
+
+.walkable2{
+    background-image: url("/public/images/map/floor2.jpg");
+}
+
+.electroWall {
+    background-color: #4a4a4a;
+    background-image: linear-gradient(135deg, #6e6e6e 25%, transparent 25%),
+    linear-gradient(225deg, #6e6e6e 25%, transparent 25%),
+    linear-gradient(45deg, #6e6e6e 25%, transparent 25%),
+    linear-gradient(315deg, #6e6e6e 25%, transparent 25%);
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 0, 10px -10px, 0px 10px;
+    box-shadow: inset 0 0 10px #000000;
+    border: 1px solid #2a2a2a;
+}
+
 
 @keyframes pulse {
     0% {
@@ -189,7 +206,7 @@
 }
 
 .vent {
-    background-image: url("/public/images/map/vent.png");
+    background-image: url("/public/images/map/vent.jpg");
     cursor: pointer;
 }
 
@@ -199,6 +216,13 @@
     animation: none;
 }
 
+.purple{
+    background-image: url("/public/images/map/lila.jpg");
+}
+
+.floor3{
+    background-color: #5D666B;
+}
 .player {
     position: relative;
     display: flex;

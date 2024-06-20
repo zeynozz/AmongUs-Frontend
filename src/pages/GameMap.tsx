@@ -714,7 +714,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                             } else {
                                 switch (cell) {
                                     case 1:
-                                        cellClass = 'walkable';
+                                        cellClass = 'walkable1';
                                         break;
                                     case 2:
                                         cellClass = completedTasks.some(task => task.x === cellIndex && task.y === rowIndex) ? 'completed-task' : 'task';
@@ -766,6 +766,18 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                                         break;
                                     case 18:
                                         cellClass = 'vent';
+                                        break;
+                                    case 19:
+                                        cellClass = 'walkable2'
+                                        break;
+                                    case 20:
+                                        cellClass = 'electroWall'
+                                        break;
+                                    case 21:
+                                        cellClass = 'purple'
+                                        break;
+                                    case 22:
+                                        cellClass = 'floor3'
                                         break;
                                     default:
                                         cellClass = 'obstacle';
