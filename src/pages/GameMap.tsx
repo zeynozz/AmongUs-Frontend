@@ -61,6 +61,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
     const [sabotageTriggered, setSabotageTriggered] = useState(false);
     const [showToast, setShowToast] = useState(false);
     const [showChatInput, setShowChatInput] = useState(false);
+    const [showChatInputTopRight, setShowChatInputTopRight] = useState(false); // For top-right chat
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [chatMessage, setChatMessage] = useState("");
 
@@ -355,6 +356,10 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
         setShowChatInput(false);
     };
 
+    const handleCloseChatTopRight = () => {
+        setShowChatInputTopRight(false);
+    };
+
     const handleCloseVoting = () => {
         setShowVoting(false);
     };
@@ -362,6 +367,10 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
     const handleOpenChat = () => {
         setShowVoting(false);
         setShowChatInput(true);
+    };
+
+    const handleOpenChatTopRight = () => { 
+        setShowChatInputTopRight(true);
     };
 
     useEffect(() => {
@@ -903,6 +912,50 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                     </div>
                 </div>
             )}
+            {showChatInputTopRight && ( // Chat dialog for top-right corner button
+                <div className="overlay">
+                    <div className="dialog">
+                        <div className="message-container">
+                            {messages.map((msg, index) => (
+                                <div key={index} className="message">
+                                    <div className="text-content">
+                                        <strong className="username">{msg.sender}</strong>
+                                        <div className="content">{msg.content}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="input-container">
+                            <input
+                                type="text"
+                                value={chatMessage}
+                                onChange={(e) => setChatMessage(e.target.value)}
+                                placeholder="Type message"
+                                onKeyPress={(e) => {
+                                    if (e.key === 'Enter') {
+                                        handleSendMessage();
+                                    }
+                                }}
+                            />
+                            <button onClick={handleSendMessage}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     className="bi bi-send" viewBox="0 0 16 16">
+                                    <path
+                                        d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576zm6.787-8.201L1.591 6.602l4.339 2.76z" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div className="close-button" onClick={handleCloseChatTopRight}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor"
+                                 className="bi bi-x-circle" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                                <path
+                                    d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            )}
             {showVoting && (
                 <div className="overlay">
                     <div className="voting-dialog">
@@ -973,7 +1026,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
             {showImpostorsWinAnimation && !killAnimationFinished && ( // Nur anzeigen, wenn die KillAnimation nicht angezeigt wird
                 <ImpostorAnimation onClose={() => setShowImpostorsWinAnimation(false)} impostorPlayers={impostors}  />
             )}
-            <div className="chat-button-top" onClick={handleOpenChat}>
+            <div className="chat-button-top" onClick={handleOpenChatTopRight}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" className="bi bi-chat-dots" viewBox="0 0 16 16">
                     <path d="M5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/>
                     <path d="m2.165 15.803.02-.004c1.83-.363 2.948-.842 3.468-1.105A9 9 0 0 0 8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6a10.4 10.4 0 0 1-.524 2.318l-.003.011a11 11 0 0 1-.244.637c-.079.186.074.394.273.362a22 22 0 0 0 .693-.125m.8-3.108a1 1 0 0 0-.287-.801C1.618 10.83 1 9.468 1 8c0-3.192 3.004-6 7-6s7 2.808 7 6-3.004 6-7 6a8 8 0 0 1-2.088-.272 1 1 0 0 0-.711.074c-.387.196-1.24.57-2.634.893a11 11 0 0 0 .398-2"/>
