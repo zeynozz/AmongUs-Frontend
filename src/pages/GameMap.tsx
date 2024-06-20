@@ -11,6 +11,8 @@ import ReportAnimation from "./ReportAnimation";
 import VotedOutAnimation from "./VotingAnimation";
 import CrewmateAnimation from './CrewmatesAnimation';
 import ImpostorAnimation from './ImpostorAnimation';
+import MiniMap from "./MiniMap";
+import "../css/MiniMap.css";
 
 interface Player {
     status: "ALIVE" | "DEAD" | "GHOST";
@@ -43,121 +45,6 @@ interface ChatMessage {
     type: string;
 }
 
-const MiniMap: React.FC<{ map: number[][]; playerPosition: any; tasks: any[]; players: Player[]; completedTasks: any[]; currentPlayer: Player }> = ({ map, playerPosition, tasks, players, completedTasks, currentPlayer }) => {
-    const mapSize = 500; // Größe der Mini-Map
-
-    const renderMiniMap = () => {
-        const miniMap = map.flatMap((row, rowIndex) =>
-            row.map((cell, cellIndex) => {
-                let cellColor;
-                switch (cell) {
-                    case 1:
-                        cellColor = "#E0E8D6";
-                        break;
-                    case 2:
-                        cellColor = "beige";
-                        break;
-                    case 3:
-                    case 4:
-                    case 5:
-                    case 6:
-                        cellColor = "gray";
-                        break;
-                    case 7:
-                    case 8:
-                    case 9:
-                    case 10:
-                    case 11:
-                    case 12:
-                        cellColor = "darkgray";
-                        break;
-                    case 13:
-                        cellColor = "red";
-                        break;
-                    case 14:
-                    case 15:
-                    case 16:
-                    case 17:
-                        cellColor = "blue";
-                        break;
-                    case 18:
-                        cellColor = "purple";
-                        break;
-                    default:
-                        cellColor = "transparent";
-                        break;
-                }
-
-                const x = (cellIndex / map[0].length) * mapSize;
-                const y = (rowIndex / map.length) * mapSize;
-
-                return (
-                    <div
-                        key={`${rowIndex}-${cellIndex}`}
-                        className="mini-map-cell"
-                        style={{
-                            backgroundColor: cellColor,
-                            left: `${x}px`,
-                            top: `${y}px`,
-                        }}
-                    ></div>
-                );
-            })
-        );
-
-        // Aufgaben hinzufügen
-        tasks.forEach((task) => {
-            const x = (task.position.x / map[0].length) * mapSize;
-            const y = (task.position.y / map.length) * mapSize;
-            miniMap.push(
-                <div
-                    key={`task-${task.id}`}
-                    className={`mini-map-task ${completedTasks.some(t => t.x === task.position.x && t.y === task.position.y) ? 'completed' : 'pulse'}`}
-                    style={{
-                        backgroundColor: completedTasks.some(t => t.x === task.position.x && t.y === task.position.y) ? "green" : "#E0E8D6",
-                        left: `${x}px`,
-                        top: `${y}px`,
-                    }}
-                >
-                    {!completedTasks.some(t => t.x === task.position.x && t.y === task.position.y) && <span>!</span>}
-                </div>
-            );
-        });
-
-        // Spieler hinzufügen
-        players.forEach((player) => {
-            const x = (player.position.x / map[0].length) * mapSize;
-            const y = (player.position.y / map.length) * mapSize;
-            let playerColor = "black";
-
-            if (player.id === currentPlayer.id) {
-                playerColor = currentPlayer.role === "CREWMATE" ? "cyan" : "red";
-            }
-
-            miniMap.push(
-                <div
-                    key={`player-${player.id}`}
-                    className="mini-map-player"
-                    style={{
-                        left: `${x}px`,
-                        top: `${y}px`,
-                        backgroundColor: playerColor,
-                        transform: `rotate(${player.id === playerPosition.id ? playerPosition.direction : 0}deg)`,
-                    }}
-                ></div>
-            );
-        });
-
-        return miniMap;
-    };
-
-    return (
-        <div className="mini-map" style={{ width: mapSize, height: mapSize }}>
-            {renderMiniMap()}
-        </div>
-    );
-};
-
 const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled }) => {
     const [showPopup, setShowPopup] = useState(false);
     const [tasksCompleted, setTasksCompleted] = useState(0);
@@ -176,6 +63,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
     const [showChatInput, setShowChatInput] = useState(false);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [chatMessage, setChatMessage] = useState("");
+
     const [showKillAnimation, setShowKillAnimation] = useState(false);
     const [impostorImage, setImpostorImage] = useState<string>('');
     const [victimImage, setVictimImage] = useState<string>('');
@@ -209,10 +97,10 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
 
     const tasks = [
         { id: 1, name: "Card Swipe 1", position: { x: 51, y: 5 } },
-        { id: 2, name: "Card Swipe 2", position: { x: 18, y: 18 } },
-        { id: 3, name: "Card Swipe 3", position: { x: 52, y: 36 } },
-        { id: 4, name: "Card Swipe 4", position: { x: 73, y: 21 } },
-        { id: 5, name: "Card Swipe 5", position: { x: 74, y: 35 } }
+        { id: 2, name: "Card Swipe 2", position: { x: 28, y: 7 } },
+        { id: 3, name: "Card Swipe 3", position: { x: 71, y: 12 } },
+        { id: 4, name: "Card Swipe 4", position: { x: 18, y: 20 } },
+        { id: 5, name: "Card Swipe 5", position: { x: 30, y: 28 } }
     ];
 
     const emergencyCells = [
@@ -395,7 +283,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
             return;
         }
 
-        if ((cellType >= 14 && cellType <= 17) && isNearEmergencyCell(playerPosition.x, playerPosition.y)) {
+        if ((cellType >= 13 && cellType <= 17) && isNearEmergencyCell(playerPosition.x, playerPosition.y)) {
             if (stompClient) {
                 stompClient.send("/app/emergency", {}, gameCode);
                 setShowEmergency(true);
@@ -503,13 +391,13 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                 let newDirection = currentPlayer.direction;
                 let newIndex = playerImageIndex;
 
-                if (keyCode === 'KeyA') {
+                if (keyCode === 'ArrowLeft') {
                     newDirection = 'left';
                     newIndex = (playerImageIndex + 1) % 4;
-                } else if (keyCode === 'KeyD') {
+                } else if (keyCode === 'ArrowRight') {
                     newDirection = 'right';
                     newIndex = (playerImageIndex + 1) % 4;
-                } else if (keyCode === 'KeyW' || keyCode === 'KeyS') {
+                } else if (keyCode === 'ArrowUp' || keyCode === 'ArrowDown') {
                     newDirection = 'upDown';
                     newIndex = 0;
                 }
@@ -545,16 +433,16 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
     const calculateNewPosition = (currentPosition: { x: number, y: number }, keyCode: string) => {
         let deltaX = 0, deltaY = 0;
         switch (keyCode) {
-            case "KeyA":
+            case "ArrowLeft":
                 deltaX = -1;
                 break;
-            case "KeyW":
+            case "ArrowUp":
                 deltaY = -1;
                 break;
-            case "KeyD":
+            case "ArrowRight":
                 deltaX = 1;
                 break;
-            case "KeyS":
+            case "ArrowDown":
                 deltaY = 1;
                 break;
             default:
@@ -575,8 +463,11 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
         }
     };
 
-    const isNearTaskCell = (x: number, y: number) => {
-        return tasks.some(task => Math.abs(task.position.x - playerPosition.x) <= 1 && Math.abs(task.position.y - playerPosition.y) <= 1);
+    const isNearTaskCell = (taskX: number, taskY: number) => {
+        return (
+            Math.abs(taskX - playerPosition.x) <= 1 &&
+            Math.abs(taskY - playerPosition.y) <= 1
+        );
     };
 
     const isNearEmergencyCell = (x: number, y: number) => {
@@ -742,8 +633,22 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
         setVoteMessage(null);
     };
 
+    const zoomLevel = 1.5;
+
+    const tileSize = 50;
+    const screenCenterX = window.innerWidth / 2;
+    const screenCenterY = window.innerHeight / 2;
+    const playerCenterX = playerPosition.x * tileSize;
+    const playerCenterY = playerPosition.y * tileSize;
+
     const cameraStyle = {
-        transform: `translate(-${playerPosition.x * 50 - window.innerWidth / 2}px, -${playerPosition.y * 50 - window.innerHeight / 2}px)`
+        transition: 'transform 0.9s ease-out',
+        transform: `
+        translate(${screenCenterX}px, ${screenCenterY}px) 
+        scale(${zoomLevel}) 
+        translate(${-playerCenterX / zoomLevel}px, ${-playerCenterY / zoomLevel}px)
+    `,
+        transformOrigin: 'center center'
     };
 
     useEffect(() => {
@@ -769,7 +674,6 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                 {currentPlayer?.role === "IMPOSTOR" ? (
                     <div className="task-list">
                         <div className="task-item1">Sabotage-and-kill</div>
-                        {/*<div className="task-item">Fake tasks</div>*/}
                         {tasks.map(task => (
                             <div key={task.id} className="task-item">{task.name}</div>
                         ))}
@@ -810,7 +714,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                             } else {
                                 switch (cell) {
                                     case 1:
-                                        cellClass = 'walkable';
+                                        cellClass = 'walkable1';
                                         break;
                                     case 2:
                                         cellClass = completedTasks.some(task => task.x === cellIndex && task.y === rowIndex) ? 'completed-task' : 'task';
@@ -846,7 +750,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                                         cellClass = 'edge2';
                                         break;
                                     case 13:
-                                        cellClass = completedTasks.some(task => task.x === cellIndex && task.y === rowIndex) ? 'completed-task1' : 'task1 task1-glow';
+                                        cellClass = completedTasks.some(task => task.x === cellIndex && task.y === rowIndex) ? 'completed-task' : 'task task-glow';
                                         break;
                                     case 14:
                                         cellClass = 'emergency1';
@@ -862,6 +766,18 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                                         break;
                                     case 18:
                                         cellClass = 'vent';
+                                        break;
+                                    case 19:
+                                        cellClass = 'walkable2'
+                                        break;
+                                    case 20:
+                                        cellClass = 'electroWall'
+                                        break;
+                                    case 21:
+                                        cellClass = 'purple'
+                                        break;
+                                    case 22:
+                                        cellClass = 'floor3'
                                         break;
                                     default:
                                         cellClass = 'obstacle';

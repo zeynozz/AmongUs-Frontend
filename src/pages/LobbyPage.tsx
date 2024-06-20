@@ -10,6 +10,15 @@ type Props = {
   onChangeSetGame: (game: Game) => void;
 };
 
+const seatPositions = [
+  { x: 130, y: 200 },
+  { x: 230, y: 100 },
+  { x: 330, y: 5 },
+  { x: 430, y: -90 },
+  { x: 530, y: -190 },
+  { x: 630, y: -290 },
+];
+
 export default function LobbyPage({ game, onChangeSetGame }: Props) {
   const [stompClient, setStompClient] = useState<any>(null);
   const navigate = useNavigate();
@@ -118,20 +127,30 @@ export default function LobbyPage({ game, onChangeSetGame }: Props) {
         </video>
         <div className="lobby-container">
           <div className="spaceship-lobby">
-            {game.players.map((player, index) => (
-                <div key={player.id} className={`player player-${index + 1}`}>
-                  <img
-                      src={`/public/images/movement/${player.color}/sit.png`}
-                      alt={`${player.username} avatar`}
-                      className="player-avatar"
-                      style={{ transform: `translateX(${player.position.x}px) translateY(${player.position.y}px)` }}
-                  />
-                  <span className="player-name">{player.username}</span>
+            {seatPositions.slice(0, game.numberOfPlayers).map((position, index) => (
+                <div
+                    key={index}
+                    className="player"
+                    style={{ left: `${position.x}px`, top: `${position.y}px` }}
+                >
+                  <img src={`/public/images/setup/seat.png`} alt="Seat" className="player-seat" />
+                  {game.players[index] && (
+                      <>
+                        <img
+                            src={`/public/images/movement/${game.players[index].color}/sit.png`}
+                            alt={`${game.players[index].username} avatar`}
+                            className="player-avatar"
+                        />
+                        <span className="player-name">{game.players[index].username}</span>
+                      </>
+                  )}
                 </div>
             ))}
           </div>
           <div className="game-info">
-            <div className="game-code" onClick={(e) => copyToClipboard(gameCode, e.currentTarget)}>CODE: {gameCode}</div>
+            <div className="game-code" onClick={(e) => copyToClipboard(gameCode, e.currentTarget)}>
+              CODE: {gameCode}
+            </div>
             <div className="players-info">
               <img src="/public/images/setup/whiteFigure.png" alt="Player Icon" className="player-icon" />
               <span className="player-count">

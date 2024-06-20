@@ -25,7 +25,7 @@
 }
 
 .player-icon {
-    height: 20px;
+    height: 50px;
     width: auto;
     margin-right: 5px;
 }
@@ -41,32 +41,37 @@
     height: 70%;
     background: #2a2f32;
     clip-path: polygon(20% 0, 80% 0, 100% 100%, 0% 100%);
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
+    position: relative;
     padding: 20px;
 }
 
-.player-avatar {
+.player {
+    position: absolute;
     width: 80px;
-    height: auto;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.player-seat {
+    width: 80px;
+    z-index: 1;
+}
+
+.player-avatar {
+    position: absolute;
+    z-index: 2;
+    width: 80px;
     transition: transform 0.3s ease;
     cursor: pointer;
-}
-
-.player {
-    position: relative;
-}
-
-.player-icon {
-    height: 70px;
-    width: auto;
-    margin-right: 5px;
 }
 
 .player-name {
     color: white;
     font-size: 14px;
+    z-index: 2
 }
 
 .game-info {
@@ -109,8 +114,6 @@
     opacity: 0.5;
 }
 
-
-/* Tooltip styles */
 .tooltip {
     position: absolute;
     bottom: -30px;
