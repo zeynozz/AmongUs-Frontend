@@ -559,7 +559,7 @@
 }
 
 .username {
-    color: #0bdeae;
+    color: #4455ABB5;
     font-family: 'DSEG14Classic', sans-serif;
     font-size: 11px;
     text-shadow: 0 1px 10px rgba(80, 87, 108, 0.7);
@@ -742,3 +742,23 @@
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+.chat-button-top{
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(98, 94, 94, 0.9);
+    border: 2px solid rgba(68, 85, 171, 0.71);
+    border-radius: 50%;
+    padding: 10px;
+    cursor: pointer;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
+}
+
+.chat-button-top svg {
+    width: 25px;
+    height: 25px;
+    color: white;
+}
+
