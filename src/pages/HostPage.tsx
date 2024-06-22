@@ -33,7 +33,7 @@ export default function HostPage({ setGame }: Props) {
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
-    const gameCode = Date.now();  // Simulated unique game code generation
+    const gameCode = Date.now();
 
     const gameData = {
       gameCode: gameCode,

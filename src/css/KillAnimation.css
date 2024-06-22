@@ -30,7 +30,7 @@
 .knife-animation {
     position: absolute;
     width: 200px;
-    top: 40%; /* Adjust this value to position the knife vertically */
+    top: 40%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 3;
@@ -41,7 +41,7 @@
     position: absolute;
     width: 150px;
     height: 150px;
-    bottom: 40%; /* Adjust this value to align vertically with the knife */
+    bottom: 40%;
     z-index: 2;
     animation: shake 0.5s infinite;
 }

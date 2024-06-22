@@ -19,7 +19,7 @@ const Crewmate = ({ game, playerId }) => {
         const killAnimationSubscription = stompClient.subscribe(`/user/queue/killAnimation`, (message) => {
             if (message.body === "KILL_ANIMATION") {
                 const victim = game.players.find(p => p.id === playerId);
-                const impostor = game.players.find(p => p.role === "IMPOSTOR"); // Ensure to get the correct impostor here
+                const impostor = game.players.find(p => p.role === "IMPOSTOR");
                 if (impostor && victim) {
                     setImpostorImage(`/images/movement/${impostor.color}/upDown.png`);
                     setVictimImage(`/images/movement/${victim.color}/sit.png`);

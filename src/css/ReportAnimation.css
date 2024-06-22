@@ -41,11 +41,11 @@
 .report-content {
     position: relative;
     text-align: center;
-    width: 100%; /* Ensure it takes the full width */
+    width: 100%;
 }
 
 .report-image {
-    width: 100%; /* Ensure the image takes the full width */
+    width: 100%;
     height: auto;
     object-fit: contain;
     position: relative;
@@ -54,7 +54,7 @@
 
 .reportBody-image {
     position: absolute;
-    width: 150px; /* Adjust size as necessary */
+    width: 150px;
     height: auto;
     top: 30%;
     left: 45%;
@@ -66,7 +66,7 @@
 .report-text {
     font-family: 'DSEG14Classic', sans-serif;
     position: absolute;
-    top: 60%; /* Adjust as necessary to be below the body */
+    top: 60%;
     left: 50%;
     transform: translate(-50%, -50%);
     color: black;

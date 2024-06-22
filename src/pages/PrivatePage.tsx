@@ -45,7 +45,7 @@ export default function PrivatePage() {
     if (!isJoinDisabled && stompClient) {
       const data = {
         username: playerName,
-        color: figureColor, // Add the color to the data being sent
+        color: figureColor,
         position: {
           x: 10,
           y: 9,

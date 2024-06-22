@@ -28,9 +28,9 @@ const CardSwipe = ({ onClose }) => {
 
         if (status === 'valid') {
             setSwipeSuccessful(true);
-            onClose(true); // Call onClose with true when the swipe is successful
+            onClose(true);
         } else {
-            onClose(false); // Call onClose with false when the swipe is unsuccessful
+            onClose(false);
         }
     };
 
@@ -59,13 +59,12 @@ const CardSwipe = ({ onClose }) => {
         setTimeEnd(performance.now());
         const readerWidth = readerRef.current.offsetWidth;
         const cardWidth = cardRef.current.offsetWidth;
-        const threshold = readerWidth - cardWidth / 2; // adjust this to set how far the card needs to be dragged
+        const threshold = readerWidth - cardWidth / 2;
 
         let finalX = e.type === 'touchend' ? e.changedTouches[0].clientX : e.clientX;
         let xDiff = finalX - initialX;
 
         cardRef.current.classList.add('slide');
-        // Check if the card was dragged all the way to the threshold
 
         if (xDiff >= threshold) {
             readerRef.current.dataset.status = 'valid';
@@ -90,7 +89,7 @@ const CardSwipe = ({ onClose }) => {
         let currentX = e.type === "touchmove" ? e.touches[0].clientX : e.clientX;
         let xDiff = currentX - initialX;
 
-        if (xDiff > 0) { // Make sure we only allow dragging to the right
+        if (xDiff > 0) {
             setTranslate(xDiff);
             readerRef.current.dataset.status = 'invalid';
         }
@@ -99,8 +98,8 @@ const CardSwipe = ({ onClose }) => {
     const setTranslate = (x) => {
         const cardWidth = cardRef.current.offsetWidth;
         const readerWidth = readerRef.current.offsetWidth;
-        const minTranslate = -cardWidth / 2; // Start position (left edge)
-        const maxTranslate = readerWidth - cardWidth / 2; // End position (right edge)
+        const minTranslate = -cardWidth / 2;
+        const maxTranslate = readerWidth - cardWidth / 2;
 
         if (x < minTranslate) {
             x = minTranslate;

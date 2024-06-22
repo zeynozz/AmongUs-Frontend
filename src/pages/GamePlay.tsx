@@ -120,27 +120,15 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
                 setVotedOutPlayerRole(eliminatedPlayer.role);
                 setShowVotedOutAnimation(true);
 
-                // Kurze Verzögerung, um sicherzustellen, dass der Zustand aktualisiert wurde
                 setTimeout(() => {
-                    // Überprüfen, ob alle Crewmates oder alle Impostors eliminiert wurden
                     const remainingCrewmates = game.players.filter(player => player.role === 'CREWMATE' && player.status === 'ALIVE');
                     const remainingImpostors = game.players.filter(player => player.role === 'IMPOSTOR' && player.status === 'ALIVE');
                     if (remainingCrewmates.length === 0) {
-                        setTimeout(() => {
-                            setShowImpostorsWinAnimation(true);
-                            setTimeout(() => {
-                                setShowImpostorsWinAnimation(false);
-                            }, 6000); // ImpostorAnimation für 6 Sekunden anzeigen
-                        }, 6000); // Warte, bis die VotingAnimation abgeschlossen ist
+                        stompClient.send(`/topic/${game.gameCode}/gameEnd`, {}, "IMPOSTORS_WIN");
                     } else if (remainingImpostors.length === 0) {
-                        setTimeout(() => {
-                            setShowCrewmatesWinAnimation(true);
-                            setTimeout(() => {
-                                setShowCrewmatesWinAnimation(false);
-                            }, 6000); // CrewmateAnimation für 6 Sekunden anzeigen
-                        }, 6000); // Warte, bis die VotingAnimation abgeschlossen ist
+                        stompClient.send(`/topic/${game.gameCode}/gameEnd`, {}, "CREWMATES_WIN");
                     }
-                }, 3000); // Verzögerung von 100 ms, um den Zustand zu aktualisieren
+                }, 3000);
             });
 
             const gameEndSubscription = stompClient.subscribe(`/topic/${game.gameCode}/gameEnd`, (message: Stomp.Message) => {
@@ -156,7 +144,7 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
                 }
                 setTimeout(() => {
                     window.location.href = "/";
-                }, 7000); // Show the end game animation for 7 seconds
+                }, 9000);
             });
 
             stompClient.send(`/app/${game.gameCode}/play`, {}, JSON.stringify(game));
@@ -176,7 +164,7 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
 
     useEffect(() => {
         if (playerRole) {
-            setTimeout(() => setShowAnimation(false), 3000); // Show animation for 3 seconds
+            setTimeout(() => setShowAnimation(false), 3000);
         }
     }, [playerRole]);
 
@@ -205,6 +193,31 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
     const handleVotedOutClose = () => {
         setShowVotedOutAnimation(false);
     };
+
+    const checkForImpostorWin = () => {
+        const remainingImpostors = game.players.filter(player => player.role === 'IMPOSTOR' && player.status === 'ALIVE');
+        if (remainingImpostors.length === 0) {
+            setShowCrewmatesWinAnimation(true);
+        }
+    };
+
+    useEffect(() => {
+        if (showCrewmatesWinAnimation) {
+            const timeout = setTimeout(() => {
+                setShowCrewmatesWinAnimation(false);
+                stompClient.send(`/app/${game.gameCode}/endGame`, {}, "CREWMATES_WIN");
+            }, 9000);
+            return () => clearTimeout(timeout);
+        }
+
+        if (showImpostorsWinAnimation) {
+            const timeout = setTimeout(() => {
+                setShowImpostorsWinAnimation(false);
+                stompClient.send(`/app/${game.gameCode}/endGame`, {}, "IMPOSTORS_WIN");
+            }, 9000);
+            return () => clearTimeout(timeout);
+        }
+    }, [showCrewmatesWinAnimation, showImpostorsWinAnimation]);
 
     console.log('Current Player ID:', playerId);
     console.log('Player Index:', playerIndex);
@@ -254,7 +267,7 @@ export function PlayGame({ game, onChangeSetGame }: Props) {
             {showCrewmatesWinAnimation && (
                 <CrewmateAnimation
                     onClose={() => setShowCrewmatesWinAnimation(false)}
-                    crewmatePlayers={crewmates} // Pass the list of crewmates
+                    crewmatePlayers={crewmates}
                 />
             )}
             {showImpostorsWinAnimation && (

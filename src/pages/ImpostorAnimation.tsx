@@ -20,7 +20,6 @@ const ImpostorAnimation: React.FC<ImpostorAnimationProps> = ({ onClose, impostor
             audioRef.current.play().catch(error => console.log("Audio play error:", error));
         }
 
-        // Unmount component after 7 seconds
         const timer = setTimeout(() => {
             onClose();
         }, 7000);
@@ -30,12 +29,15 @@ const ImpostorAnimation: React.FC<ImpostorAnimationProps> = ({ onClose, impostor
 
     return (
         <div className="animation-container">
+            <div className="defeat-text">DEFEAT</div>
             <div className="animation-content">
-                <h1>Impostors Win!</h1>
                 <div className="impostor-players">
                     {impostorPlayers.map((player) => (
                         <div key={player.id} className="impostor-player">
-                            <img src={`/public/images/movement/${player.color}/upDown.png`} alt={player.username} className="impostor-player-image" />
+                            <img
+                                 src={`/public/images/movement/${player.color}/upDown.png`}
+                                 alt={player.username}
+                                 className="impostor-player-image bounce" />
                             <div className="impostor-player-name">{player.username}</div>
                         </div>
                     ))}

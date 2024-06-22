@@ -77,7 +77,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
 
     const [showCrewmatesWinAnimation, setShowCrewmatesWinAnimation] = useState(false);
     const [showImpostorsWinAnimation, setShowImpostorsWinAnimation] = useState(false);
-    const [killAnimationFinished, setKillAnimationFinished] = useState(false); // Zustand für KillAnimation
+    const [killAnimationFinished, setKillAnimationFinished] = useState(false);
 
     const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -87,14 +87,14 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
     const [playerPosition, setPlayerPosition] = useState<{ x: number, y: number }>(initialPlayerPosition);
     const [players, setPlayers] = useState<Player[]>(playerList);
     const [playerStatus, setPlayerStatus] = useState(currentPlayer?.status || 'ALIVE');
-    const [votingAnimationFinished, setVotingAnimationFinished] = useState(false); // Zustand für VotingAnimation
+    const [votingAnimationFinished, setVotingAnimationFinished] = useState(false);
 
     const [showVotedOutAnimation, setShowVotedOutAnimation] = useState(false);
     const [votedOutPlayer, setVotedOutPlayer] = useState<string | null>(null);
     const [votedOutPlayerColor, setVotedOutPlayerColor] = useState<string | null>(null);
-    const [votedOutPlayerRole, setVotedOutPlayerRole] = useState<string | null>(null); // Add state for player's role
-    const [impostors, setImpostors] = useState<Player[]>([]); // Add state to track impostors
-    const [crewmates, setCrewmates] = useState<Player[]>([]); // Add state to track crewmates
+    const [votedOutPlayerRole, setVotedOutPlayerRole] = useState<string | null>(null);
+    const [impostors, setImpostors] = useState<Player[]>([]);
+    const [crewmates, setCrewmates] = useState<Player[]>([]);
 
     const tasks = [
         { id: 1, name: "Card Swipe 1", position: { x: 51, y: 5 } },
@@ -170,37 +170,28 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
 
                     setPlayers(prevPlayers => {
                         const updatedPlayers = prevPlayers.filter(player => player.username !== eliminatedPlayer.username);
-                        console.log('Updated Players:', updatedPlayers);
                         return updatedPlayers;
                     });
 
-                    const remainingCrewmates = players.filter(player => player.role === 'CREWMATE' && player.status === 'ALIVE');
-                    console.log('Remaining Crewmates:', remainingCrewmates);
+                    setTimeout(() => {
+                        const remainingCrewmates = players.filter(player => player.role === 'CREWMATE' && player.status === 'ALIVE');
+                        const remainingImpostors = players.filter(player => player.role === 'IMPOSTOR' && player.status === 'ALIVE');
 
-                    if (remainingCrewmates.length === 0) {
-                        setTimeout(() => {
-                            console.log('Impostors Win');
+                        if (remainingCrewmates.length === 0) {
                             setShowImpostorsWinAnimation(true);
                             setTimeout(() => {
-                                setShowImpostorsWinAnimation(true);
-                            }, 6000); // ImpostorAnimation für 6 Sekunden anzeigen
-                        }, 6000);
-                    }
+                                setShowImpostorsWinAnimation(false);
+                            }, 9000);
+                        }
 
-                    const remainingImpostors = players.filter(player => player.role === 'IMPOSTOR' && player.status === 'ALIVE');
-                    console.log('Remaining Impostors:', remainingImpostors);
-
-                    if (remainingImpostors.length === 0) {
-                        setTimeout(() => {
-                            console.log('Crewmates Win');
+                        if (remainingImpostors.length === 0) {
                             setShowCrewmatesWinAnimation(true);
                             setTimeout(() => {
-                                setShowCrewmatesWinAnimation(true);
-                            }, 6000); // CrewmateAnimation für 6 Sekunden anzeigen
-                        }, 6000);
-                    }
+                                setShowCrewmatesWinAnimation(false);
+                            }, 9000);
+                        }
 
-                    resetVotingState();
+                    }, 6000);
                 });
 
                 client.subscribe(`/topic/${gameCode}/gameEnd`, (message) => {
@@ -208,16 +199,16 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                     setShowVotedOutAnimation(false);
                     if (result === "CREWMATES_WIN") {
                         const crewmatePlayers = players.filter(p => p.role === 'CREWMATE');
-                        setCrewmates(crewmatePlayers); // Set the crewmates state
+                        setCrewmates(crewmatePlayers);
                         setShowCrewmatesWinAnimation(true);
                     } else {
                         const impostorPlayers = players.filter(p => p.role === 'IMPOSTOR');
-                        setImpostors(impostorPlayers); // Set the impostors state
+                        setImpostors(impostorPlayers);
                         setShowImpostorsWinAnimation(true);
                     }
                     setTimeout(() => {
                         window.location.href = "/";
-                    }, 7000); // Zeige die Endspielanimation für 7 Sekunden an
+                    }, 7000);
                 });
 
                 client.subscribe(`/topic/${gameCode}/report`, () => {
@@ -244,8 +235,8 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                             setShowKillAnimation(true);
                             setTimeout(() => {
                                 setShowKillAnimation(false);
-                                setKillAnimationFinished(true); // Setze den Zustand auf true, wenn die KillAnimation fertig ist
-                            }, 7000); // Dauer der Animation
+                                setKillAnimationFinished(true);
+                            }, 7000);
                         }
                     }
                 });
@@ -374,14 +365,6 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
     };
 
     useEffect(() => {
-        if (currentPlayer) {
-            setPlayerPosition(currentPlayer.position);
-        } else {
-            console.error("Current player not found in playerList", { playerId, playerList });
-        }
-    }, [playerList, currentPlayer]);
-
-    useEffect(() => {
         const handleResize = () => {
             setPlayerPosition(prev => ({ ...prev }));
         };
@@ -418,7 +401,6 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                     position: calculateNewPosition(currentPlayer.position, keyCode)
                 };
 
-                // Sende die aktualisierte Position und den Animationszustand an den Server
                 if (stompClient && currentPlayer) {
                     stompClient.send("/app/positionChange", {}, JSON.stringify(newPlayerState));
                 }
@@ -525,23 +507,20 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
             stompClient.send("/app/game/kill", {}, JSON.stringify(killMessage));
             onPlayerKilled(victim.id);
 
-            // Bildpfade konstruieren
             const impostorImagePath = `/public/images/movement/${impostor.color}/upDown.png`;
             const victimImagePath = `/public/images/movement/${victim.color}/upDown.png`;
 
-            // Loggen Sie die Pfade zur Überprüfung
             console.log("Impostor Image Path:", impostorImagePath);
             console.log("Victim Image Path:", victimImagePath);
 
-            // Setze Bilder für die Kill-Animation
             setImpostorImage(impostorImagePath);
             setVictimImage(victimImagePath);
             setShowKillAnimation(true);
 
             setTimeout(() => {
                 setShowKillAnimation(false);
-                setKillAnimationFinished(true); // Setze den Zustand auf true, wenn die KillAnimation fertig ist
-            }, 7000); // Dauer der Animation
+                setKillAnimationFinished(true);
+            }, 7000);
         }
     };
 
@@ -571,7 +550,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
         if (playerStatus === 'DEAD') {
             setTimeout(() => {
                 setPlayerStatus('GHOST');
-            }, 3000); // Annahme von 3 Sekunden, um von DEAD zu GHOST zu wechseln
+            }, 3000);
         }
     }, [playerStatus]);
 
@@ -637,6 +616,26 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
         }
     };
 
+    const checkForImpostorWin = () => {
+        const remainingImpostors = players.filter(player => player.role === 'IMPOSTOR' && player.status === 'ALIVE');
+        if (remainingImpostors.length === 0) {
+            setShowCrewmatesWinAnimation(true);
+            setTimeout(() => {
+                setShowCrewmatesWinAnimation(false);
+            }, 6000);
+        }
+    };
+
+    useEffect(() => {
+        if (showVotedOutAnimation) {
+            const timeout = setTimeout(() => {
+                setShowVotedOutAnimation(false);
+                checkForImpostorWin(); // Überprüfung nach dem Voting
+            }, 6000); // Dauer der Animation
+            return () => clearTimeout(timeout);
+        }
+    }, [showVotedOutAnimation]);
+
     const resetVotingState = () => {
         setSelectedPlayer(null);
         setVoteMessage(null);
@@ -663,10 +662,10 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
     useEffect(() => {
         if (votingAnimationFinished) {
             if (showCrewmatesWinAnimation) {
-                setTimeout(() => setShowCrewmatesWinAnimation(false), 6000); // CrewmateAnimation für 6 Sekunden anzeigen
+                setTimeout(() => setShowCrewmatesWinAnimation(false), 6000);
             }
             if (showImpostorsWinAnimation) {
-                setTimeout(() => setShowImpostorsWinAnimation(false), 6000); // ImpostorAnimation für 6 Sekunden anzeigen
+                setTimeout(() => setShowImpostorsWinAnimation(false), 6000);
             }
         }
     }, [votingAnimationFinished, showCrewmatesWinAnimation, showImpostorsWinAnimation]);
@@ -994,7 +993,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                     </div>
                 </div>
             )}
-            {showVotedOutAnimation && votedOutPlayer && votedOutPlayerColor && (
+            {showVotedOutAnimation && votedOutPlayer && votedOutPlayerColor && votedOutPlayerRole && (
                 <VotedOutAnimation
                     votedOutPlayer={votedOutPlayer}
                     playerColor={votedOutPlayerColor}
@@ -1010,6 +1009,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                     </button>
                 </div>
             )}
+
             {showKillAnimation && (
                 <KillAnimation
                     onClose={() => setShowKillAnimation(false)}
@@ -1017,15 +1017,21 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                     victimImage={victimImage}
                 />
             )}
-            {killAnimationFinished && ( // Zeige ImpostorAnimation nur, wenn die KillAnimation beendet ist
-                <ImpostorAnimation onClose={() => setShowImpostorsWinAnimation(false)} impostorPlayers={impostors}  />
+
+            {showCrewmatesWinAnimation && !showVotedOutAnimation && !showKillAnimation && !showImpostorsWinAnimation && (
+                <CrewmateAnimation
+                    onClose={() => setShowCrewmatesWinAnimation(false)}
+                    crewmatePlayers={crewmates}
+                />
             )}
-            {showCrewmatesWinAnimation && (
-                <CrewmateAnimation onClose={() => setShowCrewmatesWinAnimation(false)} crewmatePlayers={crewmates}/>
+
+            {showImpostorsWinAnimation && !showVotedOutAnimation && !showKillAnimation && (
+                <ImpostorAnimation
+                    onClose={() => setShowImpostorsWinAnimation(false)}
+                    impostorPlayers={impostors}
+                />
             )}
-            {showImpostorsWinAnimation && !killAnimationFinished && ( // Nur anzeigen, wenn die KillAnimation nicht angezeigt wird
-                <ImpostorAnimation onClose={() => setShowImpostorsWinAnimation(false)} impostorPlayers={impostors}  />
-            )}
+
             <div className="chat-button-top" onClick={handleOpenChatTopRight}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" className="bi bi-chat-dots" viewBox="0 0 16 16">
                     <path d="M5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/>

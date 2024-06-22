@@ -1,11 +1,11 @@
-// CrewmateAnimation.tsx
-import React, {useEffect, useRef} from 'react';
+import React, { useEffect, useRef } from 'react';
 import '../css/CrewmatesAnimation.css';
 
 type Crewmate = {
     id: number;
     username: string;
     color: string;
+    status: string;
 };
 
 type CrewmateAnimationProps = {
@@ -29,19 +29,13 @@ const CrewmateAnimation: React.FC<CrewmateAnimationProps> = ({ crewmatePlayers, 
 
     return (
         <div className="animation-container">
+            <div className="victory-text">VICTORY</div>
             <div className="animation-content">
-                <h2>Crewmates Win!</h2>
-                <div className="crewmate-list">
-                    {crewmatePlayers.map(crewmate => (
-                        <div key={crewmate.id} className="crewmate-item">
-                            <img
-                                src={`/public/images/movement/${crewmate.color}/upDown.png`}
-                                alt={crewmate.username}
-                                className="crewmate-image"
-                            />
-                            <div className="crewmate-name">{crewmate.username}</div>
-                        </div>
-                    ))}
+                <div className="crewmate-players animate-crewmate">
+                    <img src="/public/images/movement/purple/upDown.png"/>
+                    <img src="/public/images/movement/cyan/sit.png"/>
+                    <img src="/public/images/movement/blue/right1.png"/>
+                    <img src="/public/images/movement/red/left1.png"/>
                 </div>
             </div>
             <audio ref={audioRef} src="/public/sounds/victory.mp3" />
