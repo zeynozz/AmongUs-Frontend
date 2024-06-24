@@ -5,14 +5,17 @@ import '../css/HomePage.css';
 const backgroundMusic = new Audio('/public/sounds/theme.mp3');
 
 export default function HomePage() {
-    const backgroundMusicRef = useRef(null);
+    const backgroundMusicRef = useRef(backgroundMusic);
 
     useEffect(() => {
-        backgroundMusicRef.current = backgroundMusic;
         backgroundMusicRef.current.loop = true;
+        backgroundMusicRef.current.play().catch(error => {
+            console.log("Playback prevented", error);
+        });
 
         return () => {
             backgroundMusicRef.current.pause();
+            backgroundMusicRef.current.currentTime = 0;
         };
     }, []);
 
@@ -22,9 +25,6 @@ export default function HomePage() {
     };
 
     const startGame = () => {
-        backgroundMusicRef.current.play().catch(error => {
-            console.log("Playback prevented", error);
-        });
         playSound();
     };
 
@@ -37,6 +37,13 @@ export default function HomePage() {
             <Link to="/gameType" className="play-button" onClick={startGame}>
                 START
             </Link>
+            <div className="boi">
+                <div className="rightleg"></div>
+                <div className="leftleg"></div>
+                <div className="backpack"></div>
+                <div className="belly"></div>
+                <div className="eye"></div>
+            </div>
         </div>
     );
 }

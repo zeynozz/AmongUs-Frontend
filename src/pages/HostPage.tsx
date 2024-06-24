@@ -122,16 +122,17 @@ export default function HostPage({ setGame }: Props) {
             </div>
             <div className="form-group">
               <h1 className="animated-text2">Number of Impostors:</h1>
-              <input
-                  className="form-input"
-                  type="number"
-                  id="numImpostors"
-                  value={numImpostors}
-                  onChange={(e) => setNumImpostors(Number(e.target.value))}
-                  min="0"
-                  max={Math.floor(numPlayers / 2)}
-                  required
-              />
+              <div className="player-icons">
+                {Array.from({ length: Math.floor(numPlayers / 2) }, (_, i) => (
+                    <img
+                        key={i}
+                        src={i < numImpostors ? `/public/images/setup/redFigure.png` : "/public/images/setup/whiteFigure.png"}
+                        alt="Impostor Icon"
+                        onClick={() => setNumImpostors(i + 1)}
+                        className="player-icon"
+                    />
+                ))}
+              </div>
             </div>
             <div className="form-group">
               <h1 className="animated-text4">Choose Map:</h1>
@@ -144,7 +145,6 @@ export default function HostPage({ setGame }: Props) {
               >
                 <option value="Spaceship">🚀 Spaceship</option>
                 <option value="FHV">🏫 FHV</option>
-                <option value="Ocean">🌊 Ocean</option>
               </select>
             </div>
             <button type="submit" className="host-create-button" disabled={buttonDisabled}>
