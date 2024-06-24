@@ -787,6 +787,45 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                                     case 22:
                                         cellClass = 'floor3'
                                         break;
+                                    case 23:
+                                        cellClass = 'wall4'
+                                        break;
+                                    case 24:
+                                        cellClass = 'floor4'
+                                        break;
+                                    case 25:
+                                        cellClass = 'plant'
+                                        break;
+                                    case 26:
+                                        cellClass = 'sofa1'
+                                        break;
+                                    case 27:
+                                        cellClass = 'sofa2'
+                                        break;
+                                    case 28:
+                                        cellClass = 'sofa3'
+                                        break;
+                                    case 29:
+                                        cellClass = 'sofa4'
+                                        break;
+                                    case 30:
+                                        cellClass = 'couchtable1'
+                                        break;
+                                    case 31:
+                                        cellClass = 'couchtable2'
+                                        break;
+                                    case 32:
+                                        cellClass = 'wall5'
+                                        break;
+                                    case 33:
+                                        cellClass = 'floor5'
+                                        break;
+                                    case 34:
+                                        cellClass = 'toilet'
+                                        break;
+                                    case 35:
+                                        cellClass = 'toiletPlant'
+                                        break;
                                     default:
                                         cellClass = 'obstacle';
                                         break;
