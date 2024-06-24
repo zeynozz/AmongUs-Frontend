@@ -4,9 +4,8 @@ import { Game } from "../App";
 import "../css/HostPage.css";
 
 type Props = {
-  setGame: (game: Game) => void;
+  setGame: (game: Game, playerId: number) => void;
 };
-var currentPlayerId = 0;
 
 const playSound = () => {
   const audio = new Audio('/public/sounds/boom.mp3');
@@ -33,47 +32,32 @@ export default function HostPage({ setGame }: Props) {
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
-    const gameCode = Date.now();
-
     const gameData = {
-      gameCode: gameCode,
       numberOfPlayers: numPlayers,
       numberOfImpostors: numImpostors,
       map: map,
       player: {
         username: username,
         color: figureColor,
-        position: {
-          x: 9,
-          y: 9,
-        },
-      }
+        position: { x: 9, y: 9 },
+      },
     };
 
     console.log("Creating game:", gameData);
 
     fetch("http://localhost:3000/game/host", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(gameData),
     })
         .then(response => {
-          if (!response.ok) {
-            throw new Error("Error - creating game");
-          }
+          if (!response.ok) throw new Error("Error - creating game");
           return response.json();
         })
         .then(game => {
-          setGame(game);
-          console.log("Game created :) => ", game);
+          const playerId = game.players[0].id;
+          setGame(game, playerId);
           navigate(`/lobby/${game.gameCode}`);
-          const playerId = game?.players[0]?.id;
-          if (playerId && currentPlayerId == 0) {
-            sessionStorage.setItem('currentPlayerId', JSON.stringify(playerId));
-            console.log("Current PlayerId:", currentPlayerId)
-          }
         })
         .catch(error => {
           console.error("Error creating game:", error);
@@ -163,7 +147,7 @@ export default function HostPage({ setGame }: Props) {
                 <option value="Ocean">🌊 Ocean</option>
               </select>
             </div>
-            <button type="submit" className="host-create-button"disabled={buttonDisabled}>
+            <button type="submit" className="host-create-button" disabled={buttonDisabled}>
               HOST
             </button>
           </form>

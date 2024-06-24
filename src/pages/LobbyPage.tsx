@@ -7,6 +7,7 @@ import "../css/LobbyPage.css";
 
 type Props = {
   game: Game;
+  currentPlayerId: number | null;
   onChangeSetGame: (game: Game) => void;
 };
 
@@ -19,7 +20,7 @@ const seatPositions = [
   { x: 630, y: -290 },
 ];
 
-export default function LobbyPage({ game, onChangeSetGame }: Props) {
+export default function LobbyPage({ game, currentPlayerId, onChangeSetGame }: Props) {
   const [stompClient, setStompClient] = useState<any>(null);
   const navigate = useNavigate();
   const { gameCode } = useParams<{ gameCode: string }>();
@@ -119,6 +120,7 @@ export default function LobbyPage({ game, onChangeSetGame }: Props) {
   }
 
   const isGameReadyToStart = game.numberOfPlayers === game.players.length;
+  const isCurrentPlayerHost = game.hostId === currentPlayerId; // Check if the current player is the host
 
   return (
       <div className="space">
@@ -147,9 +149,12 @@ export default function LobbyPage({ game, onChangeSetGame }: Props) {
                 </div>
             ))}
           </div>
+          <div className="flames flames-top"></div>
+          <div className="flames flames-bottom"></div>
           <div className="game-info">
             <div className="game-code" onClick={(e) => copyToClipboard(gameCode, e.currentTarget)}>
-              CODE: {gameCode}
+              Code: {gameCode}
+              <div className="code">Click to copy</div>
             </div>
             <div className="players-info">
               <img src="/public/images/setup/whiteFigure.png" alt="Player Icon" className="player-icon" />
@@ -157,9 +162,11 @@ export default function LobbyPage({ game, onChangeSetGame }: Props) {
               {game.players.length}/{game.numberOfPlayers}
             </span>
             </div>
-            <button onClick={handleStartGame} disabled={!isGameReadyToStart} className="start-game-button">
-              <img src="/public/images/setup/start.png" alt="Start Game" />
-            </button>
+            {isCurrentPlayerHost && (
+                <button onClick={handleStartGame} disabled={!isGameReadyToStart} className="start-game-button">
+                  <img src="/public/images/setup/start.png" alt="Start Game" />
+                </button>
+            )}
           </div>
         </div>
       </div>
