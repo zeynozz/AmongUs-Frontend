@@ -59,6 +59,13 @@
     background-image: url("/public/images/map/floor2.jpg");
 }
 
+.floor4{
+    background-image: url("/public/images/map/parkett.jpg");
+}
+
+.wall4{
+    background-color: grey;
+}
 .electroWall {
     background-color: #4a4a4a;
     background-image: linear-gradient(135deg, #6e6e6e 25%, transparent 25%),
@@ -220,9 +227,38 @@
     background-image: url("/public/images/map/lila.jpg");
 }
 
+.plant{
+    background-image: url("/public/images/map/plant.png");
+}
+
+.sofa1{
+    background-image: url("/public/images/map/sofa1.png");
+}
+
+.sofa2{
+    background-image: url("/public/images/map/sofa2.png");
+}
+
+.sofa3{
+    background-image: url("/public/images/map/sofa3.png");
+}
+
+.sofa4{
+    background-image: url("/public/images/map/sofa4.png");
+}
+
 .floor3{
     background-color: #5D666B;
 }
+
+.couchtable1{
+    background-image: url("/public/images/map/couchtable1.png");
+}
+
+.couchtable2{
+    background-image: url("/public/images/map/couchtable2.png ");
+}
+
 .player {
     position: relative;
     display: flex;
@@ -326,6 +362,22 @@
     100% {
         left: 100%;
     }
+}
+
+.floor5{
+    background-image: url("/public/images/map/floor5.png");
+}
+
+.wall5{
+    background-color: darkgray;
+}
+
+.toilet{
+    background-image: url("/public/images/map/toilet.png");
+}
+
+.toiletPlant{
+    background-image: url("/public/images/map/toiletPlant.png");
 }
 
 .task-list {
