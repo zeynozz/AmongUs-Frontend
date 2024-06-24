@@ -54,9 +54,9 @@
 }
 
 .join-button:hover{
-    color: #00FA9A;
-    border-color: #00FA9A;
-    text-shadow: 0 0 10px #00FA9A;
+    color: #00FF00;
+    border-color: #00FF00;
+    text-shadow: 0 0 10px #00FF00;
     background: black;
 }
 

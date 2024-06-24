@@ -39,10 +39,11 @@
 .spaceship-lobby {
     width: 100%;
     height: 70%;
-    background: #2a2f32;
-    clip-path: polygon(20% 0, 80% 0, 100% 100%, 0% 100%);
+    background: linear-gradient(#6E6E6E, #2a2f32);
+    clip-path: polygon(20% 0, 80% 0, 90% 20%, 90% 80%, 80% 100%, 20% 100%, 10% 80%, 10% 20%);
     position: relative;
     padding: 20px;
+    animation: float 3s ease-in-out infinite;
 }
 
 .player {
@@ -71,7 +72,7 @@
 .player-name {
     color: white;
     font-size: 14px;
-    z-index: 2
+    z-index: 2;
 }
 
 .game-info {
@@ -88,11 +89,22 @@
     z-index: 2;
 }
 
+.code{
+    margin-top: 5px;
+    font-size: 0.6em;
+    font-style: italic;
+}
+
 .game-code, .players-info {
     font-size: 1.2em;
     font-family: monospace;
     cursor: pointer;
     position: relative;
+}
+
+.game-code{
+    font-size: 1.7em;
+    font-weight: bolder;
 }
 
 .start-game-button {
@@ -131,4 +143,59 @@
 
 .show-tooltip {
     opacity: 1;
+}
+
+.flames {
+    position: absolute;
+    width: 100px;
+    height: 50px;
+    background: linear-gradient(180deg, rgba(0, 191, 255, 0.8), white, rgba(0, 0, 255, 0.8));
+    animation: flames 1.5s infinite ease-in-out, burn 1.5s infinite alternate ease-in-out;
+    opacity: 0.8;
+    transform-origin: left center;
+
+}
+
+.flames-top {
+    left: -1%;
+    top: 150px;
+    transform: translateX(-100%) rotate(-90deg);
+}
+
+.flames-bottom {
+    bottom: 350px;
+    left: -1%;
+    transform: translateX(100%) rotate(180deg);
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+@keyframes burn {
+    0% {
+        transform: scaleY(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scaleY(2);
+        opacity: 0.8;
+    }
+}
+
+@keyframes flames {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
 }

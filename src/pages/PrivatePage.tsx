@@ -4,12 +4,15 @@ import SockJS from "sockjs-client";
 import Stomp from "stompjs";
 import "../css/PrivatePage.css";
 
-export default function PrivatePage() {
+type Props = {
+  setCurrentPlayerId: (playerId: number) => void;
+};
+
+export default function PrivatePage({ setCurrentPlayerId }: Props) {
   const navigate = useNavigate();
   const [playerName, setPlayerName] = useState("");
   const [gameCode, setGameCode] = useState("");
   const [stompClient, setStompClient] = useState(null);
-  const [currentPlayerId, setCurrentPlayerId] = useState(null);
   const [figureColor, setFigureColor] = useState("red");
 
   useEffect(() => {
@@ -62,7 +65,7 @@ export default function PrivatePage() {
   const handleJoinGameResponse = (message) => {
     const data = JSON.parse(message.body);
     const playerId = parseInt(data.headers.playerId[0], 10);
-    if (playerId && !currentPlayerId) {
+    if (playerId) {
       sessionStorage.setItem('currentPlayerId', JSON.stringify(playerId));
       setCurrentPlayerId(playerId);
       console.log("Current PlayerId:", playerId);
