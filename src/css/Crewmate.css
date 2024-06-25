@@ -19,3 +19,26 @@
     margin-left: -40px;
     margin-top:10px;
 }
+.report-button, .report-button-disabled {
+    position: fixed;
+    bottom: 50px;
+    right: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    height: 10%;
+    width: 10%;
+    transition: opacity 0.3s;
+}
+
+.report-button {
+    opacity: 1;
+    cursor: pointer;
+}
+
+.report-button-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

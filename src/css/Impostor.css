@@ -11,7 +11,7 @@
     align-items: center;
     flex-grow: 1;
     position: relative;
-    margin-left:-45px;
+    margin-left: -45px;
 }
 
 .impostor-map-button {
@@ -29,10 +29,9 @@
     height: 100px;
     cursor: pointer;
     z-index: 1000;
-    background: url('/public/images/impostor/kill.png') no-repeat center / contain;
+    background: url('/public/images/killen2.png') no-repeat center / contain;
     border: none;
 }
-
 
 .kill-button img {
     width: 70%;
@@ -44,6 +43,83 @@
     pointer-events: none;
 }
 
+.sabotage-container {
+    position: fixed;
+    right: 120px;
+    bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1000;
+}
 
+.sabotage-icon {
+    width: 150px;
+    height: 150px;
+    cursor: pointer;
+    transition: opacity 0.3s;
+    position: relative;
+}
 
+.sabotage-icon.inactive {
+    opacity: 0.5;
+    pointer-events: none;
+}
 
+.sabotage-cooldown {
+    position: absolute;
+    bottom: 60%;
+    left: 50%;
+    transform: translate(-50%, 50%);
+    color: white;
+    font-size: 50px;
+    font-weight: bold;
+    z-index: 2;
+    text-shadow:
+            -4px -4px 0 #000,
+            4px -4px 0 #000,
+            -4px 4px 0 #000,
+            4px 4px 0 #000;
+}
+
+.sabotage-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.sabotage-countdown {
+    color: red;
+    font-size: 100px;
+    font-family: 'DSEG14Classic', sans-serif;
+    font-weight: bold;
+    text-shadow:
+            -4px -4px 0 #000,
+            4px -4px 0 #000,
+            -4px 4px 0 #000,
+            4px 4px 0 #000;
+    animation: glowWhite 1s infinite alternate;
+}
+
+.sabotage-message {
+    font-family: 'DSEG14Classic', sans-serif;
+    font-size: 50px;
+    color: white;
+    animation: glowRed 1s infinite alternate;
+    margin-bottom: 20px;
+}
+
+.sabotage-image {
+    width: 200px;
+    height: 300px;
+    margin-top: 20px;
+    animation: floatLeftRight 3s infinite linear, glowWhite 1s infinite alternate;
+}

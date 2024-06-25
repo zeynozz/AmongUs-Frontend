@@ -909,19 +909,6 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
             {showToast && (
                 <Toast message="Sabotage-counter-activated" onClose={() => setShowToast(false)} />
             )}
-            {currentPlayer && currentPlayer.role === "IMPOSTOR" && (
-                <div className="sabotage-container">
-                    <img
-                        src={`/public/images/impostor/sabotage.png`}
-                        alt="Sabotage"
-                        className={`sabotage-icon ${isNearTaskCell(playerPosition.x, playerPosition.y) && sabotageCooldown === 0 ? '' : 'inactive'}`}
-                        onClick={handleSabotageClick}
-                    />
-                    {sabotageCooldown > 0 && (
-                        <div className="sabotage-cooldown">{sabotageCooldown}</div>
-                    )}
-                </div>
-            )}
             <audio ref={audioRef} src="/public/sounds/sabotage.mp3" />
             {showChatInput && (
                 <div className="overlay">
@@ -1057,14 +1044,6 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                     playerRole={votedOutPlayerRole}
                     onClose={() => setShowVotedOutAnimation(false)}
                 />
-            )}
-
-            {currentPlayer?.status === "ALIVE" && currentPlayer?.role !== "IMPOSTOR" && (
-                <div className="report-container">
-                    <button className={`report-button ${isReportEnabled ? '' : 'report-button-disabled'}`} onClick={isReportEnabled ? handleReportClick : undefined}>
-                        <img src="/images/Report.webp" alt="Report" />
-                    </button>
-                </div>
             )}
 
             {showKillAnimation && (

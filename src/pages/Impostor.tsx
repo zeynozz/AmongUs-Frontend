@@ -1,14 +1,35 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "../css/Impostor.css";
 import Role from "./Role";
 import KillAnimation from "./KillAnimation";
+import Toast from './Toast'; // Assuming Toast is used to display sabotage cooldown messages
 import { useStompClient } from "./StompClientProvider";
 
 const Impostor = ({ game, playerId, onChangeSetGame, onPlayerKilled }) => {
     const [showKillAnimation, setShowKillAnimation] = useState(false);
     const [impostorImage, setImpostorImage] = useState("");
     const [victimImage, setVictimImage] = useState("");
+    const [sabotageCooldown, setSabotageCooldown] = useState(0);
+    const [showToast, setShowToast] = useState(false);
+    const [isNearTask, setIsNearTask] = useState(false);
     const stompClient = useStompClient();
+    const audioRef = useRef(null);
+    const tasks = [
+        { id: 1, name: "Card Swipe 1", position: { x: 51, y: 5 } },
+        { id: 2, name: "Card Swipe 2", position: { x: 28, y: 7 } },
+        { id: 3, name: "Card Swipe 3", position: { x: 71, y: 12 } },
+        { id: 4, name: "Card Swipe 4", position: { x: 18, y: 20 } },
+        { id: 5, name: "Card Swipe 5", position: { x: 30, y: 28 } }
+    ];
+    const currentPlayer = game.players.find((p) => p.id === playerId);
+    const playerPosition = currentPlayer ? currentPlayer.position : { x: 45, y: 7 };
+
+    const isNearTaskCell = (playerPosition, tasks) => {
+        return tasks.some(task =>
+            Math.abs(task.position.x - playerPosition.x) <= 1 &&
+            Math.abs(task.position.y - playerPosition.y) <= 1
+        );
+    };
 
     useEffect(() => {
         const subscription = stompClient.subscribe("/topic/playerKilled", (message) => {
@@ -26,6 +47,10 @@ const Impostor = ({ game, playerId, onChangeSetGame, onPlayerKilled }) => {
             killAnimationSubscription.unsubscribe();
         };
     }, [stompClient, onChangeSetGame]);
+
+    useEffect(() => {
+        setIsNearTask(isNearTaskCell(playerPosition, tasks));
+    }, [playerPosition, tasks]);
 
     const isAdjacent = (player1, player2) => {
         return (
@@ -82,22 +107,65 @@ const Impostor = ({ game, playerId, onChangeSetGame, onPlayerKilled }) => {
         setTimeout(() => setShowKillAnimation(false), 3000);
     };
 
+    const handleSabotageClick = () => {
+        if (sabotageCooldown === 0 && isNearTask) {
+            setSabotageCooldown(30);
+            setShowToast(true);
+            setTimeout(() => setShowToast(false), 3000);
+            if (stompClient) {
+                stompClient.send("/app/sabotage", {}, game.gameCode);
+            }
+            if (audioRef.current) {
+                audioRef.current.play();
+            }
+        }
+    };
+
+    useEffect(() => {
+        let timer = null;
+        if (sabotageCooldown > 0) {
+            timer = setInterval(() => {
+                setSabotageCooldown(prev => prev - 1);
+            }, 1000);
+        } else if (timer) {
+            clearInterval(timer);
+        }
+        return () => {
+            if (timer) clearInterval(timer);
+        };
+    }, [sabotageCooldown]);
+
     return (
         <div className="impostor-container">
             <div className="impostor-role">
-            <Role role="IMPOSTOR" />
-            <button
-                className={`kill-button ${isCrewmateAdjacent() ? "" : "disabled"}`}
-                onClick={handleKill}
-            >
-            </button>
-            {showKillAnimation && (
-                <KillAnimation
-                    onClose={() => setShowKillAnimation(false)}
-                    impostorImage={impostorImage}
-                    victimImage={victimImage}
-                />
-            )}
+                <Role role="IMPOSTOR" />
+                <button
+                    className={`kill-button ${isCrewmateAdjacent() ? "" : "disabled"}`}
+                    onClick={handleKill}
+                >
+                </button>
+                {showKillAnimation && (
+                    <KillAnimation
+                        onClose={() => setShowKillAnimation(false)}
+                        impostorImage={impostorImage}
+                        victimImage={victimImage}
+                    />
+                )}
+                <div className="sabotage-container">
+                    <img
+                        src={`/public/images/impostor/sabotage.png`}
+                        alt="Sabotage"
+                        className={`sabotage-icon ${sabotageCooldown === 0 && isNearTask ? '' : 'inactive'}`}
+                        onClick={handleSabotageClick}
+                    />
+                    {sabotageCooldown > 0 && (
+                        <div className="sabotage-cooldown">{sabotageCooldown}</div>
+                    )}
+                </div>
+                {showToast && (
+                    <Toast message="Sabotage counter activated" onClose={() => setShowToast(false)} />
+                )}
+                <audio ref={audioRef} src="/public/sounds/sabotage.mp3" />
             </div>
         </div>
     );
