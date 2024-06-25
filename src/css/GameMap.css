@@ -30,8 +30,6 @@
     width: 100vw;
     height: 100vh;
     overflow: hidden;
-    animation: spaceshipSwing 4s infinite ease-in-out;
-
 }
 
 .map-container {
@@ -719,6 +717,29 @@
     border-right: 10px solid transparent;
     border-bottom: 20px solid rgba(0, 0, 0, 0.5);
     transform-origin: 50% 0%;
+}
+.map-button {
+    position: fixed;
+    right: 10px; /* Adjust this value if needed */
+    top: 70px;
+    background-color: rgba(98, 94, 94, 0.9);
+    border: 2px solid rgba(68, 85, 171, 0.71);
+    border-radius: 50%;
+    padding: 10px;
+    cursor: pointer;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
+
+}
+
+.map-button svg {
+    width: 25px;
+    height: 25px;
+    color: white;
+}
+
+.map-button:hover {
+    background-color: #d96f38;
 }
 
 
