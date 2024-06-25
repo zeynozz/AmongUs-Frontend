@@ -45,7 +45,7 @@ export default function HostPage({ setGame }: Props) {
 
     console.log("Creating game:", gameData);
 
-    fetch("http://localhost:8081/game/host", {
+    fetch("http://localhost:3000/game/host", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(gameData),
