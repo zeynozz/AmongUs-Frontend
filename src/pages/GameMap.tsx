@@ -309,7 +309,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                     }
                     return prev - 1;
                 });
-            }, 3000);
+            }, 1000);
             return;
         }
 
