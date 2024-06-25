@@ -3,6 +3,7 @@ import "../css/GameMap.css";
 import "../css/CardSwipe.css";
 import CardSwipe from './CardSwipe';
 import EmergencyAnimation from './EmergencyAnimation';
+import ArrowComponent from './ArrowComponent';
 import Toast from './Toast';
 import Stomp from 'stompjs';
 import SockJS from 'sockjs-client';
@@ -670,6 +671,22 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
         }
     }, [votingAnimationFinished, showCrewmatesWinAnimation, showImpostorsWinAnimation]);
 
+    const getDirectionArrow = (taskX: number, taskY: number) => {
+        const dx = taskX - playerPosition.x;
+        const dy = taskY - playerPosition.y;
+        const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+        const arrowDistance = 35;
+
+        return (
+            <ArrowComponent
+                key={`${taskX}-${taskY}`}
+                top={playerPosition.y * tileSize + tileSize / 2 + Math.sin(angle * Math.PI / 180) * arrowDistance}
+                left={playerPosition.x * tileSize + tileSize / 2 + Math.cos(angle * Math.PI / 180) * arrowDistance}
+                rotation={angle}
+            />
+        );
+    };
+
     return (
         <div className="MapDisplay-map-container">
             <div className="progress-container">
@@ -872,6 +889,7 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
                         })}
                     </div>
                 ))}
+                {tasks.map(task => getDirectionArrow(task.position.x, task.position.y))}
             </div>
             {showPopup && (
                 <div className="popup" id="popup">
