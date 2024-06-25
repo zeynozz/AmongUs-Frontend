@@ -29,7 +29,7 @@ interface Player {
 interface VotingResult {
     username: string;
     color: string;
-    role: string;
+    role: string;x
     isLastImpostor: boolean;
 }
 
@@ -700,12 +700,14 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
     return (
         <div className="MapDisplay-map-container">
             <div className="progress-container">
-                <div className="progress" role="progressbar" aria-valuenow={(tasksCompleted / 5) * 100}
-                     aria-valuemin={0} aria-valuemax={100}>
-                    <div className="progress-bar"
-                         style={{ width: `${(tasksCompleted / 5) * 100}%` }}>{(tasksCompleted / 5) * 100}% Complete
+                {currentPlayer?.role != "IMPOSTOR" ? (
+                    <div className="progress" role="progressbar" aria-valuenow={(tasksCompleted / 5) * 100}
+                         aria-valuemin={0} aria-valuemax={100}>
+                        <div className="progress-bar"
+                             style={{ width: `${(tasksCompleted / 5) * 100}%` }}>{(tasksCompleted / 5) * 100}% Complete
+                        </div>
                     </div>
-                </div>
+                ) : null}
                 {currentPlayer?.role === "IMPOSTOR" ? (
                     <div className="task-list">
                         <div className="task-item1">Sabotage-and-kill</div>
