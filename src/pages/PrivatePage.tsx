@@ -16,7 +16,7 @@ export default function PrivatePage({ setCurrentPlayerId }: Props) {
   const [figureColor, setFigureColor] = useState("red");
 
   useEffect(() => {
-    const socket = new SockJS("http://localhost:3000/ws");
+    const socket = new SockJS("http://localhost:8081/ws");
     const client = Stomp.over(socket);
     client.connect({}, () => {
       setStompClient(client);
