@@ -814,3 +814,14 @@
     color: white;
 }
 
+.arrow {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 20px solid rgba(0, 0, 0, 0.5);
+    transform-origin: 50% 0%;
+}
+
+
