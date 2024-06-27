@@ -14,8 +14,8 @@
     position: relative;
     border: 2px solid #000000;
     background-color: rgba(0, 0, 0, 0.5);
-    width: 1000px; /* Adjusted width */
-    height: 800px; /* Adjusted height */
+    width: 1000px;
+    height: 800px;
 }
 
 .mini-map {

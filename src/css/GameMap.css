@@ -720,7 +720,7 @@
 }
 .map-button {
     position: fixed;
-    right: 10px; /* Adjust this value if needed */
+    right: 10px;
     top: 70px;
     background-color: rgba(98, 94, 94, 0.9);
     border: 2px solid rgba(68, 85, 171, 0.71);

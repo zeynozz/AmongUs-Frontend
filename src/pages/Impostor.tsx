@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import "../css/Impostor.css";
 import Role from "./Role";
 import KillAnimation from "./KillAnimation";
-import Toast from './Toast'; // Assuming Toast is used to display sabotage cooldown messages
+import Toast from './Toast';
 import { useStompClient } from "./StompClientProvider";
 
 const Impostor = ({ game, playerId, onChangeSetGame, onPlayerKilled }) => {

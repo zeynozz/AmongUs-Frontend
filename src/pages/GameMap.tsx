@@ -14,6 +14,7 @@ import CrewmateAnimation from './CrewmatesAnimation';
 import ImpostorAnimation from './ImpostorAnimation';
 import MiniMap from "./MiniMap";
 import "../css/MiniMap.css";
+import { useStompClient } from '../hooks/useStompClient';
 
 interface Player {
     status: "ALIVE" | "DEAD" | "GHOST";
@@ -29,7 +30,7 @@ interface Player {
 interface VotingResult {
     username: string;
     color: string;
-    role: string;x
+    role: string;
     isLastImpostor: boolean;
 }
 
@@ -56,7 +57,6 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
     const [isReportEnabled, setIsReportEnabled] = useState(false);
     const [showTaskPopup, setShowTaskPopup] = useState(false);
     const [taskCountdown, setTaskCountdown] = useState(0);
-    const [stompClient, setStompClient] = useState<any>(null);
     const [sabotageCooldown, setSabotageCooldown] = useState(0);
     const [isSabotageActive, setIsSabotageActive] = useState(false);
     const [sabotageTriggered, setSabotageTriggered] = useState(false);
@@ -127,12 +127,13 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
         }
     }, [playerList, currentPlayer]);
 
+    const stompClient = useStompClient("http://localhost:3000/ws");
+
     useEffect(() => {
         if (!stompClient) {
             const socket = new SockJS("http://localhost:3000/ws");
             const client = Stomp.over(socket);
             client.connect({}, () => {
-                setStompClient(client);
 
                 client.subscribe(`/topic/${gameCode}/sabotage`, () => {
                     setIsSabotageActive(true);
@@ -641,8 +642,8 @@ const GameMap: React.FC<Props> = ({ map, playerList, gameCode, onPlayerKilled })
         if (showVotedOutAnimation) {
             const timeout = setTimeout(() => {
                 setShowVotedOutAnimation(false);
-                checkForImpostorWin(); // Überprüfung nach dem Voting
-            }, 6000); // Dauer der Animation
+                checkForImpostorWin();
+            }, 6000);
             return () => clearTimeout(timeout);
         }
     }, [showVotedOutAnimation]);

@@ -18,7 +18,7 @@ interface MiniMapProps {
     players: Player[];
     completedTasks: any[];
     currentPlayer: Player;
-    onClose: () => void; // Add onClose prop for close button functionality
+    onClose: () => void;
 }
 
 const MiniMap: React.FC<MiniMapProps> = ({ map, playerPosition, tasks, players, completedTasks, currentPlayer, onClose }) => {
@@ -39,34 +39,34 @@ const MiniMap: React.FC<MiniMapProps> = ({ map, playerPosition, tasks, players, 
                         cellColor = completedTasks.some(task => task.x === cellIndex && task.y === rowIndex) ? "green" : "gold"; // task
                         break;
                     case 3:
-                        cellColor = "gray"; // table1
+                        cellColor = "gray";
                         break;
                     case 4:
-                        cellColor = "gray"; // table2
+                        cellColor = "gray";
                         break;
                     case 5:
-                        cellColor = "gray"; // table4
+                        cellColor = "gray";
                         break;
                     case 6:
-                        cellColor = "gray"; // table3
+                        cellColor = "gray";
                         break;
                     case 7:
-                        cellColor = "lightblue"; // window
+                        cellColor = "lightblue";
                         break;
                     case 8:
-                        cellColor = "darkgray"; // wall
+                        cellColor = "darkgray";
                         break;
                     case 9:
-                        cellColor = "darkgray"; // wall2
+                        cellColor = "darkgray";
                         break;
                     case 10:
-                        cellColor = "darkgray"; // wall3
+                        cellColor = "darkgray";
                         break;
                     case 11:
-                        cellColor = "darkgray"; // edge1
+                        cellColor = "darkgray";
                         break;
                     case 12:
-                        cellColor = "darkgray"; // edge2
+                        cellColor = "darkgray";
                         break;
                     case 13:
                         cellColor = completedTasks.some(task => task.x === cellIndex && task.y === rowIndex) ? "green" : "red"; // task task-glow
@@ -75,56 +75,56 @@ const MiniMap: React.FC<MiniMapProps> = ({ map, playerPosition, tasks, players, 
                     case 15:
                     case 16:
                     case 17:
-                        cellColor = "blue"; // emergency1, emergency2, emergency3, emergency4
+                        cellColor = "blue";
                         break;
                     case 18:
-                        cellColor = "purple"; // vent
+                        cellColor = "purple";
                         break;
                     case 19:
-                        cellColor = "#E0E8D6"; // walkable2
+                        cellColor = "#E0E8D6";
                         break;
                     case 20:
-                        cellColor = "darkgray"; // electroWall
+                        cellColor = "darkgray";
                         break;
                     case 21:
-                        cellColor = "purple"; // purple
+                        cellColor = "purple";
                         break;
                     case 22:
-                        cellColor = "#5D666B"; // floor3
+                        cellColor = "#5D666B";
                         break;
                     case 23:
-                        cellColor = "darkgray"; // wall4
+                        cellColor = "darkgray";
                         break;
                     case 24:
-                        cellColor = "#8B4513"; // floor4
+                        cellColor = "#8B4513";
                         break;
                     case 25:
-                        cellColor = "green"; // plant
+                        cellColor = "green";
                         break;
                     case 26:
                     case 27:
                     case 28:
                     case 29:
-                        cellColor = "brown"; // sofa1, sofa2, sofa3, sofa4
+                        cellColor = "brown";
                         break;
                     case 30:
                     case 31:
-                        cellColor = "brown"; // couchtable1, couchtable2
+                        cellColor = "brown";
                         break;
                     case 32:
-                        cellColor = "darkgray"; // wall5
+                        cellColor = "darkgray";
                         break;
                     case 33:
-                        cellColor = "#5D666B"; // floor5
+                        cellColor = "#5D666B";
                         break;
                     case 34:
-                        cellColor = "white"; // toilet
+                        cellColor = "white";
                         break;
                     case 35:
-                        cellColor = "green"; // toiletPlant
+                        cellColor = "green";
                         break;
                     default:
-                        cellColor = "transparent"; // obstacle
+                        cellColor = "transparent";
                         break;
                 }
 
